@@ -90,6 +90,9 @@ class TestSourcesController(unittest.TestCase):
         source = self.asset_manager.add_source(Path("test.png"), 200, 150)
         self.controller.current_source = source
         
+        # Load source into canvas (this sets the pixmap)
+        self.controller.load_source(source, "test.png")
+        
         # Setup canvas with selection
         rect = self.ui_factory.create_rect(10, 20, 50, 60)
         self.controller.canvas.set_selection_rect(rect)
@@ -116,6 +119,10 @@ class TestSourcesController(unittest.TestCase):
         obj = self.asset_manager.add_object("Test Object")
         
         self.controller.current_source = source
+        # Load source into canvas (this sets the pixmap)
+        self.controller.load_source(source, "test.png")
+        # Refresh object combo to include the new object
+        self.controller.refresh_object_combo()
         self.controller.object_combo.set_current_index(1)  # Select the object
         
         # Setup canvas with selection
@@ -408,6 +415,8 @@ class TestIntegration(unittest.TestCase):
         
         # 4. Create a slice and assign it to the object
         self.sources_controller.current_source = source
+        # Refresh object combo to include the new object
+        self.sources_controller.refresh_object_combo()
         self.sources_controller.object_combo.set_current_index(1)  # Select the object
         
         rect = self.ui_factory.create_rect(10, 20, 50, 60)
