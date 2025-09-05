@@ -1,0 +1,60 @@
+{
+    "templates": {
+        "character": {
+            "name": "character",
+            "description": "Basic character template for 2D games",
+            "required_views": [
+                "front",
+                "back",
+                "left",
+                "right",
+                "walk1",
+                "walk2",
+                "idle"
+            ]
+        },
+        "tile": {
+            "name": "tile",
+            "description": "Basic tile template for level design",
+            "required_views": [
+                "base",
+                "variant1",
+                "variant2"
+            ]
+        },
+        "ui_element": {
+            "name": "ui_element",
+            "description": "UI element template with states",
+            "required_views": [
+                "normal",
+                "hover",
+                "pressed",
+                "disabled"
+            ]
+        },
+        "weapon": {
+            "name": "weapon",
+            "description": "Weapon template with different states",
+            "required_views": [
+                "idle",
+                "swing1",
+                "swing2",
+                "swing3",
+                "block"
+            ]
+        },
+        "enemy": {
+            "name": "enemy",
+            "description": "Enemy character template",
+            "required_views": [
+                "idle",
+                "walk1",
+                "walk2",
+                "attack1",
+                "attack2",
+                "hurt",
+                "death"
+            ]
+        }
+    }
+}

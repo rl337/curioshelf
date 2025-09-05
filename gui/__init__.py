@@ -1,0 +1,3 @@
+"""
+CurioShelf GUI module
+"""

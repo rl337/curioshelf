@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "curioshelf"
+version = "0.1.0"
+description = "A visual asset manager for 2D games"
+authors = ["CurioShelf Team <team@curioshelf.dev>"]
+readme = "README.md"
+packages = [{include = "curioshelf"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+PySide6 = "^6.5.0"
+Pillow = "^10.0.0"
+PyYAML = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+black = "^23.0.0"
+flake8 = "^6.0.0"
+mypy = "^1.0.0"
+
+[tool.poetry.scripts]
+curioshelf = "main:main"
+curioshelf-test = "run_tests:run_tests"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
