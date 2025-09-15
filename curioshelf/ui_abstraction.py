@@ -55,6 +55,10 @@ class UIWidget(ABC):
     @property
     def visible(self) -> bool:
         return self._visible
+    
+    def set_layout(self, layout: 'UILayout'):
+        """Set the layout for the widget"""
+        self._layout = layout
 
 
 class UIButton(UIWidget):

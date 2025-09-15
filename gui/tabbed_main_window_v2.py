@@ -87,10 +87,10 @@ class TabbedMainWindowV2(QMainWindow):
     def setup_ui_state_management(self):
         """Setup UI state management"""
         # Connect state manager signals
-        self.ui_state_manager.project_state_changed.connect(self.on_project_state_changed)
-        self.ui_state_manager.source_state_changed.connect(self.on_source_state_changed)
-        self.ui_state_manager.object_state_changed.connect(self.on_object_state_changed)
-        self.ui_state_manager.template_state_changed.connect(self.on_template_state_changed)
+        self.ui_state_manager.connect_signal("project_state_changed", self.on_project_state_changed)
+        self.ui_state_manager.connect_signal("source_state_changed", self.on_source_state_changed)
+        self.ui_state_manager.connect_signal("object_state_changed", self.on_object_state_changed)
+        self.ui_state_manager.connect_signal("template_state_changed", self.on_template_state_changed)
         
         # UI elements will be registered after menu and toolbar creation
     

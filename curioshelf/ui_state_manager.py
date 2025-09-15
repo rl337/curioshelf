@@ -3,25 +3,17 @@ UI State Management for CurioShelf
 
 Manages UI element states based on project and data availability.
 Provides centralized state management for enabling/disabling UI elements.
+Uses the UI abstraction layer for framework independence.
 """
 
 from typing import Dict, List, Optional, Callable, Any
-from PySide6.QtWidgets import QWidget, QAction
-from PySide6.QtCore import QObject, Signal
+from .ui_abstraction import UIWidget
 
 
-class UIStateManager(QObject):
+class UIStateManager:
     """Manages UI state and provides signals for state changes"""
     
-    # Signals for state changes
-    project_state_changed = Signal(bool)  # True if project is loaded
-    source_state_changed = Signal(bool)   # True if sources are available
-    object_state_changed = Signal(bool)   # True if objects are available
-    template_state_changed = Signal(bool) # True if templates are available
-    
     def __init__(self):
-        super().__init__()
-        
         # State flags
         self.has_project = False
         self.has_sources = False
@@ -40,6 +32,25 @@ class UIStateManager(QObject):
             "project_or_source": [],     # Requires either project or sources
             "always_enabled": []         # Always enabled (like project creation)
         }
+        
+        # Signal callbacks
+        self._signal_callbacks: Dict[str, List[Callable]] = {
+            "project_state_changed": [],
+            "source_state_changed": [],
+            "object_state_changed": [],
+            "template_state_changed": []
+        }
+    
+    def connect_signal(self, signal_name: str, callback: Callable):
+        """Connect a callback to a signal"""
+        if signal_name in self._signal_callbacks:
+            self._signal_callbacks[signal_name].append(callback)
+    
+    def emit_signal(self, signal_name: str, data: Any = None):
+        """Emit a signal to all connected callbacks"""
+        if signal_name in self._signal_callbacks:
+            for callback in self._signal_callbacks[signal_name]:
+                callback(data)
     
     def register_element(self, element_id: str, element: Any, 
                         state_groups: List[str] = None, 
@@ -79,28 +90,28 @@ class UIStateManager(QObject):
         """Update project availability state"""
         if self.has_project != has_project:
             self.has_project = has_project
-            self.project_state_changed.emit(has_project)
+            self.emit_signal("project_state_changed", has_project)
             self._update_all_elements()
     
     def update_source_state(self, has_sources: bool):
         """Update sources availability state"""
         if self.has_sources != has_sources:
             self.has_sources = has_sources
-            self.source_state_changed.emit(has_sources)
+            self.emit_signal("source_state_changed", has_sources)
             self._update_all_elements()
     
     def update_object_state(self, has_objects: bool):
         """Update objects availability state"""
         if self.has_objects != has_objects:
             self.has_objects = has_objects
-            self.object_state_changed.emit(has_objects)
+            self.emit_signal("object_state_changed", has_objects)
             self._update_all_elements()
     
     def update_template_state(self, has_templates: bool):
         """Update templates availability state"""
         if self.has_templates != has_templates:
             self.has_templates = has_templates
-            self.template_state_changed.emit(has_templates)
+            self.emit_signal("template_state_changed", has_templates)
             self._update_all_elements()
     
     def update_all_states(self, has_project: bool, has_sources: bool, 
@@ -112,10 +123,10 @@ class UIStateManager(QObject):
         self.has_templates = has_templates
         
         # Emit all signals
-        self.project_state_changed.emit(has_project)
-        self.source_state_changed.emit(has_sources)
-        self.object_state_changed.emit(has_objects)
-        self.template_state_changed.emit(has_templates)
+        self.emit_signal("project_state_changed", has_project)
+        self.emit_signal("source_state_changed", has_sources)
+        self.emit_signal("object_state_changed", has_objects)
+        self.emit_signal("template_state_changed", has_templates)
         
         self._update_all_elements()
     
@@ -170,7 +181,9 @@ class UIStateManager(QObject):
     
     def _set_element_enabled(self, element: Any, enabled: bool):
         """Set the enabled state of a UI element"""
-        if hasattr(element, 'setEnabled'):
+        if isinstance(element, UIWidget):
+            element.set_enabled(enabled)
+        elif hasattr(element, 'setEnabled'):
             element.setEnabled(enabled)
         elif hasattr(element, 'set_enabled'):
             element.set_enabled(enabled)
@@ -189,91 +202,30 @@ class UIStateManager(QObject):
             "has_templates": self.has_templates
         }
     
-    def create_ghost_overlay(self, parent_widget: QWidget) -> 'GhostOverlay':
+    def create_ghost_overlay(self, parent_widget: Any) -> 'GhostOverlay':
         """Create a ghost overlay for when no project is loaded"""
         return GhostOverlay(parent_widget, self)
 
 
-class GhostOverlay(QWidget):
+class GhostOverlay:
     """Overlay widget that shows when no project is loaded"""
     
-    def __init__(self, parent: QWidget, state_manager: UIStateManager):
-        super().__init__(parent)
+    def __init__(self, parent: Any, state_manager: UIStateManager):
+        self.parent = parent
         self.state_manager = state_manager
-        self.setup_ui()
+        self.visible = False
         
         # Connect to state changes
-        self.state_manager.project_state_changed.connect(self.on_project_state_changed)
-    
-    def setup_ui(self):
-        """Setup the ghost overlay UI"""
-        from PySide6.QtWidgets import QVBoxLayout, QLabel, QPushButton
-        from PySide6.QtCore import Qt
-        from PySide6.QtGui import QFont
-        
-        # Make overlay cover the entire parent
-        self.setGeometry(0, 0, self.parent().width(), self.parent().height())
-        
-        # Create layout
-        layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignCenter)
-        
-        # Create ghost message
-        ghost_label = QLabel("No Project Loaded")
-        ghost_label.setAlignment(Qt.AlignCenter)
-        font = QFont()
-        font.setPointSize(24)
-        font.setBold(True)
-        ghost_label.setFont(font)
-        ghost_label.setStyleSheet("color: #666666;")
-        layout.addWidget(ghost_label)
-        
-        # Create instruction text
-        instruction_label = QLabel("Create a new project or load an existing one to get started")
-        instruction_label.setAlignment(Qt.AlignCenter)
-        instruction_label.setStyleSheet("color: #888888; margin: 20px;")
-        layout.addWidget(instruction_label)
-        
-        # Create buttons
-        button_layout = QVBoxLayout()
-        button_layout.setSpacing(10)
-        
-        new_project_btn = QPushButton("Create New Project")
-        new_project_btn.setMinimumSize(200, 40)
-        new_project_btn.clicked.connect(self.create_new_project)
-        button_layout.addWidget(new_project_btn)
-        
-        load_project_btn = QPushButton("Load Existing Project")
-        load_project_btn.setMinimumSize(200, 40)
-        load_project_btn.clicked.connect(self.load_existing_project)
-        button_layout.addWidget(load_project_btn)
-        
-        layout.addLayout(button_layout)
-        
-        # Initially hidden
-        self.hide()
+        self.state_manager.connect_signal("project_state_changed", self.on_project_state_changed)
     
     def on_project_state_changed(self, has_project: bool):
         """Handle project state changes"""
-        if has_project:
-            self.hide()
-        else:
-            self.show()
-            # Update size to match parent
-            self.setGeometry(0, 0, self.parent().width(), self.parent().height())
+        self.visible = not has_project
     
-    def create_new_project(self):
-        """Emit signal to create new project"""
-        # This would be connected to the main window's new project action
-        pass
+    def show(self):
+        """Show the ghost overlay"""
+        self.visible = True
     
-    def load_existing_project(self):
-        """Emit signal to load existing project"""
-        # This would be connected to the main window's load project action
-        pass
-    
-    def resizeEvent(self, event):
-        """Handle resize events"""
-        super().resizeEvent(event)
-        # Keep overlay covering the entire parent
-        self.setGeometry(0, 0, self.parent().width(), self.parent().height())
+    def hide(self):
+        """Hide the ghost overlay"""
+        self.visible = False
