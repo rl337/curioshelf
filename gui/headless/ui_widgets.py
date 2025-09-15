@@ -13,95 +13,101 @@ from curioshelf.ui_abstraction import (
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout
 )
+from .message_system import MessageLogger, MessageType
 
 
 class HeadlessUIWidget(UIWidget):
     """Headless implementation of UIWidget"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
-    def _log(self, message: str):
-        """Log a message if verbose mode is enabled"""
-        if self.verbose:
-            print(f"[HEADLESS] {message}")
+    def _log_ui_event(self, action: str, data: Optional[dict] = None):
+        """Log a UI event"""
+        self.message_logger.log_ui_event(self.__class__.__name__, action, data)
+    
+    def _log_state_change(self, action: str, data: Optional[dict] = None):
+        """Log a state change"""
+        self.message_logger.log_state_change(self.__class__.__name__, action, data)
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the widget"""
         super().set_enabled(enabled)
-        self._log(f"Widget {'enabled' if enabled else 'disabled'}")
+        self._log_state_change(f"{'enabled' if enabled else 'disabled'}")
     
     def set_visible(self, visible: bool):
         """Show or hide the widget"""
         super().set_visible(visible)
-        self._log(f"Widget {'shown' if visible else 'hidden'}")
+        self._log_state_change(f"{'shown' if visible else 'hidden'}")
 
 
 class HeadlessUIButton(UIButton):
     """Headless implementation of UIButton"""
     
-    def __init__(self, text: str = "", verbose: bool = True):
+    def __init__(self, text: str = "", verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__(text)
         self.verbose = verbose
-    
-    def _log(self, message: str):
-        """Log a message if verbose mode is enabled"""
-        if self.verbose:
-            print(f"[HEADLESS] {message}")
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def click(self):
         """Simulate a button click"""
-        self._log(f"Button '{self._text}' clicked")
+        self.message_logger.log_user_action(self.__class__.__name__, "clicked", {"text": self._text})
         super().click()
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the button"""
         super().set_enabled(enabled)
-        self._log(f"Button '{self._text}' {'enabled' if enabled else 'disabled'}")
+        self.message_logger.log_state_change(self.__class__.__name__, f"{'enabled' if enabled else 'disabled'}", {"text": self._text})
     
     def set_visible(self, visible: bool):
         """Show or hide the button"""
         super().set_visible(visible)
-        self._log(f"Button '{self._text}' {'shown' if visible else 'hidden'}")
+        self.message_logger.log_state_change(self.__class__.__name__, f"{'shown' if visible else 'hidden'}", {"text": self._text})
 
 
 class HeadlessUITextInput(UITextInput):
     """Headless implementation of UITextInput"""
     
-    def __init__(self, placeholder: str = "", verbose: bool = True):
+    def __init__(self, placeholder: str = "", verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__(placeholder)
         self.verbose = verbose
-    
-    def _log(self, message: str):
-        """Log a message if verbose mode is enabled"""
-        if self.verbose:
-            print(f"[HEADLESS] {message}")
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def set_text(self, text: str):
         """Set text and emit signal"""
         old_text = self._text
         super().set_text(text)
         if old_text != text:
-            self._log(f"Text input changed: '{old_text}' -> '{text}'")
+            self.message_logger.log_ui_event(self.__class__.__name__, "text_changed", {
+                "old_text": old_text,
+                "new_text": text,
+                "placeholder": self._placeholder
+            })
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the input"""
         super().set_enabled(enabled)
-        self._log(f"Text input {'enabled' if enabled else 'disabled'}")
+        self.message_logger.log_state_change(self.__class__.__name__, f"{'enabled' if enabled else 'disabled'}", {
+            "placeholder": self._placeholder
+        })
     
     def set_visible(self, visible: bool):
         """Show or hide the input"""
         super().set_visible(visible)
-        self._log(f"Text input {'shown' if visible else 'hidden'}")
+        self.message_logger.log_state_change(self.__class__.__name__, f"{'shown' if visible else 'hidden'}", {
+            "placeholder": self._placeholder
+        })
 
 
 class HeadlessUIComboBox(UIComboBox):
     """Headless implementation of UIComboBox"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -140,9 +146,10 @@ class HeadlessUIComboBox(UIComboBox):
 class HeadlessUIListWidget(UIListWidget):
     """Headless implementation of UIListWidget"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -181,9 +188,10 @@ class HeadlessUIListWidget(UIListWidget):
 class HeadlessUICanvas(UICanvas):
     """Headless implementation of UICanvas"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -230,8 +238,9 @@ class HeadlessUICanvas(UICanvas):
 class HeadlessUIMessageBox(UIMessageBox):
     """Headless implementation of UIMessageBox"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -260,8 +269,9 @@ class HeadlessUIMessageBox(UIMessageBox):
 class HeadlessUIFileDialog(UIFileDialog):
     """Headless implementation of UIFileDialog"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -284,9 +294,10 @@ class HeadlessUIFileDialog(UIFileDialog):
 class HeadlessUIProgressBar(UIProgressBar):
     """Headless implementation of UIProgressBar"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -318,9 +329,10 @@ class HeadlessUIProgressBar(UIProgressBar):
 class HeadlessUIGroupBox(UIGroupBox):
     """Headless implementation of UIGroupBox"""
     
-    def __init__(self, title: str = "", verbose: bool = True):
+    def __init__(self, title: str = "", verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__(title)
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -341,9 +353,10 @@ class HeadlessUIGroupBox(UIGroupBox):
 class HeadlessUITabWidget(UITabWidget):
     """Headless implementation of UITabWidget"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__()
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""
@@ -410,19 +423,29 @@ class HeadlessUISplitter(UISplitter):
 class HeadlessUILayout(UILayout):
     """Headless implementation of UILayout"""
     
-    def __init__(self, orientation: str = "vertical", verbose: bool = True):
+    def __init__(self, orientation: str = "vertical", verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         self._orientation = orientation
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
+        self._widgets = []
     
-    def _log(self, message: str):
-        """Log a message if verbose mode is enabled"""
-        if self.verbose:
-            print(f"[HEADLESS] {message}")
+    def _log_ui_event(self, action: str, data: Optional[dict] = None):
+        """Log a UI event"""
+        self.message_logger.log_ui_event(self.__class__.__name__, action, data)
     
     def add_widget(self, widget: UIWidget, *args, **kwargs):
         """Add a widget to the layout"""
-        self._log(f"Widget added to {self._orientation} layout")
+        self._widgets.append(widget)
+        self._log_ui_event("widget_added", {
+            "orientation": self._orientation,
+            "widget_type": widget.__class__.__name__
+        })
     
     def remove_widget(self, widget: UIWidget):
         """Remove a widget from the layout"""
-        self._log(f"Widget removed from {self._orientation} layout")
+        if widget in self._widgets:
+            self._widgets.remove(widget)
+        self._log_ui_event("widget_removed", {
+            "orientation": self._orientation,
+            "widget_type": widget.__class__.__name__
+        })

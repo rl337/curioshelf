@@ -1,5 +1,5 @@
 #!/bin/bash
 # CurioShelf launcher script
 
-# Run the application using Poetry
-poetry run python main.py
+# Default to Qt UI, but allow command line arguments to be passed through
+poetry run python main.py "$@"

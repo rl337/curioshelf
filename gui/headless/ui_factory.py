@@ -19,17 +19,22 @@ from .ui_widgets import (
     HeadlessUIProgressBar, HeadlessUIGroupBox, HeadlessUITabWidget, HeadlessUISplitter,
     HeadlessUILayout
 )
+from .message_system import MessageLogger, MessageType
 from gui.ui_interface import UIImplementationInterface, UIImplementationError
 
 
 class HeadlessUIImplementation(UIImplementationInterface):
     """Headless implementation of the UI interface for testing"""
     
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, collect_messages: bool = True):
         super().__init__(verbose)
         self._pixmap_counter = 0
         self._style = {}
         self._running = False
+        self._message_logger = MessageLogger(
+            collect_messages=collect_messages,
+            print_messages=verbose
+        )
     
     def initialize(self) -> bool:
         """Initialize the headless UI implementation"""
@@ -96,51 +101,51 @@ class HeadlessUIImplementation(UIImplementationInterface):
     
     def create_widget(self) -> 'HeadlessUIWidget':
         """Create a basic widget"""
-        return HeadlessUIWidget()
+        return HeadlessUIWidget(self.verbose, self._message_logger)
     
     def create_button(self, text: str = "") -> 'HeadlessUIButton':
         """Create a button"""
-        return HeadlessUIButton(text, self.verbose)
+        return HeadlessUIButton(text, self.verbose, self._message_logger)
     
     def create_text_input(self, placeholder: str = "") -> 'HeadlessUITextInput':
         """Create a text input"""
-        return HeadlessUITextInput(placeholder, self.verbose)
+        return HeadlessUITextInput(placeholder, self.verbose, self._message_logger)
     
     def create_combo_box(self) -> 'HeadlessUIComboBox':
         """Create a combo box"""
-        return HeadlessUIComboBox(self.verbose)
+        return HeadlessUIComboBox(self.verbose, self._message_logger)
     
     def create_list_widget(self) -> 'HeadlessUIListWidget':
         """Create a list widget"""
-        return HeadlessUIListWidget(self.verbose)
+        return HeadlessUIListWidget(self.verbose, self._message_logger)
     
     def create_canvas(self) -> 'HeadlessUICanvas':
         """Create a canvas widget"""
-        return HeadlessUICanvas(self.verbose)
+        return HeadlessUICanvas(self.verbose, self._message_logger)
     
     def create_message_box(self) -> 'HeadlessUIMessageBox':
         """Create a message box"""
-        return HeadlessUIMessageBox(self.verbose)
+        return HeadlessUIMessageBox(self.verbose, self._message_logger)
     
     def create_file_dialog(self) -> 'HeadlessUIFileDialog':
         """Create a file dialog"""
-        return HeadlessUIFileDialog(self.verbose)
+        return HeadlessUIFileDialog(self.verbose, self._message_logger)
     
     def create_progress_bar(self) -> 'HeadlessUIProgressBar':
         """Create a progress bar"""
-        return HeadlessUIProgressBar(self.verbose)
+        return HeadlessUIProgressBar(self.verbose, self._message_logger)
     
     def create_group_box(self, title: str = "") -> 'HeadlessUIGroupBox':
         """Create a group box"""
-        return HeadlessUIGroupBox(title, self.verbose)
+        return HeadlessUIGroupBox(title, self.verbose, self._message_logger)
     
     def create_tab_widget(self) -> 'HeadlessUITabWidget':
         """Create a tab widget"""
-        return HeadlessUITabWidget(self.verbose)
+        return HeadlessUITabWidget(self.verbose, self._message_logger)
     
     def create_splitter(self, orientation: str = "horizontal") -> 'HeadlessUISplitter':
         """Create a splitter widget"""
-        return HeadlessUISplitter(orientation, self.verbose)
+        return HeadlessUISplitter(orientation, self.verbose, self._message_logger)
     
     def create_pixmap(self, width: int, height: int) -> 'HeadlessPixmap':
         """Create a pixmap for testing"""
@@ -149,7 +154,20 @@ class HeadlessUIImplementation(UIImplementationInterface):
     
     def create_layout(self, orientation: str = "vertical") -> 'HeadlessUILayout':
         """Create a layout"""
-        return HeadlessUILayout(orientation, self.verbose)
+        return HeadlessUILayout(orientation, self.verbose, self._message_logger)
+    
+    def get_message_logger(self) -> MessageLogger:
+        """Get the message logger for testing and debugging"""
+        return self._message_logger
+    
+    def get_messages(self, component: Optional[str] = None, action: Optional[str] = None,
+                    message_type: Optional[MessageType] = None):
+        """Get messages from the logger"""
+        return self._message_logger.get_messages(component, action, message_type)
+    
+    def clear_messages(self):
+        """Clear all collected messages"""
+        self._message_logger.clear_messages()
 
 
 # Backward compatibility alias

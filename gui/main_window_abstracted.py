@@ -11,22 +11,20 @@ from pathlib import Path
 from curioshelf.models import AssetManager
 from curioshelf.project_manager import ProjectManager, ProjectInfo
 from curioshelf.ui_state_manager import UIStateManager
-from gui.ui_interface import UIImplementationInterface, create_ui_implementation
 from gui.project_dialog_abstracted import ProjectDialogAbstracted
 
 
 class MainWindowAbstracted:
     """Main application window using UI abstraction layer"""
     
-    def __init__(self, ui_implementation: str = "qt", verbose: bool = False):
+    def __init__(self, ui_implementation, verbose: bool = False):
         # Initialize managers
         self.project_manager = ProjectManager()
         self.ui_state_manager = UIStateManager()
         self.asset_manager: Optional[AssetManager] = None
         
-        # Create UI implementation
-        self.ui = create_ui_implementation(ui_implementation, verbose=verbose)
-        self.ui.initialize()
+        # Use provided UI implementation
+        self.ui = ui_implementation
         
         # UI components (will be created by setup_ui)
         self.main_widget = None
