@@ -15,22 +15,22 @@ sys.path.insert(0, str(project_root))
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt
 
-from gui.tabbed_main_window import TabbedMainWindow
+from gui.tabbed_main_window_v2 import TabbedMainWindowV2
 
 
 def main():
     """Main application entry point"""
     # Create QApplication
     app = QApplication(sys.argv)
-    app.setApplicationName("CurioShelf")
-    app.setApplicationVersion("0.1.0")
+    app.setApplicationName("CurioShelf V2")
+    app.setApplicationVersion("2.0.0")
     app.setOrganizationName("CurioShelf")
     
     # Set application style
     app.setStyle('Fusion')  # Modern look
     
     # Create and show main window
-    window = TabbedMainWindow()
+    window = TabbedMainWindowV2()
     window.show()
     
     # Run the application

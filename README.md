@@ -1,16 +1,24 @@
-# CurioShelf
+# CurioShelf V2
 
 A visual asset manager for 2D games built with Python and PySide6.
 
 ## Features
 
 - Import and tag large SVG or raster source files
-- Select rectangular regions and save them as named slices
+- **View-based slice creation** with 1:1 correspondence between views and slices
 - Group slices under named objects with multiple layers (concept, working, production)
 - Template system for defining required views/states
 - Visual feedback on object completeness
 - Clean JSON metadata storage
 - Export functionality for sprite frames and spritesheets
+
+## What's New in V2
+
+- **Simplified Sources Tab**: Focused purely on source image management
+- **Enhanced Objects Tab**: Integrated slice creation for object views
+- **1:1 Correspondence**: Each object view has exactly one corresponding slice
+- **Better UX**: Single workflow for object completion
+- **Improved Architecture**: Clean separation between UI and business logic
 
 ## Installation
 
@@ -37,18 +45,24 @@ poetry shell
 python main.py
 ```
 
-### Basic Workflow
+### Basic Workflow (V2)
 
-1. **Sources Tab**: Import source images and create slices by selecting rectangular regions
+1. **Sources Tab**: Import and manage source images (simplified)
 2. **Templates Tab**: Create and manage templates with visual representation of required views
-3. **Objects Tab**: Create objects, assign templates, and track compliance with visual progress indicators
+3. **Objects Tab**: Create objects, assign templates, and create slices for views (enhanced)
 
 #### Detailed Steps:
 1. **Import Source**: In Sources tab, click "Import Source" to load an image file
-2. **Create Slice**: Click and drag on the canvas to select a region, then create a named slice
-3. **Create Template**: In Templates tab, create templates with required views (e.g., "front", "back", "walk1")
-4. **Create Object**: In Objects tab, create objects and assign templates
+2. **Create Template**: In Templates tab, create templates with required views (e.g., "front", "back", "walk1")
+3. **Create Object**: In Objects tab, create objects and assign templates
+4. **Create Slices**: In Objects tab, select a source, select a view, draw selection, and create slice
 5. **Track Progress**: View template compliance with visual progress bars and status indicators
+
+#### V2 Improvements:
+- **Unified Workflow**: Slice creation is now part of the object management process
+- **1:1 Correspondence**: Each view has exactly one corresponding slice
+- **Better Organization**: No orphaned slices or duplicate views
+- **Clearer Mental Model**: Views and slices are directly connected
 
 ### Templates
 
