@@ -118,6 +118,7 @@ class HeadlessUIComboBox(UIComboBox):
         """Add an item to the combo box"""
         super().add_item(text, data)
         self._log(f"Combo box item added: '{text}'")
+        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": text, "data": data})
     
     def clear(self):
         """Clear all items"""
@@ -131,11 +132,13 @@ class HeadlessUIComboBox(UIComboBox):
         if old_index != index:
             text = self.current_text()
             self._log(f"Combo box selection changed to index {index}: '{text}'")
+            self.message_logger.log_ui_event(self.__class__.__name__, "current_changed", {"index": index, "text": text})
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the combo box"""
         super().set_enabled(enabled)
         self._log(f"Combo box {'enabled' if enabled else 'disabled'}")
+        self.message_logger.log_state_change(self.__class__.__name__, "enabled" if enabled else "disabled")
     
     def set_visible(self, visible: bool):
         """Show or hide the combo box"""
@@ -160,6 +163,7 @@ class HeadlessUIListWidget(UIListWidget):
         """Add an item to the list"""
         super().add_item(text, data)
         self._log(f"List item added: '{text}'")
+        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": text, "data": data})
     
     def clear(self):
         """Clear all items"""
@@ -173,11 +177,13 @@ class HeadlessUIListWidget(UIListWidget):
         if old_index != index:
             text = self.current_text()
             self._log(f"List selection changed to index {index}: '{text}'")
+            self.message_logger.log_ui_event(self.__class__.__name__, "current_changed", {"index": index, "text": text})
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the list"""
         super().set_enabled(enabled)
         self._log(f"List {'enabled' if enabled else 'disabled'}")
+        self.message_logger.log_state_change(self.__class__.__name__, "enabled" if enabled else "disabled")
     
     def set_visible(self, visible: bool):
         """Show or hide the list"""
@@ -314,16 +320,22 @@ class HeadlessUIProgressBar(UIProgressBar):
         self._value = max(self._minimum, min(value, self._maximum))
         if old_value != self._value:
             self._log(f"Progress bar: {self._value}%")
+            self.message_logger.log_ui_event(self.__class__.__name__, "value_changed", {"value": self._value})
     
     def set_enabled(self, enabled: bool):
         """Enable or disable the progress bar"""
         super().set_enabled(enabled)
         self._log(f"Progress bar {'enabled' if enabled else 'disabled'}")
+        self.message_logger.log_state_change(self.__class__.__name__, "enabled" if enabled else "disabled")
     
     def set_visible(self, visible: bool):
         """Show or hide the progress bar"""
         super().set_visible(visible)
         self._log(f"Progress bar {'shown' if visible else 'hidden'}")
+    
+    def set_value(self, value: int):
+        """Set the progress bar value"""
+        self.value = value
 
 
 class HeadlessUIGroupBox(UIGroupBox):
@@ -390,9 +402,10 @@ class HeadlessUITabWidget(UITabWidget):
 class HeadlessUISplitter(UISplitter):
     """Headless implementation of UISplitter"""
     
-    def __init__(self, orientation: str = "horizontal", verbose: bool = True):
+    def __init__(self, orientation: str = "horizontal", verbose: bool = True, message_logger: Optional[MessageLogger] = None):
         super().__init__(orientation)
         self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""

@@ -217,7 +217,7 @@ class MessageLogger:
             raise ValueError(f"Unsupported format: {format}")
 
 
-class TestMessageCollector:
+class MessageCollector:
     """Helper class for testing with message collection"""
     
     def __init__(self):
