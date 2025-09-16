@@ -429,7 +429,7 @@ class UIImplementationRegistry:
         return list(cls._implementations.keys())
     
     @classmethod
-    def create(cls, name: str, **kwargs) -> UIImplementationInterface:
+    def create(cls, name: str, **kwargs: Any) -> UIImplementationInterface:
         """
         Create an instance of a registered implementation
         
@@ -441,12 +441,12 @@ class UIImplementationRegistry:
             UIImplementationInterface: Instance of the requested implementation
         """
         implementation_class = cls.get(name)
-        return implementation_class(**kwargs)
+        return implementation_class(**kwargs)  # type: ignore[no-any-return]
 
 
 # Convenience Functions
 
-def create_ui_implementation(name: str, **kwargs) -> UIImplementationInterface:
+def create_ui_implementation(name: str, **kwargs: Any) -> UIImplementationInterface:
     """
     Create a UI implementation by name
     

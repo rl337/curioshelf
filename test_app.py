@@ -75,43 +75,51 @@ def test_gui_imports():
     """Test that GUI modules can be imported"""
     print("Testing GUI imports...")
     
+    # Test that GUI modules can be imported without errors
     try:
-        from gui.main_window import MainWindow
-        print("✓ MainWindow imported successfully")
+        from gui.ui_factory import create_ui_factory, get_available_ui_backends
+        print("✓ UI factory imported successfully")
         
-        from gui.canvas_widget import CanvasWidget
-        print("✓ CanvasWidget imported successfully")
+        from gui.main_window_abstracted import MainWindowAbstracted
+        print("✓ MainWindowAbstracted imported successfully")
         
-        from gui.object_panel import ObjectPanel
-        print("✓ ObjectPanel imported successfully")
+        from gui.sources_tab_abstracted import SourcesTabAbstracted
+        print("✓ SourcesTabAbstracted imported successfully")
         
-        from gui.template_panel import TemplatePanel
-        print("✓ TemplatePanel imported successfully")
+        from gui.objects_tab_abstracted import ObjectsTabAbstracted
+        print("✓ ObjectsTabAbstracted imported successfully")
+        
+        from gui.templates_tab_abstracted import TemplatesTabAbstracted
+        print("✓ TemplatesTabAbstracted imported successfully")
+        
+        # Test that we can create a UI factory
+        backends = get_available_ui_backends()
+        print(f"✓ Available UI backends: {backends}")
         
         print("All GUI imports passed! ✓")
         
     except ImportError as e:
         print(f"✗ GUI import failed: {e}")
-        return False
-    
-    return True
+        assert False, f"GUI import failed: {e}"
 
 
 if __name__ == "__main__":
     print("CurioShelf Test Suite")
     print("=" * 40)
     
-    # Test models
-    test_models()
-    print()
-    
-    # Test GUI imports
-    if test_gui_imports():
+    try:
+        # Test models
+        test_models()
+        print()
+        
+        # Test GUI imports
+        test_gui_imports()
         print()
         print("All tests passed! The application should work correctly.")
         print()
         print("To run the application:")
         print("  python main.py")
-    else:
+    except AssertionError as e:
+        print(f"Test failed: {e}")
         print("Some tests failed. Please check the error messages above.")
         sys.exit(1)

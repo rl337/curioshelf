@@ -19,16 +19,17 @@ from PySide6.QtCore import Qt
 def test_imports():
     """Test that all V2 components can be imported"""
     try:
-        from gui.tabbed_main_window_v2 import TabbedMainWindowV2
-        from gui.sources_tab_v2 import SourcesTabV2
-        from gui.objects_tab_v2 import ObjectsTabV2
+        from gui.main_window_abstracted import MainWindowAbstracted
+        from gui.sources_tab_abstracted import SourcesTabAbstracted
+        from gui.objects_tab_abstracted import ObjectsTabAbstracted
+        from gui.templates_tab_abstracted import TemplatesTabAbstracted
         from curioshelf.business_logic_v2 import SourcesController, TemplatesController, ObjectsController
         from curioshelf.ui_mocks import MockUIFactory
+        from gui.ui_factory import create_ui_factory
         print("✅ All V2 imports successful")
-        return True
     except Exception as e:
         print(f"❌ Import error: {e}")
-        return False
+        assert False, f"Import error: {e}"
 
 def test_business_logic():
     """Test that business logic controllers work"""
@@ -51,33 +52,30 @@ def test_business_logic():
         objects_controller.setup_ui(MockUIFactory)
         
         print("✅ Business logic controllers work correctly")
-        return True
     except Exception as e:
         print(f"❌ Business logic error: {e}")
-        return False
+        assert False, f"Business logic error: {e}"
 
 def test_application():
     """Test that the application can be created"""
     try:
-        from gui.tabbed_main_window_v2 import TabbedMainWindowV2
+        from gui.ui_factory import create_ui_factory
         
-        # Create QApplication
-        app = QApplication(sys.argv)
+        # Create UI factory
+        factory = create_ui_factory("headless", verbose=False)
         
         # Create main window
-        window = TabbedMainWindowV2()
+        window = factory.create_main_window()
         
         # Check that window was created
         assert window is not None
-        assert window.asset_manager is not None
-        assert window.tab_widget is not None
-        assert window.tab_widget.count() == 3  # Sources, Templates, Objects
+        assert hasattr(window, 'asset_manager')
+        assert hasattr(window, 'tab_widget')
         
         print("✅ Application creation successful")
-        return True
     except Exception as e:
         print(f"❌ Application error: {e}")
-        return False
+        assert False, f"Application error: {e}"
 
 def main():
     """Run all tests"""
@@ -95,10 +93,13 @@ def main():
     
     for test_name, test_func in tests:
         print(f"\n🔍 Running {test_name}...")
-        if test_func():
+        try:
+            test_func()
             passed += 1
-        else:
-            print(f"❌ {test_name} failed")
+        except AssertionError as e:
+            print(f"❌ {test_name} failed: {e}")
+        except Exception as e:
+            print(f"❌ {test_name} failed with unexpected error: {e}")
     
     print("\n" + "=" * 50)
     print(f"📊 Test Results: {passed}/{total} tests passed")

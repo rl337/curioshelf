@@ -18,7 +18,7 @@ from .ui_abstraction import (
 class SourcesController:
     """Business logic controller for sources management"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable):
+    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
         
@@ -41,7 +41,7 @@ class SourcesController:
         self.on_source_loaded: Optional[Callable[[AssetSource], None]] = None
         self.on_slice_created: Optional[Callable[[ObjectSlice], None]] = None
     
-    def setup_ui(self, ui_factory: Callable):
+    def setup_ui(self, ui_factory: Callable) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
         
@@ -72,14 +72,14 @@ class SourcesController:
         # Initial refresh
         self.refresh()
     
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the UI with current data"""
         self.refresh_source_combo()
         self.refresh_object_combo()
         if self.current_source:
             self.refresh_slices()
     
-    def refresh_source_combo(self):
+    def refresh_source_combo(self) -> None:
         """Refresh the source combo box"""
         if not self.source_combo:
             return
@@ -89,7 +89,7 @@ class SourcesController:
             display_text = f"{source.file_path.name} ({source.width}x{source.height})"
             self.source_combo.add_item(display_text, source.id)
     
-    def refresh_object_combo(self):
+    def refresh_object_combo(self) -> None:
         """Refresh the object combo box"""
         if not self.object_combo:
             return
@@ -99,7 +99,7 @@ class SourcesController:
         for obj in self.asset_manager.objects.values():
             self.object_combo.add_item(obj.name, obj.id)
     
-    def refresh_slices(self):
+    def refresh_slices(self) -> None:
         """Refresh the slices list for the current source"""
         if not self.slices_list or not self.current_source:
             return
@@ -123,7 +123,7 @@ class SourcesController:
             for slice_obj in sorted(slices_by_layer[layer], key=lambda s: s.name):
                 self.slices_list.add_item(f"  {slice_obj.name}", slice_obj)
     
-    def import_source(self):
+    def import_source(self) -> None:
         """Import a new source image"""
         if not self.file_dialog:
             return
@@ -157,7 +157,7 @@ class SourcesController:
             except Exception as e:
                 self.message_box.show_error("Error", f"Failed to load source: {str(e)}")
     
-    def load_source(self, source: AssetSource, file_path: str):
+    def load_source(self, source: AssetSource, file_path: str) -> None:
         """Load a source image into the canvas"""
         self.current_source = source
         if self.canvas:
@@ -166,7 +166,7 @@ class SourcesController:
             self.canvas.set_zoom(1.0)
         self.refresh_slices()
     
-    def on_source_selected(self, source_id: str):
+    def on_source_selected(self, source_id: str) -> None:
         """Handle source selection"""
         if not source_id:
             return
@@ -175,7 +175,7 @@ class SourcesController:
         if source:
             self.load_source(source, str(source.file_path))
     
-    def on_selection_changed(self, selection_rect: Optional[Any]):
+    def on_selection_changed(self, selection_rect: Optional[Any]) -> None:
         """Handle selection changes from the canvas"""
         if not self.create_slice_btn:
             return
@@ -188,7 +188,7 @@ class SourcesController:
         else:
             self.create_slice_btn.set_enabled(False)
     
-    def create_slice(self):
+    def create_slice(self) -> None:
         """Create a slice from the current selection"""
         if not self.current_source or not self.canvas or not self.canvas.selection_rect:
             return
@@ -248,7 +248,7 @@ class SourcesController:
 class TemplatesController:
     """Business logic controller for templates management"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable):
+    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
         
@@ -271,7 +271,7 @@ class TemplatesController:
         self.on_template_updated: Optional[Callable[[Template], None]] = None
         self.on_template_deleted: Optional[Callable[[str], None]] = None
     
-    def setup_ui(self, ui_factory: Callable):
+    def setup_ui(self, ui_factory: Callable) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
         
@@ -295,7 +295,7 @@ class TemplatesController:
         # Initial refresh
         self.refresh()
     
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the template list"""
         if not self.templates_list:
             return
@@ -304,7 +304,7 @@ class TemplatesController:
         for template in self.asset_manager.templates.values():
             self.templates_list.add_item(template.name, template.name)
     
-    def on_template_selected(self, template_name: str):
+    def on_template_selected(self, template_name: str) -> None:
         """Handle template selection"""
         if not template_name:
             return
@@ -319,7 +319,7 @@ class TemplatesController:
             self.edit_template_btn.set_enabled(False)
             self.delete_template_btn.set_enabled(False)
     
-    def refresh_details(self):
+    def refresh_details(self) -> None:
         """Refresh the template details display"""
         if not self.current_template:
             if self.template_name_label:
@@ -341,7 +341,7 @@ class TemplatesController:
         # Refresh usage statistics
         self.refresh_usage_stats()
     
-    def refresh_views(self):
+    def refresh_views(self) -> None:
         """Refresh the required views display"""
         if not self.views_widget or not self.current_template:
             return
@@ -355,7 +355,7 @@ class TemplatesController:
             if hasattr(self.views_widget, 'add_item'):
                 self.views_widget.add_item(view)
     
-    def refresh_usage_stats(self):
+    def refresh_usage_stats(self) -> None:
         """Refresh usage statistics"""
         if not self.usage_label or not self.current_template:
             return
@@ -373,7 +373,7 @@ class TemplatesController:
         
         self.usage_label.set_text(usage_text)
     
-    def create_template(self):
+    def create_template(self) -> None:
         """Create a new template"""
         # For testing, create a simple template
         template_name = f"test_template_{len(self.asset_manager.templates)}"
@@ -394,7 +394,7 @@ class TemplatesController:
         if self.on_template_created:
             self.on_template_created(template)
     
-    def edit_template(self):
+    def edit_template(self) -> None:
         """Edit the selected template"""
         if not self.current_template:
             return
@@ -408,7 +408,7 @@ class TemplatesController:
         if self.on_template_updated:
             self.on_template_updated(self.current_template)
     
-    def delete_template(self):
+    def delete_template(self) -> None:
         """Delete the selected template"""
         if not self.current_template:
             return
@@ -452,7 +452,7 @@ class TemplatesController:
 class ObjectsController:
     """Business logic controller for objects management"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable):
+    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
         
@@ -476,7 +476,7 @@ class ObjectsController:
         self.on_object_updated: Optional[Callable[[CurioObject], None]] = None
         self.on_object_deleted: Optional[Callable[[str], None]] = None
     
-    def setup_ui(self, ui_factory: Callable):
+    def setup_ui(self, ui_factory: Callable) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
         
@@ -501,7 +501,7 @@ class ObjectsController:
         # Initial refresh
         self.refresh()
     
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the object list"""
         if not self.objects_list:
             return
@@ -510,7 +510,7 @@ class ObjectsController:
         for obj in self.asset_manager.objects.values():
             self.objects_list.add_item(obj.name, obj.id)
     
-    def on_object_selected(self, object_id: str):
+    def on_object_selected(self, object_id: str) -> None:
         """Handle object selection"""
         if not object_id:
             return
@@ -525,7 +525,7 @@ class ObjectsController:
             self.edit_object_btn.set_enabled(False)
             self.delete_object_btn.set_enabled(False)
     
-    def refresh_details(self):
+    def refresh_details(self) -> None:
         """Refresh the object details display"""
         if not self.current_object:
             if self.object_name_label:
@@ -553,7 +553,7 @@ class ObjectsController:
         self.refresh_compliance()
         self.refresh_slices()
     
-    def refresh_compliance(self):
+    def refresh_compliance(self) -> None:
         """Refresh the template compliance display"""
         if not self.current_object or not self.current_object.template_name:
             if self.compliance_progress:
@@ -578,7 +578,7 @@ class ObjectsController:
             self.compliance_progress.set_value(progress)
             self.compliance_progress.set_visible(True)
     
-    def refresh_slices(self):
+    def refresh_slices(self) -> None:
         """Refresh the slices list for the current object"""
         if not self.slices_list or not self.current_object:
             return
@@ -602,7 +602,7 @@ class ObjectsController:
             for slice_obj in sorted(slices_by_layer[layer], key=lambda s: s.name):
                 self.slices_list.add_item(f"  {slice_obj.name}", slice_obj)
     
-    def create_object(self):
+    def create_object(self) -> None:
         """Create a new object"""
         object_name = f"test_object_{len(self.asset_manager.objects)}"
         template_name = None
@@ -625,7 +625,7 @@ class ObjectsController:
         if self.on_object_created:
             self.on_object_created(obj)
     
-    def edit_object(self):
+    def edit_object(self) -> None:
         """Edit the selected object"""
         if not self.current_object:
             return
@@ -640,7 +640,7 @@ class ObjectsController:
         if self.on_object_updated:
             self.on_object_updated(self.current_object)
     
-    def delete_object(self):
+    def delete_object(self) -> None:
         """Delete the selected object"""
         if not self.current_object:
             return

@@ -54,8 +54,6 @@ class UIMessage:
             return f"[{timestamp_str}] INFO: {self.component} - {self.action}"
         elif self.message_type == MessageType.DEBUG:
             return f"[{timestamp_str}] DEBUG: {self.component} - {self.action}"
-        else:
-            return f"[{timestamp_str}] {self.component}: {self.action}"
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert message to dictionary for serialization"""
@@ -178,7 +176,7 @@ class MessageLogger:
         """Get all messages from a specific component"""
         return self.get_messages(component=component)
     
-    def clear_messages(self):
+    def clear_messages(self) -> None:
         """Clear all collected messages"""
         self.messages.clear()
         self._message_counter = 0
@@ -220,7 +218,7 @@ class MessageLogger:
 class MessageCollector:
     """Helper class for testing with message collection"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = MessageLogger(collect_messages=True, print_messages=False)
     
     def get_ui_events(self, component: Optional[str] = None) -> List[UIMessage]:
@@ -243,7 +241,7 @@ class MessageCollector:
         """Get warning messages for testing"""
         return self.logger.get_messages(message_type=MessageType.WARNING)
     
-    def assert_message_sequence(self, expected_sequence: List[Dict[str, str]]):
+    def assert_message_sequence(self, expected_sequence: List[Dict[str, str]]) -> None:
         """
         Assert that messages appear in the expected sequence
         
@@ -265,7 +263,7 @@ class MessageCollector:
                 assert message.message_type == expected_type, \
                     f"Message {i}: expected type '{expected_type}', got '{message.message_type}'"
     
-    def assert_ui_event(self, component: str, action: str, data: Optional[Dict[str, Any]] = None):
+    def assert_ui_event(self, component: str, action: str, data: Optional[Dict[str, Any]] = None) -> None:
         """Assert that a specific UI event occurred"""
         messages = self.get_ui_events(component)
         matching = [msg for msg in messages if msg.action == action]
@@ -277,19 +275,19 @@ class MessageCollector:
                     return
             assert False, f"UI event {component}.{action} found but data doesn't match: {data}"
     
-    def assert_user_action(self, component: str, action: str):
+    def assert_user_action(self, component: str, action: str) -> None:
         """Assert that a specific user action occurred"""
         messages = self.get_user_actions(component)
         matching = [msg for msg in messages if msg.action == action]
         assert len(matching) > 0, f"No user action found for {component}.{action}"
     
-    def assert_state_change(self, component: str, action: str):
+    def assert_state_change(self, component: str, action: str) -> None:
         """Assert that a specific state change occurred"""
         messages = self.get_state_changes(component)
         matching = [msg for msg in messages if msg.action == action]
         assert len(matching) > 0, f"No state change found for {component}.{action}"
     
-    def clear(self):
+    def clear(self) -> None:
         """Clear all collected messages"""
         self.logger.clear_messages()
     

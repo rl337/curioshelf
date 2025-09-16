@@ -152,7 +152,7 @@ class CurioObject:
 class AssetManager:
     """Coordinates sources, objects, and templates"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.sources: Dict[str, AssetSource] = {}
         self.objects: Dict[str, CurioObject] = {}
         self.templates: Dict[str, Template] = {}

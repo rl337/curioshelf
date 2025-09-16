@@ -23,28 +23,29 @@ class UISignal:
 class UIWidget(ABC):
     """Abstract base class for UI widgets"""
     
-    def __init__(self):
-        self._signals: Dict[str, List[Callable]] = {}
+    def __init__(self) -> None:
+        self._signals: Dict[str, List[Callable[..., None]]] = {}
         self._enabled = True
         self._visible = True
+        self._layout: Optional['UILayout'] = None
     
-    def connect_signal(self, signal_name: str, callback: Callable):
+    def connect_signal(self, signal_name: str, callback: Callable[..., None]) -> None:
         """Connect a callback to a signal"""
         if signal_name not in self._signals:
             self._signals[signal_name] = []
         self._signals[signal_name].append(callback)
     
-    def emit_signal(self, signal_name: str, data: Any = None):
+    def emit_signal(self, signal_name: str, data: Any = None) -> None:
         """Emit a signal to all connected callbacks"""
         if signal_name in self._signals:
             for callback in self._signals[signal_name]:
                 callback(data)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the widget"""
         self._enabled = enabled
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the widget"""
         self._visible = visible
     
@@ -56,7 +57,7 @@ class UIWidget(ABC):
     def visible(self) -> bool:
         return self._visible
     
-    def set_layout(self, layout: 'UILayout'):
+    def set_layout(self, layout: 'UILayout') -> None:
         """Set the layout for the widget"""
         self._layout = layout
 
@@ -64,24 +65,24 @@ class UIWidget(ABC):
 class UIButton(UIWidget):
     """Abstract button interface"""
     
-    def __init__(self, text: str = ""):
+    def __init__(self, text: str = "") -> None:
         super().__init__()
         self._text = text
-        self._clicked_callback = None
+        self._clicked_callback: Optional[Callable[[], None]] = None
     
     @property
     def text(self) -> str:
         return self._text
     
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str) -> None:
         self._text = value
     
-    def set_clicked_callback(self, callback: Callable):
+    def set_clicked_callback(self, callback: Callable[[], None]) -> None:
         """Set the callback for button clicks"""
         self._clicked_callback = callback
     
-    def click(self):
+    def click(self) -> None:
         """Simulate a button click"""
         if self._clicked_callback:
             self._clicked_callback()
@@ -91,7 +92,7 @@ class UIButton(UIWidget):
 class UITextInput(UIWidget):
     """Abstract text input interface"""
     
-    def __init__(self, placeholder: str = ""):
+    def __init__(self, placeholder: str = "") -> None:
         super().__init__()
         self._text = ""
         self._placeholder = placeholder
@@ -101,7 +102,7 @@ class UITextInput(UIWidget):
         return self._text
     
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str) -> None:
         self._text = value
     
     @property
@@ -109,14 +110,14 @@ class UITextInput(UIWidget):
         return self._placeholder
     
     @placeholder.setter
-    def placeholder(self, value: str):
+    def placeholder(self, value: str) -> None:
         self._placeholder = value
     
-    def set_text_changed_callback(self, callback: Callable[[str], None]):
+    def set_text_changed_callback(self, callback: Callable[[str], None]) -> None:
         """Set callback for text changes"""
         self.connect_signal("text_changed", callback)
     
-    def set_text(self, text: str):
+    def set_text(self, text: str) -> None:
         """Set text and emit signal"""
         old_text = self._text
         self._text = text
@@ -127,21 +128,21 @@ class UITextInput(UIWidget):
 class UIComboBox(UIWidget):
     """Abstract combo box interface"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._items: List[tuple] = []  # (text, data) pairs
+        self._items: List[tuple[str, Any]] = []  # (text, data) pairs
         self._current_index = -1
     
-    def add_item(self, text: str, data: Any = None):
+    def add_item(self, text: str, data: Any = None) -> None:
         """Add an item to the combo box"""
         self._items.append((text, data))
     
-    def clear(self):
+    def clear(self) -> None:
         """Clear all items"""
         self._items.clear()
         self._current_index = -1
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current selection"""
         if 0 <= index < len(self._items):
             self._current_index = index
@@ -159,7 +160,7 @@ class UIComboBox(UIWidget):
             return self._items[self._current_index][1]
         return None
     
-    def set_current_changed_callback(self, callback: Callable[[Any], None]):
+    def set_current_changed_callback(self, callback: Callable[[Any], None]) -> None:
         """Set callback for selection changes"""
         self.connect_signal("current_changed", callback)
 
@@ -167,21 +168,21 @@ class UIComboBox(UIWidget):
 class UIListWidget(UIWidget):
     """Abstract list widget interface"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._items: List[tuple] = []  # (text, data) pairs
+        self._items: List[tuple[str, Any]] = []  # (text, data) pairs
         self._current_index = -1
     
-    def add_item(self, text: str, data: Any = None):
+    def add_item(self, text: str, data: Any = None) -> None:
         """Add an item to the list"""
         self._items.append((text, data))
     
-    def clear(self):
+    def clear(self) -> None:
         """Clear all items"""
         self._items.clear()
         self._current_index = -1
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current selection"""
         if 0 <= index < len(self._items):
             self._current_index = index
@@ -199,7 +200,7 @@ class UIListWidget(UIWidget):
             return self._items[self._current_index][1]
         return None
     
-    def set_current_changed_callback(self, callback: Callable[[Any], None]):
+    def set_current_changed_callback(self, callback: Callable[[Any], None]) -> None:
         """Set callback for selection changes"""
         self.connect_signal("current_changed", callback)
 
@@ -207,18 +208,18 @@ class UIListWidget(UIWidget):
 class UICanvas(UIWidget):
     """Abstract canvas interface for image display and selection"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._pixmap = None
         self._zoom_factor = 1.0
         self._selection_rect = None
     
-    def set_pixmap(self, pixmap: Any):
+    def set_pixmap(self, pixmap: Any) -> None:
         """Set the image to display"""
         self._pixmap = pixmap
         self.emit_signal("pixmap_changed")
     
-    def set_zoom(self, zoom_factor: float):
+    def set_zoom(self, zoom_factor: float) -> None:
         """Set the zoom factor"""
         self._zoom_factor = zoom_factor
         self.emit_signal("zoom_changed")
@@ -231,17 +232,17 @@ class UICanvas(UIWidget):
     def selection_rect(self) -> Optional[Any]:
         return self._selection_rect
     
-    def set_selection_rect(self, rect: Any):
+    def set_selection_rect(self, rect: Any) -> None:
         """Set the selection rectangle"""
         self._selection_rect = rect
         self.emit_signal("selection_changed", rect)
     
-    def clear_selection(self):
+    def clear_selection(self) -> None:
         """Clear the current selection"""
         self._selection_rect = None
         self.emit_signal("selection_changed", None)
     
-    def set_selection_changed_callback(self, callback: Callable[[Any], None]):
+    def set_selection_changed_callback(self, callback: Callable[[Any], None]) -> None:
         """Set callback for selection changes"""
         self.connect_signal("selection_changed", callback)
 
@@ -301,7 +302,7 @@ class UIFileDialog(ABC):
 class UIProgressBar(UIWidget):
     """Abstract progress bar interface"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._value = 0
         self._minimum = 0
@@ -312,7 +313,7 @@ class UIProgressBar(UIWidget):
         return self._value
     
     @value.setter
-    def value(self, value: int):
+    def value(self, value: int) -> None:
         self._value = max(self._minimum, min(value, self._maximum))
     
     @property
@@ -320,7 +321,7 @@ class UIProgressBar(UIWidget):
         return self._minimum
     
     @minimum.setter
-    def minimum(self, value: int):
+    def minimum(self, value: int) -> None:
         self._minimum = value
     
     @property
@@ -328,7 +329,7 @@ class UIProgressBar(UIWidget):
         return self._maximum
     
     @maximum.setter
-    def maximum(self, value: int):
+    def maximum(self, value: int) -> None:
         self._maximum = value
 
 
@@ -336,12 +337,12 @@ class UILayout(ABC):
     """Abstract layout interface"""
     
     @abstractmethod
-    def add_widget(self, widget: UIWidget, *args, **kwargs):
+    def add_widget(self, widget: UIWidget, *args: Any, **kwargs: Any) -> None:
         """Add a widget to the layout"""
         pass
     
     @abstractmethod
-    def remove_widget(self, widget: UIWidget):
+    def remove_widget(self, widget: UIWidget) -> None:
         """Remove a widget from the layout"""
         pass
 
@@ -349,20 +350,20 @@ class UILayout(ABC):
 class UIGroupBox(UIWidget):
     """Abstract group box interface"""
     
-    def __init__(self, title: str = ""):
+    def __init__(self, title: str = "") -> None:
         super().__init__()
         self._title = title
-        self._layout = None
+        self._layout: Optional[UILayout] = None
     
     @property
     def title(self) -> str:
         return self._title
     
     @title.setter
-    def title(self, value: str):
+    def title(self, value: str) -> None:
         self._title = value
     
-    def set_layout(self, layout: UILayout):
+    def set_layout(self, layout: UILayout) -> None:
         """Set the layout for the group box"""
         self._layout = layout
 
@@ -370,16 +371,16 @@ class UIGroupBox(UIWidget):
 class UITabWidget(UIWidget):
     """Abstract tab widget interface"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._tabs: List[tuple] = []  # (widget, title) pairs
         self._current_index = 0
     
-    def add_tab(self, widget: UIWidget, title: str):
+    def add_tab(self, widget: UIWidget, title: str) -> None:
         """Add a tab"""
         self._tabs.append((widget, title))
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current tab"""
         if 0 <= index < len(self._tabs):
             self._current_index = index
@@ -389,7 +390,7 @@ class UITabWidget(UIWidget):
         """Get the current tab index"""
         return self._current_index
     
-    def set_current_changed_callback(self, callback: Callable[[int], None]):
+    def set_current_changed_callback(self, callback: Callable[[int], None]) -> None:
         """Set callback for tab changes"""
         self.connect_signal("current_changed", callback)
 
@@ -397,18 +398,18 @@ class UITabWidget(UIWidget):
 class UISplitter(UIWidget):
     """Abstract splitter interface"""
     
-    def __init__(self, orientation: str = "horizontal"):
+    def __init__(self, orientation: str = "horizontal") -> None:
         super().__init__()
         self._orientation = orientation
         self._widgets: List[UIWidget] = []
         self._sizes: List[int] = []
     
-    def add_widget(self, widget: UIWidget):
+    def add_widget(self, widget: UIWidget) -> None:
         """Add a widget to the splitter"""
         self._widgets.append(widget)
         self._sizes.append(100)  # Default size
     
-    def set_sizes(self, sizes: List[int]):
+    def set_sizes(self, sizes: List[int]) -> None:
         """Set the sizes of the widgets"""
         if len(sizes) == len(self._widgets):
             self._sizes = sizes.copy()

@@ -26,16 +26,16 @@ from curioshelf.ui_abstraction import (
 class QtUIWidget(UIWidget):
     """Qt implementation of UIWidget"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_widget = QWidget()
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the widget"""
         super().set_enabled(enabled)
         self._qt_widget.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the widget"""
         super().set_visible(visible)
         self._qt_widget.setVisible(visible)
@@ -49,12 +49,12 @@ class QtUIWidget(UIWidget):
 class QtUIButton(UIButton):
     """Qt implementation of UIButton"""
     
-    def __init__(self, text: str = ""):
+    def __init__(self, text: str = "") -> None:
         super().__init__(text)
         self._qt_button = QPushButton(text)
         self._qt_button.clicked.connect(self._on_qt_clicked)
     
-    def _on_qt_clicked(self):
+    def _on_qt_clicked(self) -> None:
         """Handle Qt button click"""
         if self._clicked_callback:
             self._clicked_callback()
@@ -65,16 +65,16 @@ class QtUIButton(UIButton):
         return self._qt_button.text()
     
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str) -> None:
         self._text = value
         self._qt_button.setText(value)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the button"""
         super().set_enabled(enabled)
         self._qt_button.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the button"""
         super().set_visible(visible)
         self._qt_button.setVisible(visible)
@@ -88,13 +88,13 @@ class QtUIButton(UIButton):
 class QtUITextInput(UITextInput):
     """Qt implementation of UITextInput"""
     
-    def __init__(self, placeholder: str = ""):
+    def __init__(self, placeholder: str = "") -> None:
         super().__init__(placeholder)
         self._qt_input = QLineEdit()
         self._qt_input.setPlaceholderText(placeholder)
         self._qt_input.textChanged.connect(self._on_qt_text_changed)
     
-    def _on_qt_text_changed(self, text: str):
+    def _on_qt_text_changed(self, text: str) -> None:
         """Handle Qt text change"""
         self._text = text
         self.emit_signal("text_changed", text)
@@ -104,20 +104,20 @@ class QtUITextInput(UITextInput):
         return self._qt_input.text()
     
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str) -> None:
         self._text = value
         self._qt_input.setText(value)
     
-    def set_text(self, text: str):
+    def set_text(self, text: str) -> None:
         """Set text and emit signal"""
         self._qt_input.setText(text)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the input"""
         super().set_enabled(enabled)
         self._qt_input.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the input"""
         super().set_visible(visible)
         self._qt_input.setVisible(visible)
@@ -131,37 +131,37 @@ class QtUITextInput(UITextInput):
 class QtUIComboBox(UIComboBox):
     """Qt implementation of UIComboBox"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_combo = QComboBox()
         self._qt_combo.currentIndexChanged.connect(self._on_qt_current_changed)
     
-    def _on_qt_current_changed(self, index: int):
+    def _on_qt_current_changed(self, index: int) -> None:
         """Handle Qt selection change"""
         self._current_index = index
         self.emit_signal("current_changed", self.current_data())
     
-    def add_item(self, text: str, data: Any = None):
+    def add_item(self, text: str, data: Any = None) -> None:
         """Add an item to the combo box"""
         super().add_item(text, data)
         self._qt_combo.addItem(text)
     
-    def clear(self):
+    def clear(self) -> None:
         """Clear all items"""
         super().clear()
         self._qt_combo.clear()
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current selection"""
         super().set_current_index(index)
         self._qt_combo.setCurrentIndex(index)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the combo box"""
         super().set_enabled(enabled)
         self._qt_combo.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the combo box"""
         super().set_visible(visible)
         self._qt_combo.setVisible(visible)
@@ -175,39 +175,39 @@ class QtUIComboBox(UIComboBox):
 class QtUIListWidget(UIListWidget):
     """Qt implementation of UIListWidget"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_list = QListWidget()
         self._qt_list.currentRowChanged.connect(self._on_qt_current_changed)
     
-    def _on_qt_current_changed(self, row: int):
+    def _on_qt_current_changed(self, row: int) -> None:
         """Handle Qt selection change"""
         self._current_index = row
         self.emit_signal("current_changed", self.current_data())
     
-    def add_item(self, text: str, data: Any = None):
+    def add_item(self, text: str, data: Any = None) -> None:
         """Add an item to the list"""
         super().add_item(text, data)
         item = QListWidgetItem(text)
         item.setData(Qt.UserRole, data)
         self._qt_list.addItem(item)
     
-    def clear(self):
+    def clear(self) -> None:
         """Clear all items"""
         super().clear()
         self._qt_list.clear()
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current selection"""
         super().set_current_index(index)
         self._qt_list.setCurrentRow(index)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the list"""
         super().set_enabled(enabled)
         self._qt_list.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the list"""
         super().set_visible(visible)
         self._qt_list.setVisible(visible)
@@ -221,7 +221,7 @@ class QtUIListWidget(UIListWidget):
 class QtUICanvas(UICanvas):
     """Qt implementation of UICanvas"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_view = QGraphicsView()
         self._qt_scene = QGraphicsScene()
@@ -232,7 +232,7 @@ class QtUICanvas(UICanvas):
         # Connect selection changes
         self._qt_scene.selectionChanged.connect(self._on_qt_selection_changed)
     
-    def _on_qt_selection_changed(self):
+    def _on_qt_selection_changed(self) -> None:
         """Handle Qt selection changes"""
         items = self._qt_scene.selectedItems()
         if items:
@@ -244,7 +244,7 @@ class QtUICanvas(UICanvas):
         
         self.emit_signal("selection_changed", self._selection_rect)
     
-    def set_pixmap(self, pixmap: Any):
+    def set_pixmap(self, pixmap: Any) -> None:
         """Set the image to display"""
         super().set_pixmap(pixmap)
         if isinstance(pixmap, QPixmap):
@@ -253,14 +253,14 @@ class QtUICanvas(UICanvas):
             self._qt_view.fitInView(self._qt_scene.itemsBoundingRect(), Qt.KeepAspectRatio)
         self.emit_signal("pixmap_changed")
     
-    def set_zoom(self, zoom_factor: float):
+    def set_zoom(self, zoom_factor: float) -> None:
         """Set the zoom factor"""
         super().set_zoom(zoom_factor)
         self._qt_view.resetTransform()
         self._qt_view.scale(zoom_factor, zoom_factor)
         self.emit_signal("zoom_changed")
     
-    def set_selection_rect(self, rect: Any):
+    def set_selection_rect(self, rect: Any) -> None:
         """Set the selection rectangle"""
         super().set_selection_rect(rect)
         if isinstance(rect, QRect):
@@ -269,17 +269,17 @@ class QtUICanvas(UICanvas):
             for item in self._qt_scene.items(rect):
                 item.setSelected(True)
     
-    def clear_selection(self):
+    def clear_selection(self) -> None:
         """Clear the current selection"""
         super().clear_selection()
         self._qt_scene.clearSelection()
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the canvas"""
         super().set_enabled(enabled)
         self._qt_view.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the canvas"""
         super().set_visible(visible)
         self._qt_view.setVisible(visible)
@@ -329,7 +329,7 @@ class QtUIFileDialog(UIFileDialog):
 class QtUIProgressBar(UIProgressBar):
     """Qt implementation of UIProgressBar"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_progress = QProgressBar()
         self._qt_progress.setMinimum(self._minimum)
@@ -341,7 +341,7 @@ class QtUIProgressBar(UIProgressBar):
         return self._qt_progress.value()
     
     @value.setter
-    def value(self, value: int):
+    def value(self, value: int) -> None:
         super().value = value
         self._qt_progress.setValue(value)
     
@@ -350,7 +350,7 @@ class QtUIProgressBar(UIProgressBar):
         return self._qt_progress.minimum()
     
     @minimum.setter
-    def minimum(self, value: int):
+    def minimum(self, value: int) -> None:
         super().minimum = value
         self._qt_progress.setMinimum(value)
     
@@ -359,16 +359,16 @@ class QtUIProgressBar(UIProgressBar):
         return self._qt_progress.maximum()
     
     @maximum.setter
-    def maximum(self, value: int):
+    def maximum(self, value: int) -> None:
         super().maximum = value
         self._qt_progress.setMaximum(value)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the progress bar"""
         super().set_enabled(enabled)
         self._qt_progress.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the progress bar"""
         super().set_visible(visible)
         self._qt_progress.setVisible(visible)
@@ -382,7 +382,7 @@ class QtUIProgressBar(UIProgressBar):
 class QtUIGroupBox(UIGroupBox):
     """Qt implementation of UIGroupBox"""
     
-    def __init__(self, title: str = ""):
+    def __init__(self, title: str = "") -> None:
         super().__init__(title)
         self._qt_group = QGroupBox(title)
     
@@ -391,16 +391,16 @@ class QtUIGroupBox(UIGroupBox):
         return self._qt_group.title()
     
     @title.setter
-    def title(self, value: str):
+    def title(self, value: str) -> None:
         super().title = value
         self._qt_group.setTitle(value)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the group box"""
         super().set_enabled(enabled)
         self._qt_group.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the group box"""
         super().set_visible(visible)
         self._qt_group.setVisible(visible)
@@ -414,33 +414,33 @@ class QtUIGroupBox(UIGroupBox):
 class QtUITabWidget(UITabWidget):
     """Qt implementation of UITabWidget"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._qt_tabs = QTabWidget()
         self._qt_tabs.currentChanged.connect(self._on_qt_current_changed)
     
-    def _on_qt_current_changed(self, index: int):
+    def _on_qt_current_changed(self, index: int) -> None:
         """Handle Qt tab change"""
         self._current_index = index
         self.emit_signal("current_changed", index)
     
-    def add_tab(self, widget: UIWidget, title: str):
+    def add_tab(self, widget: UIWidget, title: str) -> None:
         """Add a tab"""
         super().add_tab(widget, title)
         if isinstance(widget, QtUIWidget):
             self._qt_tabs.addTab(widget.qt_widget, title)
     
-    def set_current_index(self, index: int):
+    def set_current_index(self, index: int) -> None:
         """Set the current tab"""
         super().set_current_index(index)
         self._qt_tabs.setCurrentIndex(index)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the tab widget"""
         super().set_enabled(enabled)
         self._qt_tabs.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the tab widget"""
         super().set_visible(visible)
         self._qt_tabs.setVisible(visible)
@@ -454,28 +454,28 @@ class QtUITabWidget(UITabWidget):
 class QtUISplitter(UISplitter):
     """Qt implementation of UISplitter"""
     
-    def __init__(self, orientation: str = "horizontal"):
+    def __init__(self, orientation: str = "horizontal") -> None:
         super().__init__(orientation)
         qt_orientation = Qt.Horizontal if orientation == "horizontal" else Qt.Vertical
         self._qt_splitter = QSplitter(qt_orientation)
     
-    def add_widget(self, widget: UIWidget):
+    def add_widget(self, widget: UIWidget) -> None:
         """Add a widget to the splitter"""
         super().add_widget(widget)
         if isinstance(widget, QtUIWidget):
             self._qt_splitter.addWidget(widget.qt_widget)
     
-    def set_sizes(self, sizes: List[int]):
+    def set_sizes(self, sizes: List[int]) -> None:
         """Set the sizes of the widgets"""
         super().set_sizes(sizes)
         self._qt_splitter.setSizes(sizes)
     
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the splitter"""
         super().set_enabled(enabled)
         self._qt_splitter.setEnabled(enabled)
     
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
         """Show or hide the splitter"""
         super().set_visible(visible)
         self._qt_splitter.setVisible(visible)
@@ -489,7 +489,7 @@ class QtUISplitter(UISplitter):
 class QtUILayout(UILayout):
     """Qt implementation of UILayout"""
     
-    def __init__(self, orientation: str = "vertical"):
+    def __init__(self, orientation: str = "vertical") -> None:
         self._orientation = orientation
         if orientation == "vertical":
             self._qt_layout = QVBoxLayout()
@@ -500,17 +500,17 @@ class QtUILayout(UILayout):
         else:
             self._qt_layout = QVBoxLayout()
     
-    def add_widget(self, widget: UIWidget, *args, **kwargs):
+    def add_widget(self, widget: UIWidget, *args, **kwargs) -> None:
         """Add a widget to the layout"""
         if isinstance(widget, QtUIWidget):
             self._qt_layout.addWidget(widget.qt_widget, *args, **kwargs)
     
-    def remove_widget(self, widget: UIWidget):
+    def remove_widget(self, widget: UIWidget) -> None:
         """Remove a widget from the layout"""
         if isinstance(widget, QtUIWidget):
             self._qt_layout.removeWidget(widget.qt_widget)
     
     @property
-    def qt_layout(self):
+    def qt_layout(self) -> None:
         """Get the underlying Qt layout"""
         return self._qt_layout
