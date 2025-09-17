@@ -241,6 +241,11 @@ class MessageCollector:
         """Get warning messages for testing"""
         return self.logger.get_messages(message_type=MessageType.WARNING)
     
+    def get_messages(self, component: Optional[str] = None, 
+                    message_type: Optional[MessageType] = None) -> List[UIMessage]:
+        """Get all messages or filtered messages"""
+        return self.logger.get_messages(component=component, message_type=message_type)
+    
     def assert_message_sequence(self, expected_sequence: List[Dict[str, str]]) -> None:
         """
         Assert that messages appear in the expected sequence

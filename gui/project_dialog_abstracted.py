@@ -221,9 +221,22 @@ class ProjectDialogAbstracted(UIWidget):
     
     def exec(self):
         """Execute the dialog"""
-        # In a real implementation, this would show the dialog and wait for user input
-        # For testing, we'll just return immediately
-        pass
+        # Create a default project to get started
+        # In a real implementation, this would show a project creation/loading view in the main window
+        print("[PROJECT DIALOG] Creating default project...")
+        
+        # Create a default project for testing
+        default_project_path = Path("default_project")
+        default_project_path.mkdir(exist_ok=True)
+        
+        # Emit the project created signal
+        if self.project_created:
+            project_info = ProjectInfo(
+                name="Default Project",
+                description="A default project for testing",
+                author="System"
+            )
+            self.project_created(default_project_path, project_info)
     
     def connect_signal(self, signal_name: str, callback: Callable):
         """Connect a signal callback"""

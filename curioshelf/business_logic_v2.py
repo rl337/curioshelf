@@ -13,14 +13,16 @@ from .ui_abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget
 )
+from .ui_factory_interface import UIFactoryInterface, UIComponentManager
 
 
 class SourcesController:
     """Business logic controller for sources management (simplified)"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
+    def __init__(self, asset_manager: AssetManager, ui_factory: UIFactoryInterface) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # UI components
         self.import_btn: Optional[UIButton] = None
@@ -35,9 +37,10 @@ class SourcesController:
         # Callbacks
         self.on_source_loaded: Optional[Callable[[AssetSource], None]] = None
     
-    def setup_ui(self, ui_factory: Callable) -> None:
+    def setup_ui(self, ui_factory: UIFactoryInterface) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # Create UI components
         self.import_btn = ui_factory.create_button("Import Source")
@@ -83,7 +86,8 @@ class SourcesController:
                 pixmap = self.ui_factory.create_pixmap(800, 600)
                 
                 if pixmap.isNull():
-                    self.message_box.show_warning("Error", "Could not load the image file")
+                    if self.message_box:
+                        self.message_box.show_warning("Error", "Could not load the image file")
                     return
                 
                 # Add to asset manager
@@ -99,7 +103,8 @@ class SourcesController:
                     self.on_source_loaded(source)
                 
             except Exception as e:
-                self.message_box.show_error("Error", f"Failed to load source: {str(e)}")
+                if self.message_box:
+                    self.message_box.show_error("Error", f"Failed to load source: {str(e)}")
     
     def load_source(self, source: AssetSource, file_path: str) -> None:
         """Load a source image into the canvas"""
@@ -122,16 +127,17 @@ class SourcesController:
 class TemplatesController:
     """Business logic controller for templates management"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
+    def __init__(self, asset_manager: AssetManager, ui_factory: UIFactoryInterface) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # UI components
         self.templates_list: Optional[UIListWidget] = None
-        self.template_name_label: Optional[UIWidget] = None
-        self.template_description_label: Optional[UIWidget] = None
-        self.views_widget: Optional[UIWidget] = None
-        self.usage_label: Optional[UIWidget] = None
+        self.template_name_label: Optional[UITextInput] = None
+        self.template_description_label: Optional[UITextInput] = None
+        self.views_widget: Optional[UIListWidget] = None
+        self.usage_label: Optional[UITextInput] = None
         self.create_template_btn: Optional[UIButton] = None
         self.edit_template_btn: Optional[UIButton] = None
         self.delete_template_btn: Optional[UIButton] = None
@@ -145,9 +151,10 @@ class TemplatesController:
         self.on_template_updated: Optional[Callable[[Template], None]] = None
         self.on_template_deleted: Optional[Callable[[str], None]] = None
     
-    def setup_ui(self, ui_factory: Callable) -> None:
+    def setup_ui(self, ui_factory: UIFactoryInterface) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # Create UI components
         self.templates_list = ui_factory.create_list_widget()
@@ -186,12 +193,16 @@ class TemplatesController:
         self.current_template = self.asset_manager.templates.get(template_name)
         
         if self.current_template:
-            self.edit_template_btn.set_enabled(True)
-            self.delete_template_btn.set_enabled(True)
+            if self.edit_template_btn:
+                self.edit_template_btn.set_enabled(True)
+            if self.delete_template_btn:
+                self.delete_template_btn.set_enabled(True)
             self.refresh_details()
         else:
-            self.edit_template_btn.set_enabled(False)
-            self.delete_template_btn.set_enabled(False)
+            if self.edit_template_btn:
+                self.edit_template_btn.set_enabled(False)
+            if self.delete_template_btn:
+                self.delete_template_btn.set_enabled(False)
     
     def refresh_details(self) -> None:
         """Refresh the template details display"""
@@ -294,14 +305,15 @@ class TemplatesController:
                 using_objects.append(obj.name)
         
         if using_objects:
-            self.message_box.show_warning(
-                "Cannot Delete Template",
-                f"This template is being used by the following objects:\n{', '.join(using_objects)}\n\nPlease change their template first."
-            )
+            if self.message_box:
+                self.message_box.show_warning(
+                    "Cannot Delete Template",
+                    f"This template is being used by the following objects:\n{', '.join(using_objects)}\n\nPlease change their template first."
+                )
             return
         
         # Confirm deletion
-        if not self.message_box.show_question(
+        if self.message_box and not self.message_box.show_question(
             "Delete Template",
             f"Are you sure you want to delete template '{self.current_template.name}'?"
         ):
@@ -326,16 +338,17 @@ class TemplatesController:
 class ObjectsController:
     """Business logic controller for objects management with slice creation"""
     
-    def __init__(self, asset_manager: AssetManager, ui_factory: Callable) -> None:
+    def __init__(self, asset_manager: AssetManager, ui_factory: UIFactoryInterface) -> None:
         self.asset_manager = asset_manager
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # UI components
         self.objects_list: Optional[UIListWidget] = None
-        self.object_name_label: Optional[UIWidget] = None
-        self.object_template_label: Optional[UIWidget] = None
+        self.object_name_label: Optional[UITextInput] = None
+        self.object_template_label: Optional[UITextInput] = None
         self.compliance_progress: Optional[UIProgressBar] = None
-        self.compliance_widget: Optional[UIWidget] = None
+        self.compliance_widget: Optional[UIListWidget] = None
         self.views_list: Optional[UIListWidget] = None
         self.create_object_btn: Optional[UIButton] = None
         self.edit_object_btn: Optional[UIButton] = None
@@ -360,9 +373,10 @@ class ObjectsController:
         self.on_object_deleted: Optional[Callable[[str], None]] = None
         self.on_slice_created: Optional[Callable[[ObjectSlice], None]] = None
     
-    def setup_ui(self, ui_factory: Callable) -> None:
+    def setup_ui(self, ui_factory: UIFactoryInterface) -> None:
         """Setup UI components using the factory"""
         self.ui_factory = ui_factory
+        self.ui_manager = UIComponentManager(ui_factory)
         
         # Create UI components
         self.objects_list = ui_factory.create_list_widget()
@@ -440,12 +454,16 @@ class ObjectsController:
         self.current_object = self.asset_manager.objects.get(object_id)
         
         if self.current_object:
-            self.edit_object_btn.set_enabled(True)
-            self.delete_object_btn.set_enabled(True)
+            if self.edit_object_btn:
+                self.edit_object_btn.set_enabled(True)
+            if self.delete_object_btn:
+                self.delete_object_btn.set_enabled(True)
             self.refresh_object_details()
         else:
-            self.edit_object_btn.set_enabled(False)
-            self.delete_object_btn.set_enabled(False)
+            if self.edit_object_btn:
+                self.edit_object_btn.set_enabled(False)
+            if self.delete_object_btn:
+                self.delete_object_btn.set_enabled(False)
     
     def refresh_object_details(self) -> None:
         """Refresh the object details display"""
@@ -497,7 +515,7 @@ class ObjectsController:
         progress = int((completed_views / total_views) * 100) if total_views > 0 else 0
         
         if self.compliance_progress:
-            self.compliance_progress.set_value(progress)
+            self.compliance_progress.value = progress
             self.compliance_progress.set_visible(True)
     
     def refresh_views(self) -> None:
@@ -517,7 +535,7 @@ class ObjectsController:
             return
         
         # Group slices by view name
-        slices_by_view = {}
+        slices_by_view: Dict[str, List[ObjectSlice]] = {}
         for slice_obj in self.current_object.slices:
             view_name = slice_obj.name  # In the new model, slice name = view name
             if view_name not in slices_by_view:
@@ -570,7 +588,8 @@ class ObjectsController:
         # Get the selected view from the views list
         selected_view = self.views_list.current_data() if self.views_list else None
         if not selected_view:
-            self.message_box.show_warning("Error", "Please select a view to create a slice for")
+            if self.message_box:
+                self.message_box.show_warning("Error", "Please select a view to create a slice for")
             return
         
         # Convert selection coordinates from canvas space to source space
@@ -583,7 +602,8 @@ class ObjectsController:
         
         # For testing, always consider the selection valid if we have a MockRect
         if hasattr(source_rect, 'isValid') and not source_rect.isValid():
-            self.message_box.show_warning("Error", "Invalid selection")
+            if self.message_box:
+                self.message_box.show_warning("Error", "Invalid selection")
             return
         
         # Create the slice with the view name
@@ -611,7 +631,8 @@ class ObjectsController:
         self.clear_selection()
         self.refresh_views()
         
-        self.message_box.show_info("Success", f"Slice for view '{selected_view}' created successfully!")
+        if self.message_box:
+            self.message_box.show_info("Success", f"Slice for view '{selected_view}' created successfully!")
     
     def clear_selection(self) -> None:
         """Clear the canvas selection"""
@@ -664,7 +685,7 @@ class ObjectsController:
             return
         
         # Confirm deletion
-        if not self.message_box.show_question(
+        if not self.message_box or not self.message_box.show_question(
             "Delete Object",
             f"Are you sure you want to delete '{self.current_object.name}'?"
         ):

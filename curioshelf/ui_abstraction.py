@@ -28,6 +28,9 @@ class UIWidget(ABC):
         self._enabled = True
         self._visible = True
         self._layout: Optional['UILayout'] = None
+        self._test_mode = False
+        self._test_commands: List[Dict[str, Any]] = []
+        self._test_command_index = 0
     
     def connect_signal(self, signal_name: str, callback: Callable[..., None]) -> None:
         """Connect a callback to a signal"""
@@ -48,6 +51,35 @@ class UIWidget(ABC):
     def set_visible(self, visible: bool) -> None:
         """Show or hide the widget"""
         self._visible = visible
+    
+    def show(self) -> None:
+        """Show the widget"""
+        self.set_visible(True)
+    
+    def enable_test_mode(self, commands: List[Dict[str, Any]]) -> None:
+        """Enable test mode with a list of commands to execute"""
+        self._test_mode = True
+        self._test_commands = commands
+        self._test_command_index = 0
+        self._start_test_execution()
+    
+    def disable_test_mode(self) -> None:
+        """Disable test mode"""
+        self._test_mode = False
+        self._test_commands = []
+        self._test_command_index = 0
+    
+    def _start_test_execution(self) -> None:
+        """Start executing test commands (to be overridden by implementations)"""
+        pass
+    
+    def _execute_test_command(self, command: Dict[str, Any]) -> None:
+        """Execute a single test command (to be overridden by implementations)"""
+        pass
+    
+    def _next_test_command(self) -> None:
+        """Execute the next test command (to be overridden by implementations)"""
+        pass
     
     @property
     def enabled(self) -> bool:

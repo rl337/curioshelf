@@ -43,8 +43,8 @@ class MainWindowAbstracted:
         self.setup_ui()
         self.setup_ui_state_management()
         
-        # Show project dialog on startup
-        self.show_project_dialog()
+        # Don't show project dialog immediately - let the user choose
+        # self.show_project_dialog()
     
     def setup_ui(self):
         """Setup the user interface using abstraction layer"""
@@ -70,10 +70,34 @@ class MainWindowAbstracted:
         self.templates_tab = None
         self.objects_tab = None
         
-        # Add placeholder tabs
+        # Add placeholder tabs with some content
         placeholder1 = self.ui.create_widget()
+        placeholder1_label = self.ui.create_text_input()
+        placeholder1_label.set_text("Sources tab - Load a project to see sources")
+        placeholder1_label.set_enabled(False)  # Make it read-only
+        
         placeholder2 = self.ui.create_widget()
+        placeholder2_label = self.ui.create_text_input()
+        placeholder2_label.set_text("Templates tab - Load a project to see templates")
+        placeholder2_label.set_enabled(False)  # Make it read-only
+        
         placeholder3 = self.ui.create_widget()
+        placeholder3_label = self.ui.create_text_input()
+        placeholder3_label.set_text("Objects tab - Load a project to see objects")
+        placeholder3_label.set_enabled(False)  # Make it read-only
+        
+        # Create layouts for placeholder tabs
+        placeholder1_layout = self.ui.create_layout("vertical")
+        placeholder1.set_layout(placeholder1_layout)
+        placeholder1_layout.add_widget(placeholder1_label)
+        
+        placeholder2_layout = self.ui.create_layout("vertical")
+        placeholder2.set_layout(placeholder2_layout)
+        placeholder2_layout.add_widget(placeholder2_label)
+        
+        placeholder3_layout = self.ui.create_layout("vertical")
+        placeholder3.set_layout(placeholder3_layout)
+        placeholder3_layout.add_widget(placeholder3_label)
         
         self.tab_widget.add_tab(placeholder1, "Sources")
         self.tab_widget.add_tab(placeholder2, "Templates")
@@ -82,8 +106,36 @@ class MainWindowAbstracted:
         # Create status bar
         self.create_status_bar()
         
+        # Add status bar to main layout
+        status_layout = self.ui.create_layout("horizontal")
+        status_layout.add_widget(self.status_label)
+        status_layout.add_widget(self.progress_label)
+        status_layout.add_widget(self.project_status_label)
+        main_layout.add_widget(status_layout)
+        
         # Set up refresh timer
         self.setup_refresh_timer()
+        
+        # Ensure all widgets are visible
+        self.show_all_widgets()
+    
+    def show_all_widgets(self):
+        """Show all widgets in the main window"""
+        # Show main widget
+        if hasattr(self.main_widget, 'show'):
+            self.main_widget.show()
+        
+        # Show tab widget
+        if hasattr(self.tab_widget, 'show'):
+            self.tab_widget.show()
+        
+        # Show status bar widgets
+        if self.status_label and hasattr(self.status_label, 'show'):
+            self.status_label.show()
+        if self.progress_label and hasattr(self.progress_label, 'show'):
+            self.progress_label.show()
+        if self.project_status_label and hasattr(self.project_status_label, 'show'):
+            self.project_status_label.show()
     
     def create_menu_bar(self):
         """Create the menu bar using abstraction layer"""
@@ -452,19 +504,22 @@ class MainWindowAbstracted:
     
     # Utility methods
     def show_info(self, message: str):
-        """Show info message"""
-        msg_box = self.ui.create_message_box()
-        msg_box.show_info("Info", message)
+        """Show info message - log to console and update status"""
+        print(f"[INFO] {message}")
+        if self.status_label:
+            self.status_label.set_text(f"Info: {message}")
     
     def show_warning(self, message: str):
-        """Show warning message"""
-        msg_box = self.ui.create_message_box()
-        msg_box.show_warning("Warning", message)
+        """Show warning message - log to console and update status"""
+        print(f"[WARNING] {message}")
+        if self.status_label:
+            self.status_label.set_text(f"Warning: {message}")
     
     def show_error(self, message: str):
-        """Show error message"""
-        msg_box = self.ui.create_message_box()
-        msg_box.show_error("Error", message)
+        """Show error message - log to console and update status"""
+        print(f"[ERROR] {message}")
+        if self.status_label:
+            self.status_label.set_text(f"Error: {message}")
     
     def run(self):
         """Run the application"""

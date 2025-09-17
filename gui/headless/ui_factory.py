@@ -13,6 +13,7 @@ from curioshelf.ui_abstraction import (
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout
 )
+from curioshelf.ui_factory_interface import UIFactoryInterface
 from .ui_widgets import (
     HeadlessUIWidget, HeadlessUIButton, HeadlessUITextInput, HeadlessUIComboBox, 
     HeadlessUIListWidget, HeadlessUICanvas, HeadlessUIMessageBox, HeadlessUIFileDialog, 
@@ -23,10 +24,10 @@ from .message_system import MessageLogger, MessageType
 from gui.ui_interface import UIImplementationInterface, UIImplementationError
 
 
-class HeadlessUIImplementation(UIImplementationInterface):
+class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
     """Headless implementation of the UI interface for testing"""
     
-    def __init__(self, verbose: bool = True, collect_messages: bool = True):
+    def __init__(self, verbose: bool = True, collect_messages: bool = True) -> None:
         super().__init__(verbose)
         self._pixmap_counter = 0
         self._style = {}
@@ -35,6 +36,9 @@ class HeadlessUIImplementation(UIImplementationInterface):
             collect_messages=collect_messages,
             print_messages=verbose
         )
+        self._test_mode = False
+        self._test_commands = []
+        self._test_command_index = 0
     
     def initialize(self) -> bool:
         """Initialize the headless UI implementation"""
@@ -93,6 +97,97 @@ class HeadlessUIImplementation(UIImplementationInterface):
         if self.verbose:
             print(f"[HEADLESS ERROR] {error_msg} (Context: {context})")
         raise UIImplementationError(error_msg, "headless", context)
+    
+    def enable_test_mode(self, commands: List[Dict[str, Any]]) -> None:
+        """Enable test mode with a list of commands to execute"""
+        self._test_mode = True
+        self._test_commands = commands
+        self._test_command_index = 0
+        
+        if self.verbose:
+            print(f"[HEADLESS] Test mode enabled with {len(commands)} commands")
+        
+        # Execute commands immediately in headless mode
+        self._execute_all_test_commands()
+    
+    def disable_test_mode(self) -> None:
+        """Disable test mode and return to normal operation"""
+        self._test_mode = False
+        self._test_commands = []
+        self._test_command_index = 0
+        
+        if self.verbose:
+            print("[HEADLESS] Test mode disabled")
+    
+    def is_test_mode(self) -> bool:
+        """Check if the UI implementation is currently in test mode"""
+        return self._test_mode
+    
+    def _execute_all_test_commands(self) -> None:
+        """Execute all test commands immediately (headless mode)"""
+        for i, command in enumerate(self._test_commands):
+            if self.verbose:
+                print(f"[HEADLESS] Executing test command {i+1}/{len(self._test_commands)}: {command}")
+            
+            try:
+                self._execute_test_command(command)
+            except Exception as e:
+                if self.verbose:
+                    print(f"[HEADLESS] Test command {i+1} failed: {e}")
+                break
+        
+        if self.verbose:
+            print("[HEADLESS] Test execution completed")
+        
+        self.disable_test_mode()
+    
+    def _execute_test_command(self, command: Dict[str, Any]) -> None:
+        """Execute a single test command"""
+        cmd_type = command.get("command")
+        
+        if cmd_type == "wait":
+            duration = command.get("duration", 0.1)
+            # In headless mode, we can just log the wait
+            if self.verbose:
+                print(f"[HEADLESS] Waiting {duration}s")
+            
+        elif cmd_type == "create_widget":
+            widget_type = command.get("widget_type")
+            if widget_type == "button":
+                text = command.get("text", "Test Button")
+                self.create_button(text)
+            elif widget_type == "text_input":
+                placeholder = command.get("placeholder", "Test Input")
+                self.create_text_input(placeholder)
+            elif widget_type == "combo_box":
+                self.create_combo_box()
+            elif widget_type == "list_widget":
+                self.create_list_widget()
+            elif widget_type == "canvas":
+                self.create_canvas()
+            elif widget_type == "progress_bar":
+                self.create_progress_bar()
+            elif widget_type == "group_box":
+                title = command.get("title", "Test Group")
+                self.create_group_box(title)
+            elif widget_type == "tab_widget":
+                self.create_tab_widget()
+            elif widget_type == "splitter":
+                self.create_splitter()
+            elif widget_type == "layout":
+                layout_type = command.get("layout_type", "vertical")
+                self.create_layout(layout_type)
+                
+        elif cmd_type == "assert":
+            condition = command.get("condition")
+            message = command.get("message", "Assertion failed")
+            if not condition:
+                raise AssertionError(message)
+                
+        elif cmd_type == "call_method":
+            method_name = command.get("method")
+            # This would be implemented by the test
+            pass
     
     def _log(self, message: str):
         """Log a message if verbose mode is enabled"""

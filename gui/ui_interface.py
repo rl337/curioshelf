@@ -354,6 +354,38 @@ class UIImplementationInterface(ABC):
             context: Additional context about where the error occurred
         """
         pass
+    
+    @abstractmethod
+    def enable_test_mode(self, commands: List[Dict[str, Any]]) -> None:
+        """
+        Enable test mode with a list of commands to execute
+        
+        This method allows the UI implementation to enter test mode where
+        it can execute a series of commands for testing purposes. The
+        implementation should handle the commands appropriately for its
+        framework (e.g., using timers for Qt, immediate execution for headless).
+        
+        Args:
+            commands: List of test commands to execute
+        """
+        pass
+    
+    @abstractmethod
+    def disable_test_mode(self) -> None:
+        """
+        Disable test mode and return to normal operation
+        """
+        pass
+    
+    @abstractmethod
+    def is_test_mode(self) -> bool:
+        """
+        Check if the UI implementation is currently in test mode
+        
+        Returns:
+            True if in test mode, False otherwise
+        """
+        pass
 
 
 class UIImplementationError(Exception):

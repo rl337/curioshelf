@@ -21,10 +21,16 @@ from curioshelf.ui_abstraction import (
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout
 )
+from curioshelf.ui_factory_interface import UIFactoryInterface
 from gui.ui_interface import UIImplementationInterface, UIImplementationError
+from .ui_widgets import (
+    QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
+    QtUICanvas, QtUIMessageBox, QtUIFileDialog, QtUIProgressBar, QtUIGroupBox,
+    QtUITabWidget, QtUISplitter, QtUILayout
+)
 
 
-class QtUIImplementation(UIImplementationInterface):
+class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
     """Qt/PySide6 implementation of the UI interface"""
     
     def __init__(self, verbose: bool = False):
@@ -32,16 +38,26 @@ class QtUIImplementation(UIImplementationInterface):
         self._pixmap_counter = 0
         self._app = None
         self._style = {}
+        self._test_mode = False
+        self._test_commands = []
+        self._test_command_index = 0
     
     def initialize(self) -> bool:
         """Initialize the Qt UI implementation"""
         try:
+            # Always create QApplication - it's needed for widget creation
             if not QApplication.instance():
+                if self.verbose:
+                    print("[QT] Creating new QApplication instance...")
                 self._app = QApplication([])
                 self._app.setApplicationName("CurioShelf")
                 self._app.setApplicationVersion("2.0.0")
                 self._app.setOrganizationName("CurioShelf")
+                if self.verbose:
+                    print("[QT] QApplication created successfully")
             else:
+                if self.verbose:
+                    print("[QT] Using existing QApplication instance")
                 self._app = QApplication.instance()
             
             self._initialized = True
@@ -75,8 +91,16 @@ class QtUIImplementation(UIImplementationInterface):
             self.initialize()
         
         if self._app:
-            return self._app.exec()
-        return 1
+            if self.verbose:
+                print("[QT] Starting Qt event loop...")
+            result = self._app.exec()
+            if self.verbose:
+                print(f"[QT] Qt event loop exited with code: {result}")
+            return result
+        else:
+            if self.verbose:
+                print("[QT] No Qt application instance available")
+            return 1
     
     def quit_event_loop(self) -> None:
         """Quit the Qt event loop"""
@@ -138,6 +162,98 @@ class QtUIImplementation(UIImplementationInterface):
             print(f"[QT ERROR] {error_msg} (Context: {context})")
         raise UIImplementationError(error_msg, "qt", context)
     
+    def enable_test_mode(self, commands: List[Dict[str, Any]]) -> None:
+        """Enable test mode with a list of commands to execute"""
+        self._test_mode = True
+        self._test_commands = commands
+        self._test_command_index = 0
+        
+        if self.verbose:
+            print(f"[QT] Test mode enabled with {len(commands)} commands")
+        
+        # Execute commands immediately in test mode (like headless implementation)
+        # This avoids event loop issues in test environments
+        self._execute_all_test_commands()
+    
+    def _execute_all_test_commands(self) -> None:
+        """Execute all test commands immediately (like headless implementation)"""
+        for i, command in enumerate(self._test_commands):
+            if self.verbose:
+                print(f"[QT] Executing test command {i+1}/{len(self._test_commands)}: {command}")
+            try:
+                self._execute_test_command(command)
+            except Exception as e:
+                if self.verbose:
+                    print(f"[QT] Test command {i+1} failed: {e}")
+                break
+        
+        if self.verbose:
+            print("[QT] Test execution completed")
+        self.disable_test_mode()
+    
+    def disable_test_mode(self) -> None:
+        """Disable test mode and return to normal operation"""
+        self._test_mode = False
+        self._test_commands = []
+        self._test_command_index = 0
+        
+        
+        if self.verbose:
+            print("[QT] Test mode disabled")
+    
+    def is_test_mode(self) -> bool:
+        """Check if the UI implementation is currently in test mode"""
+        return self._test_mode
+    
+    
+    def _execute_test_command(self, command: Dict[str, Any]) -> None:
+        """Execute a single test command"""
+        cmd_type = command.get("command")
+        
+        if cmd_type == "wait":
+            duration = command.get("duration", 0.1)
+            # In test mode, we can simulate wait with a simple sleep
+            import time
+            time.sleep(duration)
+            
+        elif cmd_type == "create_widget":
+            widget_type = command.get("widget_type")
+            if widget_type == "button":
+                text = command.get("text", "Test Button")
+                self.create_button(text)
+            elif widget_type == "text_input":
+                placeholder = command.get("placeholder", "Test Input")
+                self.create_text_input(placeholder)
+            elif widget_type == "combo_box":
+                self.create_combo_box()
+            elif widget_type == "list_widget":
+                self.create_list_widget()
+            elif widget_type == "canvas":
+                self.create_canvas()
+            elif widget_type == "progress_bar":
+                self.create_progress_bar()
+            elif widget_type == "group_box":
+                title = command.get("title", "Test Group")
+                self.create_group_box(title)
+            elif widget_type == "tab_widget":
+                self.create_tab_widget()
+            elif widget_type == "splitter":
+                self.create_splitter()
+            elif widget_type == "layout":
+                layout_type = command.get("layout_type", "vertical")
+                self.create_layout(layout_type)
+                
+        elif cmd_type == "assert":
+            condition = command.get("condition")
+            message = command.get("message", "Assertion failed")
+            if not condition:
+                raise AssertionError(message)
+                
+        elif cmd_type == "call_method":
+            method_name = command.get("method")
+            # This would be implemented by the test
+            pass
+    
     def create_widget(self) -> 'QtUIWidget':
         """Create a basic widget"""
         return QtUIWidget()
@@ -164,7 +280,10 @@ class QtUIImplementation(UIImplementationInterface):
     
     def create_message_box(self) -> 'QtUIMessageBox':
         """Create a message box"""
-        return QtUIMessageBox()
+        msg_box = QtUIMessageBox()
+        # Pass test mode flag to message box
+        msg_box._test_mode = self._test_mode
+        return msg_box
     
     def create_file_dialog(self) -> 'QtUIFileDialog':
         """Create a file dialog"""

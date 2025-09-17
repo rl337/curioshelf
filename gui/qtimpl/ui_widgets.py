@@ -8,7 +8,7 @@ from typing import Any, Optional, Callable, List
 from pathlib import Path
 
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QLineEdit, QTextEdit, QComboBox, QListWidget,
+    QWidget, QMainWindow, QPushButton, QLineEdit, QTextEdit, QComboBox, QListWidget,
     QGraphicsView, QGraphicsScene, QMessageBox, QFileDialog, QProgressBar,
     QGroupBox, QTabWidget, QSplitter, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QListWidgetItem
@@ -21,24 +21,58 @@ from curioshelf.ui_abstraction import (
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout
 )
+from curioshelf.ui_debug import UIDebugMixin, get_global_debugger
 
 
-class QtUIWidget(UIWidget):
+class QtUIWidget(UIWidget, UIDebugMixin):
     """Qt implementation of UIWidget"""
     
     def __init__(self) -> None:
-        super().__init__()
-        self._qt_widget = QWidget()
+        UIWidget.__init__(self)
+        UIDebugMixin.__init__(self)
+        self._qt_widget = QMainWindow()
+        # Set a reasonable default size
+        self._qt_widget.resize(800, 600)
+        self._qt_widget.setWindowTitle("CurioShelf")
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIWidget created", {
+            "size": (800, 600),
+            "widget_id": id(self)
+        })
     
     def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the widget"""
         super().set_enabled(enabled)
         self._qt_widget.setEnabled(enabled)
+        self.debug_state_change(f"enabled_{enabled}", {"enabled": enabled})
     
     def set_visible(self, visible: bool) -> None:
         """Show or hide the widget"""
         super().set_visible(visible)
         self._qt_widget.setVisible(visible)
+        self.debug_state_change(f"visible_{visible}", {"visible": visible})
+    
+    def show(self) -> None:
+        """Show the widget"""
+        super().show()
+        self._qt_widget.show()
+        self.debug_ui_event("shown", {"widget_id": id(self)})
+    
+    def set_layout(self, layout: 'UILayout') -> None:
+        """Set the layout for the widget"""
+        super().set_layout(layout)
+        # Apply the layout to the Qt widget
+        if hasattr(layout, 'qt_layout'):
+            # For QMainWindow, we need to set the central widget
+            central_widget = QWidget()
+            central_widget.setLayout(layout.qt_layout)
+            self._qt_widget.setCentralWidget(central_widget)
+            self.debug_ui_event("layout_applied", {
+                "layout_type": layout.__class__.__name__,
+                "widget_id": id(self)
+            })
     
     @property
     def qt_widget(self) -> QWidget:
@@ -78,6 +112,11 @@ class QtUIButton(UIButton):
         """Show or hide the button"""
         super().set_visible(visible)
         self._qt_button.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the button"""
+        super().show()
+        self._qt_button.show()
     
     @property
     def qt_widget(self) -> QPushButton:
@@ -122,6 +161,11 @@ class QtUITextInput(UITextInput):
         super().set_visible(visible)
         self._qt_input.setVisible(visible)
     
+    def show(self) -> None:
+        """Show the input"""
+        super().show()
+        self._qt_input.show()
+    
     @property
     def qt_widget(self) -> QLineEdit:
         """Get the underlying Qt input"""
@@ -165,6 +209,11 @@ class QtUIComboBox(UIComboBox):
         """Show or hide the combo box"""
         super().set_visible(visible)
         self._qt_combo.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the combo box"""
+        super().show()
+        self._qt_combo.show()
     
     @property
     def qt_widget(self) -> QComboBox:
@@ -211,6 +260,11 @@ class QtUIListWidget(UIListWidget):
         """Show or hide the list"""
         super().set_visible(visible)
         self._qt_list.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the list"""
+        super().show()
+        self._qt_list.show()
     
     @property
     def qt_widget(self) -> QListWidget:
@@ -284,6 +338,11 @@ class QtUICanvas(UICanvas):
         super().set_visible(visible)
         self._qt_view.setVisible(visible)
     
+    def show(self) -> None:
+        """Show the canvas"""
+        super().show()
+        self._qt_view.show()
+    
     @property
     def qt_widget(self) -> QGraphicsView:
         """Get the underlying Qt graphics view"""
@@ -294,22 +353,23 @@ class QtUIMessageBox(UIMessageBox):
     """Qt implementation of UIMessageBox"""
     
     def show_info(self, title: str, message: str) -> None:
-        """Show an info message"""
-        QMessageBox.information(None, title, message)
+        """Show an info message - log to console instead of modal dialog"""
+        print(f"[QT INFO] {title}: {message}")
     
     def show_warning(self, title: str, message: str) -> None:
-        """Show a warning message"""
-        QMessageBox.warning(None, title, message)
+        """Show a warning message - log to console instead of modal dialog"""
+        print(f"[QT WARNING] {title}: {message}")
     
     def show_error(self, title: str, message: str) -> None:
-        """Show an error message"""
-        QMessageBox.critical(None, title, message)
+        """Show an error message - log to console instead of modal dialog"""
+        print(f"[QT ERROR] {title}: {message}")
     
     def show_question(self, title: str, message: str) -> bool:
-        """Show a question dialog and return True if Yes was clicked"""
-        reply = QMessageBox.question(None, title, message, 
-                                   QMessageBox.Yes | QMessageBox.No)
-        return reply == QMessageBox.Yes
+        """Show a question dialog and return True if Yes was clicked - log instead of modal"""
+        print(f"[QT QUESTION] {title}: {message}")
+        # For now, always return True to avoid blocking
+        # In a real implementation, this would show a non-modal dialog or use a different UI pattern
+        return True
 
 
 class QtUIFileDialog(UIFileDialog):
@@ -342,7 +402,8 @@ class QtUIProgressBar(UIProgressBar):
     
     @value.setter
     def value(self, value: int) -> None:
-        super().value = value
+        # Clamp value to valid range
+        value = max(self.minimum, min(value, self.maximum))
         self._qt_progress.setValue(value)
     
     @property
@@ -372,6 +433,11 @@ class QtUIProgressBar(UIProgressBar):
         """Show or hide the progress bar"""
         super().set_visible(visible)
         self._qt_progress.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the progress bar"""
+        super().show()
+        self._qt_progress.show()
     
     @property
     def qt_widget(self) -> QProgressBar:
@@ -404,6 +470,11 @@ class QtUIGroupBox(UIGroupBox):
         """Show or hide the group box"""
         super().set_visible(visible)
         self._qt_group.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the group box"""
+        super().show()
+        self._qt_group.show()
     
     @property
     def qt_widget(self) -> QGroupBox:
@@ -444,6 +515,11 @@ class QtUITabWidget(UITabWidget):
         """Show or hide the tab widget"""
         super().set_visible(visible)
         self._qt_tabs.setVisible(visible)
+    
+    def show(self) -> None:
+        """Show the tab widget"""
+        super().show()
+        self._qt_tabs.show()
     
     @property
     def qt_widget(self) -> QTabWidget:

@@ -41,6 +41,11 @@ class HeadlessUIWidget(UIWidget):
         """Show or hide the widget"""
         super().set_visible(visible)
         self._log_state_change(f"{'shown' if visible else 'hidden'}")
+    
+    def show(self) -> None:
+        """Show the widget"""
+        super().show()
+        self._log_ui_event("shown")
 
 
 class HeadlessUIButton(UIButton):
