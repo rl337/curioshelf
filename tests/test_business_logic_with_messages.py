@@ -14,7 +14,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from curioshelf.models import AssetManager, AssetSource, ObjectSlice, CurioObject, Template
-from curioshelf.business_logic_v2 import SourcesController, TemplatesController, ObjectsController
+from curioshelf.app_impl.controllers import SourcesController, TemplatesController, ObjectsController
 from gui.ui_factory import create_ui_factory
 from gui.headless.message_system import MessageCollector, MessageType
 

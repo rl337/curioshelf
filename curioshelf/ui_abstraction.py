@@ -449,3 +449,87 @@ class UISplitter(UIWidget):
     def get_sizes(self) -> List[int]:
         """Get the current sizes"""
         return self._sizes.copy()
+
+
+class UIMenuBar(UIWidget):
+    """Abstract base class for menu bars"""
+    
+    def __init__(self) -> None:
+        super().__init__()
+        self._menus: List['UIMenu'] = []
+    
+    def add_menu(self, menu: 'UIMenu') -> None:
+        """Add a menu to the menu bar"""
+        self._menus.append(menu)
+    
+    def get_menus(self) -> List['UIMenu']:
+        """Get all menus in the menu bar"""
+        return self._menus.copy()
+
+
+class UIMenu(UIWidget):
+    """Abstract base class for menus"""
+    
+    def __init__(self, title: str) -> None:
+        super().__init__()
+        self._title = title
+        self._items: List['UIMenuItem'] = []
+    
+    @property
+    def title(self) -> str:
+        """Get the menu title"""
+        return self._title
+    
+    def add_item(self, item: 'UIMenuItem') -> None:
+        """Add a menu item to the menu"""
+        self._items.append(item)
+    
+    def get_items(self) -> List['UIMenuItem']:
+        """Get all menu items in the menu"""
+        return self._items.copy()
+
+
+class UIMenuItem(UIWidget):
+    """Abstract base class for menu items"""
+    
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self._text = text
+        self._clicked_callback: Optional[Callable[[], None]] = None
+    
+    @property
+    def text(self) -> str:
+        """Get the menu item text"""
+        return self._text
+    
+    @text.setter
+    def text(self, value: str) -> None:
+        """Set the menu item text"""
+        self._text = value
+    
+    def set_clicked_callback(self, callback: Callable[[], None]) -> None:
+        """Set the callback for when the menu item is clicked"""
+        self._clicked_callback = callback
+    
+    def _on_clicked(self) -> None:
+        """Handle menu item click"""
+        if self._clicked_callback:
+            self._clicked_callback()
+        self.emit_signal("clicked")
+
+
+class UIStatusBar(UIWidget):
+    """Abstract base class for status bars"""
+    
+    def __init__(self) -> None:
+        super().__init__()
+        self._message = ""
+    
+    def set_message(self, message: str) -> None:
+        """Set the status bar message"""
+        self._message = message
+        self.emit_signal("message_changed", message)
+    
+    def get_message(self) -> str:
+        """Get the current status bar message"""
+        return self._message

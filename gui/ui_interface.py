@@ -19,7 +19,7 @@ from pathlib import Path
 from curioshelf.ui_abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
-    UISplitter, UILayout
+    UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
 
 
@@ -256,18 +256,75 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_layout(self, orientation: str = "vertical") -> UILayout:
+    def create_layout(self, orientation: str = "vertical", parent: Optional[UIWidget] = None) -> UILayout:
         """
         Create a layout manager for organizing widgets
         
         Args:
             orientation: "vertical", "horizontal", or "form" layout orientation
+            parent: Optional parent widget for proper hierarchy
             
         Returns:
             UILayout: A layout that supports:
                 - Adding widgets (add_widget)
                 - Removing widgets (remove_widget)
                 - Automatic widget arrangement
+        """
+        pass
+    
+    # Menu and Status Bar Support
+    
+    @abstractmethod
+    def create_menu_bar(self, parent: Optional[UIWidget] = None) -> 'UIMenuBar':
+        """
+        Create a menu bar widget
+        
+        Args:
+            parent: Optional parent widget for proper hierarchy
+            
+        Returns:
+            UIMenuBar: A menu bar widget that can contain menus
+        """
+        pass
+    
+    @abstractmethod
+    def create_menu(self, title: str, parent: Optional['UIMenuBar'] = None) -> 'UIMenu':
+        """
+        Create a menu widget
+        
+        Args:
+            title: Menu title text
+            parent: Optional parent menu bar
+            
+        Returns:
+            UIMenu: A menu widget that can contain menu items
+        """
+        pass
+    
+    @abstractmethod
+    def create_menu_item(self, text: str, parent: Optional['UIMenu'] = None) -> 'UIMenuItem':
+        """
+        Create a menu item widget
+        
+        Args:
+            text: Menu item text
+            parent: Optional parent menu
+            
+        Returns:
+            UIMenuItem: A menu item widget that can be clicked
+        """
+        pass
+    
+    @abstractmethod
+    def create_status_bar(self, parent: Optional[UIWidget] = None) -> 'UIStatusBar':
+        """
+        Create a status bar widget
+        
+        Args:
+            parent: Optional parent widget for proper hierarchy
+            
+        Returns:
+            UIStatusBar: A status bar widget for displaying status information
         """
         pass
     

@@ -19,14 +19,14 @@ from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QScreen
 from curioshelf.ui_abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
-    UISplitter, UILayout
+    UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
 from curioshelf.ui_factory_interface import UIFactoryInterface
 from gui.ui_interface import UIImplementationInterface, UIImplementationError
 from .ui_widgets import (
     QtUIMainWidget, QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
     QtUICanvas, QtUIMessageBox, QtUIFileDialog, QtUIProgressBar, QtUIGroupBox,
-    QtUITabWidget, QtUISplitter, QtUILayout
+    QtUITabWidget, QtUISplitter, QtUILayout, QtUIMenuBar, QtUIMenu, QtUIMenuItem, QtUIStatusBar
 )
 
 
@@ -351,6 +351,26 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a layout"""
         qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
         return QtUILayout(orientation, parent=qt_parent)
+    
+    def create_menu_bar(self, parent: Optional['UIWidget'] = None) -> 'QtUIMenuBar':
+        """Create a menu bar"""
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIMenuBar(parent=qt_parent)
+    
+    def create_menu(self, title: str, parent: Optional['UIMenuBar'] = None) -> 'QtUIMenu':
+        """Create a menu"""
+        qt_parent = parent.qt_widget if parent and hasattr(parent, 'qt_widget') else None
+        return QtUIMenu(title, parent=qt_parent)
+    
+    def create_menu_item(self, text: str, parent: Optional['UIMenu'] = None) -> 'QtUIMenuItem':
+        """Create a menu item"""
+        qt_parent = parent.qt_widget if parent and hasattr(parent, 'qt_widget') else None
+        return QtUIMenuItem(text, parent=qt_parent)
+    
+    def create_status_bar(self, parent: Optional['UIWidget'] = None) -> 'QtUIStatusBar':
+        """Create a status bar"""
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIStatusBar(parent=qt_parent)
     
     def _debug_windows(self):
         """Debug: List all windows"""

@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from curioshelf.models import AssetManager, AssetSource, ObjectSlice, CurioObject, Template
-from curioshelf.business_logic_v2 import SourcesController, TemplatesController, ObjectsController
+from curioshelf.app_impl.controllers import SourcesController, TemplatesController, ObjectsController
 from curioshelf.ui_mocks import MockUIFactory
 
 

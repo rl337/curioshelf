@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from .models import AssetManager
+from .status_bar_handler import emit_project_status, emit_info_message, emit_error_message
 
 
 @dataclass
@@ -98,10 +99,16 @@ class ProjectManager:
             self.asset_manager = AssetManager()
             self.is_project_loaded = True
             
+            # Emit status events
+            emit_info_message(f"Project '{project_info.name}' created successfully", "project_manager")
+            emit_project_status(project_info.name, "project_manager")
+            
             return True
             
         except Exception as e:
-            print(f"Error creating project: {e}")
+            error_msg = f"Error creating project: {e}"
+            print(error_msg)
+            emit_error_message(error_msg, "project_manager")
             return False
     
     def load_project(self, project_path: Path) -> bool:
@@ -132,10 +139,16 @@ class ProjectManager:
             self.current_project_path = project_path
             self.is_project_loaded = True
             
+            # Emit status events
+            emit_info_message(f"Project '{self.project_info.name}' loaded successfully", "project_manager")
+            emit_project_status(self.project_info.name, "project_manager")
+            
             return True
             
         except Exception as e:
-            print(f"Error loading project: {e}")
+            error_msg = f"Error loading project: {e}"
+            print(error_msg)
+            emit_error_message(error_msg, "project_manager")
             return False
     
     def save_project(self) -> bool:
@@ -156,10 +169,15 @@ class ProjectManager:
             with open(self.current_project_path / self.assets_file, 'w') as f:
                 self.asset_manager.save_metadata(str(self.current_project_path / self.assets_file))
             
+            # Emit status events
+            emit_info_message(f"Project '{self.project_info.name}' saved successfully", "project_manager")
+            
             return True
             
         except Exception as e:
-            print(f"Error saving project: {e}")
+            error_msg = f"Error saving project: {e}"
+            print(error_msg)
+            emit_error_message(error_msg, "project_manager")
             return False
     
     def close_project(self) -> bool:
@@ -177,10 +195,16 @@ class ProjectManager:
             self.asset_manager = None
             self.is_project_loaded = False
             
+            # Emit status events
+            emit_info_message("Project closed", "project_manager")
+            emit_project_status(None, "project_manager")
+            
             return True
             
         except Exception as e:
-            print(f"Error closing project: {e}")
+            error_msg = f"Error closing project: {e}"
+            print(error_msg)
+            emit_error_message(error_msg, "project_manager")
             return False
     
     def add_source_file(self, source_path: Path) -> Optional[Path]:

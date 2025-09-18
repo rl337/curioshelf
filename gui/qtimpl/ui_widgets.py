@@ -11,15 +11,15 @@ from PySide6.QtWidgets import (
     QWidget, QMainWindow, QPushButton, QLineEdit, QTextEdit, QComboBox, QListWidget,
     QGraphicsView, QGraphicsScene, QMessageBox, QFileDialog, QProgressBar,
     QGroupBox, QTabWidget, QSplitter, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QLabel, QListWidgetItem
+    QLabel, QListWidgetItem, QMenuBar, QMenu, QStatusBar
 )
 from PySide6.QtCore import Qt, QRect, QTimer, Signal, QObject
-from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QWheelEvent
+from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QWheelEvent, QAction
 
 from curioshelf.ui_abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
-    UISplitter, UILayout
+    UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
 from curioshelf.ui_debug import UIDebugMixin, get_global_debugger
 
@@ -65,15 +65,27 @@ class QtUIMainWidget(UIWidget, UIDebugMixin):
         super().set_layout(layout)
         if hasattr(layout, '_qt_layout'):
             # For QMainWindow, we need to set the central widget
-            central_widget = QWidget()
+            central_widget = QWidget(self._qt_widget)  # Set parent
             central_widget.setLayout(layout._qt_layout)
             self._qt_widget.setCentralWidget(central_widget)
+            # Set the parent widget on the layout so it can parent child widgets
+            layout._parent_widget = central_widget
         self.debug_log("layout_set", "Layout set on QtUIMainWidget")
     
     @property
     def qt_widget(self) -> QMainWindow:
         """Get the underlying Qt main window"""
         return self._qt_widget
+    
+    def set_menu_bar(self, menu_bar: 'QtUIMenuBar') -> None:
+        """Set the menu bar for the main window"""
+        self._qt_widget.setMenuBar(menu_bar.qt_widget)
+        self.debug_log("menu_bar_set", "Menu bar set on main window")
+    
+    def set_status_bar(self, status_bar: 'QtUIStatusBar') -> None:
+        """Set the status bar for the main window"""
+        self._qt_widget.setStatusBar(status_bar.qt_widget)
+        self.debug_log("status_bar_set", "Status bar set on main window")
 
 
 class QtUIWidget(UIWidget, UIDebugMixin):
@@ -631,18 +643,152 @@ class QtUILayout(UILayout):
     
     def add_widget(self, widget: UIWidget, *args, **kwargs) -> None:
         """Add a widget to the layout"""
-        if isinstance(widget, QtUIWidget):
+        # Check if widget has a qt_widget property (all Qt implementations should have this)
+        if hasattr(widget, 'qt_widget'):
             # Ensure the widget is properly parented
             if hasattr(self, '_parent_widget') and self._parent_widget:
                 widget.qt_widget.setParent(self._parent_widget)
             self._qt_layout.addWidget(widget.qt_widget, *args, **kwargs)
+        elif hasattr(widget, '_qt_tabs'):  # Special case for QtUITabWidget
+            # Ensure the widget is properly parented
+            if hasattr(self, '_parent_widget') and self._parent_widget:
+                widget._qt_tabs.setParent(self._parent_widget)
+            self._qt_layout.addWidget(widget._qt_tabs, *args, **kwargs)
+        else:
+            print(f"Warning: Cannot add widget {widget} to layout - no Qt widget found")
     
     def remove_widget(self, widget: UIWidget) -> None:
         """Remove a widget from the layout"""
-        if isinstance(widget, QtUIWidget):
+        if hasattr(widget, 'qt_widget'):
             self._qt_layout.removeWidget(widget.qt_widget)
+        elif hasattr(widget, '_qt_tabs'):  # Special case for QtUITabWidget
+            self._qt_layout.removeWidget(widget._qt_tabs)
     
     @property
     def qt_layout(self) -> None:
         """Get the underlying Qt layout"""
         return self._qt_layout
+
+
+class QtUIMenuBar(UIMenuBar, UIDebugMixin):
+    """Qt implementation of UIMenuBar"""
+    
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        super().__init__()
+        UIDebugMixin.__init__(self)
+        self._qt_menu_bar = QMenuBar(parent)
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIMenuBar created", {
+            "widget_id": id(self)
+        })
+    
+    @property
+    def qt_widget(self) -> QMenuBar:
+        """Get the underlying Qt menu bar"""
+        return self._qt_menu_bar
+    
+    def add_menu(self, menu: 'UIMenu') -> None:
+        """Add a menu to the menu bar"""
+        super().add_menu(menu)
+        if isinstance(menu, QtUIMenu):
+            self._qt_menu_bar.addMenu(menu.qt_widget)
+    
+    def show(self) -> None:
+        """Show the menu bar"""
+        super().show()
+        self._qt_menu_bar.show()
+
+
+class QtUIMenu(UIMenu, UIDebugMixin):
+    """Qt implementation of UIMenu"""
+    
+    def __init__(self, title: str, parent: Optional[QMenuBar] = None) -> None:
+        super().__init__(title)
+        UIDebugMixin.__init__(self)
+        self._qt_menu = QMenu(title, parent)
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIMenu created", {
+            "title": title,
+            "widget_id": id(self)
+        })
+    
+    @property
+    def qt_widget(self) -> QMenu:
+        """Get the underlying Qt menu"""
+        return self._qt_menu
+    
+    def add_item(self, item: 'UIMenuItem') -> None:
+        """Add a menu item to the menu"""
+        super().add_item(item)
+        if isinstance(item, QtUIMenuItem):
+            self._qt_menu.addAction(item.qt_action)
+    
+    def show(self) -> None:
+        """Show the menu"""
+        super().show()
+        self._qt_menu.show()
+
+
+class QtUIMenuItem(UIMenuItem, UIDebugMixin):
+    """Qt implementation of UIMenuItem"""
+    
+    def __init__(self, text: str, parent: Optional[QMenu] = None) -> None:
+        super().__init__(text)
+        UIDebugMixin.__init__(self)
+        self._qt_action = QAction(text, parent)
+        self._qt_action.triggered.connect(self._on_qt_clicked)
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIMenuItem created", {
+            "text": text,
+            "widget_id": id(self)
+        })
+    
+    @property
+    def qt_action(self) -> QAction:
+        """Get the underlying Qt action"""
+        return self._qt_action
+    
+    def _on_qt_clicked(self) -> None:
+        """Handle Qt menu item click"""
+        self._on_clicked()
+    
+    def show(self) -> None:
+        """Show the menu item"""
+        super().show()
+        self._qt_action.setVisible(True)
+
+
+class QtUIStatusBar(UIStatusBar, UIDebugMixin):
+    """Qt implementation of UIStatusBar"""
+    
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        super().__init__()
+        UIDebugMixin.__init__(self)
+        self._qt_status_bar = QStatusBar(parent)
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIStatusBar created", {
+            "widget_id": id(self)
+        })
+    
+    @property
+    def qt_widget(self) -> QStatusBar:
+        """Get the underlying Qt status bar"""
+        return self._qt_status_bar
+    
+    def set_message(self, message: str) -> None:
+        """Set the status bar message"""
+        super().set_message(message)
+        self._qt_status_bar.showMessage(message)
+    
+    def show(self) -> None:
+        """Show the status bar"""
+        super().show()
+        self._qt_status_bar.show()
