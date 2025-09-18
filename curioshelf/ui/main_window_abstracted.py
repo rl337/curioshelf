@@ -19,7 +19,7 @@ from curioshelf.event_system import (
     CreateObjectCommand, CreateTemplateCommand
 )
 from curioshelf.status_bar_handler import StatusBarEventHandler
-from gui.project_dialog_abstracted import ProjectDialogAbstracted
+from .project_dialog_abstracted import ProjectDialogAbstracted
 
 
 class MainWindowAbstracted:
@@ -358,9 +358,9 @@ class MainWindowAbstracted:
         # Note: In a real implementation, this would remove tabs from the tab widget
         
         # Create new tabs using abstraction layer
-        from gui.sources_tab_abstracted import SourcesTabAbstracted
-        from gui.templates_tab_abstracted import TemplatesTabAbstracted
-        from gui.objects_tab_abstracted import ObjectsTabAbstracted
+        from .sources_tab_abstracted import SourcesTabAbstracted
+        from .templates_tab_abstracted import TemplatesTabAbstracted
+        from .objects_tab_abstracted import ObjectsTabAbstracted
         
         self.sources_tab = SourcesTabAbstracted(self.asset_manager, self.ui)
         self.templates_tab = TemplatesTabAbstracted(self.asset_manager, self.ui)

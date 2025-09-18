@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from gui.ui_factory import create_ui_factory, get_available_ui_backends
+from .ui.ui_factory import create_ui_factory, get_available_ui_backends
 from curioshelf.ui_debug import get_global_debugger, create_debugger
 from curioshelf.ui_instrumentation_server import UIInstrumentationServer
 

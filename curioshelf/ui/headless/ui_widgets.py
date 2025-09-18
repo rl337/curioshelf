@@ -467,3 +467,106 @@ class HeadlessUILayout(UILayout):
             "orientation": self._orientation,
             "widget_type": widget.__class__.__name__
         })
+
+
+class HeadlessUIMenuBar(UIWidget):
+    """Headless implementation of UIMenuBar"""
+    
+    def __init__(self, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__()
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=True)
+        self._menus = []
+    
+    def add_menu(self, menu: 'UIMenu') -> None:
+        """Add a menu to the menu bar"""
+        self._menus.append(menu)
+        self.message_logger.log_ui_event("HeadlessUIMenuBar", "menu_added", {
+            "menu_name": getattr(menu, 'name', 'Unknown')
+        })
+    
+    def show(self) -> None:
+        """Show the menu bar"""
+        super().show()
+        self.message_logger.log_ui_event("HeadlessUIMenuBar", "shown")
+
+
+class HeadlessUIMenu(UIWidget):
+    """Headless implementation of UIMenu"""
+    
+    def __init__(self, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__()
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=True)
+        self.name = ""
+        self._items = []
+    
+    def set_title(self, title: str) -> None:
+        """Set the menu title"""
+        self.name = title
+        self.message_logger.log_ui_event("HeadlessUIMenu", "title_set", {"title": title})
+    
+    def add_item(self, item: 'UIMenuItem') -> None:
+        """Add an item to the menu"""
+        self._items.append(item)
+        self.message_logger.log_ui_event("HeadlessUIMenu", "item_added", {
+            "item_text": getattr(item, 'text', 'Unknown')
+        })
+    
+    def show(self) -> None:
+        """Show the menu"""
+        super().show()
+        self.message_logger.log_ui_event("HeadlessUIMenu", "shown", {"name": self.name})
+
+
+class HeadlessUIMenuItem(UIWidget):
+    """Headless implementation of UIMenuItem"""
+    
+    def __init__(self, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__()
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=True)
+        self.text = ""
+        self._callback = None
+    
+    def set_text(self, text: str) -> None:
+        """Set the menu item text"""
+        self.text = text
+        self.message_logger.log_ui_event("HeadlessUIMenuItem", "text_set", {"text": text})
+    
+    def set_clicked_callback(self, callback: Callable) -> None:
+        """Set the clicked callback"""
+        self._callback = callback
+        self.message_logger.log_ui_event("HeadlessUIMenuItem", "callback_set", {"text": self.text})
+    
+    def set_enabled(self, enabled: bool) -> None:
+        """Enable or disable the menu item"""
+        super().set_enabled(enabled)
+        self.message_logger.log_state_change("HeadlessUIMenuItem", f"{'enabled' if enabled else 'disabled'}", {
+            "text": self.text
+        })
+    
+    def show(self) -> None:
+        """Show the menu item"""
+        super().show()
+        self.message_logger.log_ui_event("HeadlessUIMenuItem", "shown", {"text": self.text})
+
+
+class HeadlessUIStatusBar(UIWidget):
+    """Headless implementation of UIStatusBar"""
+    
+    def __init__(self, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__()
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=True)
+        self._message = ""
+    
+    def set_message(self, message: str) -> None:
+        """Set the status bar message"""
+        self._message = message
+        self.message_logger.log_ui_event("HeadlessUIStatusBar", "message_set", {"message": message})
+    
+    def get_message(self) -> str:
+        """Get the current status bar message"""
+        return self._message
+    
+    def show(self) -> None:
+        """Show the status bar"""
+        super().show()
+        self.message_logger.log_ui_event("HeadlessUIStatusBar", "shown", {"message": self._message})

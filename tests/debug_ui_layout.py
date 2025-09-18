@@ -12,8 +12,8 @@ from pathlib import Path
 # Add the project root to the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from gui.ui_factory import create_ui_factory
-from gui.main_window_abstracted import MainWindowAbstracted
+from curioshelf.ui.ui_factory import create_ui_factory
+from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
 
 def create_debug_script():
     """Create a debugging script to investigate UI layout issues"""

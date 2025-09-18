@@ -18,10 +18,10 @@ from .ui_widgets import (
     HeadlessUIWidget, HeadlessUIButton, HeadlessUITextInput, HeadlessUIComboBox, 
     HeadlessUIListWidget, HeadlessUICanvas, HeadlessUIMessageBox, HeadlessUIFileDialog, 
     HeadlessUIProgressBar, HeadlessUIGroupBox, HeadlessUITabWidget, HeadlessUISplitter,
-    HeadlessUILayout
+    HeadlessUILayout, HeadlessUIMenuBar, HeadlessUIMenu, HeadlessUIMenuItem, HeadlessUIStatusBar
 )
 from .message_system import MessageLogger, MessageType
-from gui.ui_interface import UIImplementationInterface, UIImplementationError
+from ..ui_interface import UIImplementationInterface, UIImplementationError
 
 
 class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
@@ -194,39 +194,39 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         if self.verbose:
             print(f"[HEADLESS] {message}")
     
-    def create_widget(self) -> 'HeadlessUIWidget':
+    def create_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIWidget':
         """Create a basic widget"""
         return HeadlessUIWidget(self.verbose, self._message_logger)
     
-    def create_button(self, text: str = "") -> 'HeadlessUIButton':
+    def create_button(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'HeadlessUIButton':
         """Create a button"""
         return HeadlessUIButton(text, self.verbose, self._message_logger)
     
-    def create_text_input(self, placeholder: str = "") -> 'HeadlessUITextInput':
+    def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'HeadlessUITextInput':
         """Create a text input"""
         return HeadlessUITextInput(placeholder, self.verbose, self._message_logger)
     
-    def create_combo_box(self) -> 'HeadlessUIComboBox':
+    def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIComboBox':
         """Create a combo box"""
         return HeadlessUIComboBox(self.verbose, self._message_logger)
     
-    def create_list_widget(self) -> 'HeadlessUIListWidget':
+    def create_list_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIListWidget':
         """Create a list widget"""
         return HeadlessUIListWidget(self.verbose, self._message_logger)
     
-    def create_canvas(self) -> 'HeadlessUICanvas':
+    def create_canvas(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUICanvas':
         """Create a canvas widget"""
         return HeadlessUICanvas(self.verbose, self._message_logger)
     
-    def create_message_box(self) -> 'HeadlessUIMessageBox':
+    def create_message_box(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIMessageBox':
         """Create a message box"""
         return HeadlessUIMessageBox(self.verbose, self._message_logger)
     
-    def create_file_dialog(self) -> 'HeadlessUIFileDialog':
+    def create_file_dialog(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIFileDialog':
         """Create a file dialog"""
         return HeadlessUIFileDialog(self.verbose, self._message_logger)
     
-    def create_progress_bar(self) -> 'HeadlessUIProgressBar':
+    def create_progress_bar(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIProgressBar':
         """Create a progress bar"""
         return HeadlessUIProgressBar(self.verbose, self._message_logger)
     
@@ -234,11 +234,11 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a group box"""
         return HeadlessUIGroupBox(title, self.verbose, self._message_logger)
     
-    def create_tab_widget(self) -> 'HeadlessUITabWidget':
+    def create_tab_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUITabWidget':
         """Create a tab widget"""
         return HeadlessUITabWidget(self.verbose, self._message_logger)
     
-    def create_splitter(self, orientation: str = "horizontal") -> 'HeadlessUISplitter':
+    def create_splitter(self, orientation: str = "horizontal", parent: Optional['UIWidget'] = None) -> 'HeadlessUISplitter':
         """Create a splitter widget"""
         return HeadlessUISplitter(orientation, self.verbose, self._message_logger)
     
@@ -247,7 +247,7 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         self._pixmap_counter += 1
         return HeadlessPixmap(width, height, self._pixmap_counter)
     
-    def create_layout(self, orientation: str = "vertical") -> 'HeadlessUILayout':
+    def create_layout(self, orientation: str = "vertical", parent: Optional['UIWidget'] = None) -> 'HeadlessUILayout':
         """Create a layout"""
         return HeadlessUILayout(orientation, self.verbose, self._message_logger)
     
@@ -263,6 +263,30 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
     def clear_messages(self):
         """Clear all collected messages"""
         self._message_logger.clear_messages()
+    
+    def create_menu_bar(self, parent: Optional['UIWidget'] = None) -> 'UIMenuBar':
+        """Create a menu bar widget"""
+        return HeadlessUIMenuBar(self._message_logger)
+    
+    def create_menu(self, title: str, parent: Optional['UIMenuBar'] = None) -> 'UIMenu':
+        """Create a menu widget"""
+        menu = HeadlessUIMenu(self._message_logger)
+        menu.set_title(title)
+        return menu
+    
+    def create_menu_item(self, text: str, parent: Optional['UIMenu'] = None) -> 'UIMenuItem':
+        """Create a menu item widget"""
+        item = HeadlessUIMenuItem(self._message_logger)
+        item.set_text(text)
+        return item
+    
+    def create_status_bar(self, parent: Optional['UIWidget'] = None) -> 'UIStatusBar':
+        """Create a status bar widget"""
+        return HeadlessUIStatusBar(self._message_logger)
+    
+    def create_main_widget(self, parent: Optional['UIWidget'] = None) -> 'UIWidget':
+        """Create a main widget (main window)"""
+        return HeadlessUIWidget(self.verbose, self._message_logger)
 
 
 # Backward compatibility alias
@@ -270,7 +294,7 @@ HeadlessUIFactory = HeadlessUIImplementation
 
 
 # Register the implementation
-from gui.ui_interface import UIImplementationRegistry
+from ..ui_interface import UIImplementationRegistry
 UIImplementationRegistry.register("headless", HeadlessUIImplementation)
 
 

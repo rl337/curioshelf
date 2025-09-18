@@ -9,7 +9,7 @@ import pytest
 import time
 from typing import List, Dict, Any
 
-from gui.ui_factory import create_ui_factory
+from curioshelf.ui.ui_factory import create_ui_factory
 
 
 class TestUIUnified:

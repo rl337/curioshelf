@@ -10,14 +10,14 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from gui.ui_interface import create_ui_implementation, UIImplementationError
+from .ui_interface import create_ui_implementation, UIImplementationError
 
 # Import implementations to register them
-import gui.headless
+from . import headless
 
 # Try to import Qt implementation (may fail if PySide6 not available)
 try:
-    import gui.qtimpl
+    from . import qtimpl
 except ImportError:
     pass  # Qt implementation not available
 
@@ -72,7 +72,7 @@ class UIFactory:
     def create_main_window(self):
         """Create the main application window"""
         if self._main_window is None:
-            from gui.main_window_abstracted import MainWindowAbstracted
+            from .main_window_abstracted import MainWindowAbstracted
             
             ui_impl = self.get_ui_implementation()
             self._main_window = MainWindowAbstracted(
@@ -108,7 +108,7 @@ def create_ui_factory(ui_backend: str = "qt", verbose: bool = False) -> UIFactor
 
 def get_available_ui_backends() -> list:
     """Get list of available UI backends"""
-    from gui.ui_interface import list_available_implementations
+    from .ui_interface import list_available_implementations
     return list_available_implementations()
 
 

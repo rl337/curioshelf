@@ -22,7 +22,7 @@ from curioshelf.ui_abstraction import (
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
 from curioshelf.ui_factory_interface import UIFactoryInterface
-from gui.ui_interface import UIImplementationInterface, UIImplementationError
+from ..ui_interface import UIImplementationInterface, UIImplementationError
 from .ui_widgets import (
     QtUIMainWidget, QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
     QtUICanvas, QtUIMessageBox, QtUIFileDialog, QtUIProgressBar, QtUIGroupBox,
@@ -432,5 +432,5 @@ QtUIFactory = QtUIImplementation
 
 
 # Register the implementation
-from gui.ui_interface import UIImplementationRegistry
+from ..ui_interface import UIImplementationRegistry
 UIImplementationRegistry.register("qt", QtUIImplementation)

@@ -77,19 +77,19 @@ def test_gui_imports():
     
     # Test that GUI modules can be imported without errors
     try:
-        from gui.ui_factory import create_ui_factory, get_available_ui_backends
+        from curioshelf.ui.ui_factory import create_ui_factory, get_available_ui_backends
         print("✓ UI factory imported successfully")
         
-        from gui.main_window_abstracted import MainWindowAbstracted
+        from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
         print("✓ MainWindowAbstracted imported successfully")
         
-        from gui.sources_tab_abstracted import SourcesTabAbstracted
+        from curioshelf.ui.sources_tab_abstracted import SourcesTabAbstracted
         print("✓ SourcesTabAbstracted imported successfully")
         
-        from gui.objects_tab_abstracted import ObjectsTabAbstracted
+        from curioshelf.ui.objects_tab_abstracted import ObjectsTabAbstracted
         print("✓ ObjectsTabAbstracted imported successfully")
         
-        from gui.templates_tab_abstracted import TemplatesTabAbstracted
+        from curioshelf.ui.templates_tab_abstracted import TemplatesTabAbstracted
         print("✓ TemplatesTabAbstracted imported successfully")
         
         # Test that we can create a UI factory

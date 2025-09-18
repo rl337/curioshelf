@@ -95,7 +95,7 @@ def sample_image_path(test_data_dir):
 @pytest.fixture
 def headless_ui_factory():
     """Provide a headless UI factory for testing"""
-    from gui.ui_factory import create_ui_factory
+    from curioshelf.ui.ui_factory import create_ui_factory
     return create_ui_factory("headless", verbose=False)
 
 
@@ -103,7 +103,7 @@ def headless_ui_factory():
 def qt_ui_factory():
     """Provide a Qt UI factory for testing (if available)"""
     try:
-        from gui.ui_factory import create_ui_factory
+        from curioshelf.ui.ui_factory import create_ui_factory
         return create_ui_factory("qt", verbose=False)
     except ImportError:
         pytest.skip("Qt UI not available")
@@ -119,5 +119,5 @@ def debugger():
 @pytest.fixture
 def message_collector():
     """Provide a message collector for testing"""
-    from gui.headless.message_system import MessageCollector
+    from curioshelf.ui.headless.message_system import MessageCollector
     return MessageCollector()

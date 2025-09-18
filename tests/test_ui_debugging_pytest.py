@@ -15,8 +15,8 @@ from curioshelf.ui_debug import (
     create_debugger, UIDebugger, DebugMessage, DebugMessageType,
     UIDebugMixin, UIRemoteController
 )
-from gui.headless.message_system import MessageType
-from gui.ui_factory import create_ui_factory
+from curioshelf.ui.headless.message_system import MessageType
+from curioshelf.ui.ui_factory import create_ui_factory
 
 
 class TestUIDebugger:
