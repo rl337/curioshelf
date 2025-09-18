@@ -36,6 +36,11 @@ def main():
         help="Run in headless mode (equivalent to --ui headless)"
     )
     parser.add_argument(
+        "--run-for-real",
+        action="store_true",
+        help="Run the actual GUI application (default: runs in scripted mode for testing)"
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable UI debugging and instrumentation server"
@@ -93,8 +98,8 @@ def main():
         if ui_backend == "headless":
             print("Running in headless mode - no GUI will be shown")
             print("Use Ctrl+C to exit")
-        else:
-            print("Starting GUI application...")
+        elif args.run_for_real:
+            print("Starting GUI application (--run-for-real flag set)...")
             # Show the main window for GUI applications
             if hasattr(main_window, 'main_widget'):
                 print(f"Main window has main_widget: {main_window.main_widget}")
@@ -112,6 +117,32 @@ def main():
             
             print("Starting event loop...")
             factory.get_ui_implementation().run_event_loop()
+        else:
+            print("=" * 60)
+            print("🚨 SCRIPTED MODE - GUI NOT RUNNING 🚨")
+            print("=" * 60)
+            print("The application is running in scripted mode for testing.")
+            print("To run the actual GUI application, use the --run-for-real flag:")
+            print()
+            print("  poetry run python main.py --run-for-real")
+            print()
+            print("This prevents the GUI from hanging during testing and debugging.")
+            print("Use the scripted testing system to interact with the UI:")
+            print("  poetry run python debug_ui_layout.py")
+            print("=" * 60)
+            
+            # Run a simple scripted test instead
+            ui_impl = factory.get_ui_implementation()
+            test_commands = [
+                {"command": "wait", "duration": 0.5, "description": "Initial wait"},
+                {"command": "debug_info", "info_type": "windows", "description": "List windows"},
+                {"command": "debug_info", "info_type": "parenting", "description": "Check parenting"},
+                {"command": "wait", "duration": 1.0, "description": "Final wait"}
+            ]
+            
+            print("Running scripted test...")
+            ui_impl.enable_test_mode(test_commands)
+            print("Scripted test completed!")
     
     except KeyboardInterrupt:
         print("\nApplication interrupted by user")

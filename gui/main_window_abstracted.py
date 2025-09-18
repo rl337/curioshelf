@@ -49,10 +49,10 @@ class MainWindowAbstracted:
     def setup_ui(self):
         """Setup the user interface using abstraction layer"""
         # Create main widget
-        self.main_widget = self.ui.create_widget()
+        self.main_widget = self.ui.create_main_widget()
         
         # Create main layout
-        main_layout = self.ui.create_layout("vertical")
+        main_layout = self.ui.create_layout("vertical", parent=self.main_widget)
         self.main_widget.set_layout(main_layout)
         
         # Create menu bar
@@ -62,7 +62,7 @@ class MainWindowAbstracted:
         self.create_toolbar()
         
         # Create tab widget
-        self.tab_widget = self.ui.create_tab_widget()
+        self.tab_widget = self.ui.create_tab_widget(parent=self.main_widget)
         main_layout.add_widget(self.tab_widget)
         
         # Create tabs (will be initialized when project is loaded)
@@ -71,31 +71,31 @@ class MainWindowAbstracted:
         self.objects_tab = None
         
         # Add placeholder tabs with some content
-        placeholder1 = self.ui.create_widget()
-        placeholder1_label = self.ui.create_text_input()
+        placeholder1 = self.ui.create_widget(parent=self.main_widget)
+        placeholder1_label = self.ui.create_text_input(parent=placeholder1)
         placeholder1_label.set_text("Sources tab - Load a project to see sources")
         placeholder1_label.set_enabled(False)  # Make it read-only
         
-        placeholder2 = self.ui.create_widget()
-        placeholder2_label = self.ui.create_text_input()
+        placeholder2 = self.ui.create_widget(parent=self.main_widget)
+        placeholder2_label = self.ui.create_text_input(parent=placeholder2)
         placeholder2_label.set_text("Templates tab - Load a project to see templates")
         placeholder2_label.set_enabled(False)  # Make it read-only
         
-        placeholder3 = self.ui.create_widget()
-        placeholder3_label = self.ui.create_text_input()
+        placeholder3 = self.ui.create_widget(parent=self.main_widget)
+        placeholder3_label = self.ui.create_text_input(parent=placeholder3)
         placeholder3_label.set_text("Objects tab - Load a project to see objects")
         placeholder3_label.set_enabled(False)  # Make it read-only
         
         # Create layouts for placeholder tabs
-        placeholder1_layout = self.ui.create_layout("vertical")
+        placeholder1_layout = self.ui.create_layout("vertical", parent=placeholder1)
         placeholder1.set_layout(placeholder1_layout)
         placeholder1_layout.add_widget(placeholder1_label)
         
-        placeholder2_layout = self.ui.create_layout("vertical")
+        placeholder2_layout = self.ui.create_layout("vertical", parent=placeholder2)
         placeholder2.set_layout(placeholder2_layout)
         placeholder2_layout.add_widget(placeholder2_label)
         
-        placeholder3_layout = self.ui.create_layout("vertical")
+        placeholder3_layout = self.ui.create_layout("vertical", parent=placeholder3)
         placeholder3.set_layout(placeholder3_layout)
         placeholder3_layout.add_widget(placeholder3_label)
         
@@ -107,7 +107,7 @@ class MainWindowAbstracted:
         self.create_status_bar()
         
         # Add status bar to main layout
-        status_layout = self.ui.create_layout("horizontal")
+        status_layout = self.ui.create_layout("horizontal", parent=self.main_widget)
         status_layout.add_widget(self.status_label)
         status_layout.add_widget(self.progress_label)
         status_layout.add_widget(self.project_status_label)
@@ -142,14 +142,14 @@ class MainWindowAbstracted:
         # Note: In a real implementation, this would create actual menu widgets
         # For now, we'll store menu actions for state management
         self.actions = {
-            "new_project": self.ui.create_button("New Project"),
-            "open_project": self.ui.create_button("Open Project"),
-            "save_project": self.ui.create_button("Save Project"),
-            "close_project": self.ui.create_button("Close Project"),
-            "import_source": self.ui.create_button("Import Source"),
-            "export_assets": self.ui.create_button("Export Assets"),
-            "create_object": self.ui.create_button("Create Object"),
-            "create_template": self.ui.create_button("Create Template"),
+            "new_project": self.ui.create_button("New Project", parent=self.main_widget),
+            "open_project": self.ui.create_button("Open Project", parent=self.main_widget),
+            "save_project": self.ui.create_button("Save Project", parent=self.main_widget),
+            "close_project": self.ui.create_button("Close Project", parent=self.main_widget),
+            "import_source": self.ui.create_button("Import Source", parent=self.main_widget),
+            "export_assets": self.ui.create_button("Export Assets", parent=self.main_widget),
+            "create_object": self.ui.create_button("Create Object", parent=self.main_widget),
+            "create_template": self.ui.create_button("Create Template", parent=self.main_widget),
         }
         
         # Connect actions
@@ -171,13 +171,13 @@ class MainWindowAbstracted:
     def create_status_bar(self):
         """Create the status bar using abstraction layer"""
         # Create status labels
-        self.status_label = self.ui.create_text_input()
+        self.status_label = self.ui.create_text_input(parent=self.main_widget)
         self.status_label.set_text("Ready")
         
-        self.progress_label = self.ui.create_text_input()
+        self.progress_label = self.ui.create_text_input(parent=self.main_widget)
         self.progress_label.set_text("No project loaded")
         
-        self.project_status_label = self.ui.create_text_input()
+        self.project_status_label = self.ui.create_text_input(parent=self.main_widget)
         self.project_status_label.set_text("No Project")
     
     def setup_refresh_timer(self):

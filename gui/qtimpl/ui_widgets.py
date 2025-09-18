@@ -24,8 +24,8 @@ from curioshelf.ui_abstraction import (
 from curioshelf.ui_debug import UIDebugMixin, get_global_debugger
 
 
-class QtUIWidget(UIWidget, UIDebugMixin):
-    """Qt implementation of UIWidget"""
+class QtUIMainWidget(UIWidget, UIDebugMixin):
+    """Qt implementation of UIWidget for main window (QMainWindow)"""
     
     def __init__(self) -> None:
         UIWidget.__init__(self)
@@ -37,9 +37,61 @@ class QtUIWidget(UIWidget, UIDebugMixin):
         
         # Set up debugging
         self.set_debugger(get_global_debugger())
-        self.debug_log("widget_created", "QtUIWidget created", {
+        self.debug_log("widget_created", "QtUIMainWidget created", {
             "size": (800, 600),
             "widget_id": id(self)
+        })
+    
+    def set_enabled(self, enabled: bool) -> None:
+        """Enable or disable the widget"""
+        super().set_enabled(enabled)
+        self._qt_widget.setEnabled(enabled)
+        self.debug_state_change(f"enabled_{enabled}", {"enabled": enabled})
+    
+    def set_visible(self, visible: bool) -> None:
+        """Show or hide the widget"""
+        super().set_visible(visible)
+        self._qt_widget.setVisible(visible)
+        self.debug_state_change(f"visible_{visible}", {"visible": visible})
+    
+    def show(self) -> None:
+        """Show the widget"""
+        super().show()
+        self._qt_widget.show()
+        self.debug_log("shown", "QtUIMainWidget shown")
+    
+    def set_layout(self, layout: 'UILayout') -> None:
+        """Set the layout for this widget"""
+        super().set_layout(layout)
+        if hasattr(layout, '_qt_layout'):
+            # For QMainWindow, we need to set the central widget
+            central_widget = QWidget()
+            central_widget.setLayout(layout._qt_layout)
+            self._qt_widget.setCentralWidget(central_widget)
+        self.debug_log("layout_set", "Layout set on QtUIMainWidget")
+    
+    @property
+    def qt_widget(self) -> QMainWindow:
+        """Get the underlying Qt main window"""
+        return self._qt_widget
+
+
+class QtUIWidget(UIWidget, UIDebugMixin):
+    """Qt implementation of UIWidget"""
+    
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        UIWidget.__init__(self)
+        UIDebugMixin.__init__(self)
+        self._qt_widget = QWidget(parent)
+        # Set a reasonable default size
+        self._qt_widget.resize(800, 600)
+        
+        # Set up debugging
+        self.set_debugger(get_global_debugger())
+        self.debug_log("widget_created", "QtUIWidget created", {
+            "size": (800, 600),
+            "widget_id": id(self),
+            "parent": id(parent) if parent else None
         })
     
     def set_enabled(self, enabled: bool) -> None:
@@ -64,11 +116,11 @@ class QtUIWidget(UIWidget, UIDebugMixin):
         """Set the layout for the widget"""
         super().set_layout(layout)
         # Apply the layout to the Qt widget
-        if hasattr(layout, 'qt_layout'):
-            # For QMainWindow, we need to set the central widget
-            central_widget = QWidget()
-            central_widget.setLayout(layout.qt_layout)
-            self._qt_widget.setCentralWidget(central_widget)
+        if hasattr(layout, '_qt_layout'):
+            # Set the parent widget on the layout so it can parent child widgets
+            layout._parent_widget = self._qt_widget
+            # For regular QWidget, set the layout directly
+            self._qt_widget.setLayout(layout._qt_layout)
             self.debug_ui_event("layout_applied", {
                 "layout_type": layout.__class__.__name__,
                 "widget_id": id(self)
@@ -83,9 +135,9 @@ class QtUIWidget(UIWidget, UIDebugMixin):
 class QtUIButton(UIButton):
     """Qt implementation of UIButton"""
     
-    def __init__(self, text: str = "") -> None:
+    def __init__(self, text: str = "", parent: Optional[QWidget] = None) -> None:
         super().__init__(text)
-        self._qt_button = QPushButton(text)
+        self._qt_button = QPushButton(text, parent)
         self._qt_button.clicked.connect(self._on_qt_clicked)
     
     def _on_qt_clicked(self) -> None:
@@ -127,9 +179,9 @@ class QtUIButton(UIButton):
 class QtUITextInput(UITextInput):
     """Qt implementation of UITextInput"""
     
-    def __init__(self, placeholder: str = "") -> None:
+    def __init__(self, placeholder: str = "", parent: Optional[QWidget] = None) -> None:
         super().__init__(placeholder)
-        self._qt_input = QLineEdit()
+        self._qt_input = QLineEdit(parent)
         self._qt_input.setPlaceholderText(placeholder)
         self._qt_input.textChanged.connect(self._on_qt_text_changed)
     
@@ -175,9 +227,9 @@ class QtUITextInput(UITextInput):
 class QtUIComboBox(UIComboBox):
     """Qt implementation of UIComboBox"""
     
-    def __init__(self) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__()
-        self._qt_combo = QComboBox()
+        self._qt_combo = QComboBox(parent)
         self._qt_combo.currentIndexChanged.connect(self._on_qt_current_changed)
     
     def _on_qt_current_changed(self, index: int) -> None:
@@ -224,9 +276,9 @@ class QtUIComboBox(UIComboBox):
 class QtUIListWidget(UIListWidget):
     """Qt implementation of UIListWidget"""
     
-    def __init__(self) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__()
-        self._qt_list = QListWidget()
+        self._qt_list = QListWidget(parent)
         self._qt_list.currentRowChanged.connect(self._on_qt_current_changed)
     
     def _on_qt_current_changed(self, row: int) -> None:
@@ -389,9 +441,9 @@ class QtUIFileDialog(UIFileDialog):
 class QtUIProgressBar(UIProgressBar):
     """Qt implementation of UIProgressBar"""
     
-    def __init__(self) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__()
-        self._qt_progress = QProgressBar()
+        self._qt_progress = QProgressBar(parent)
         self._qt_progress.setMinimum(self._minimum)
         self._qt_progress.setMaximum(self._maximum)
         self._qt_progress.setValue(self._value)
@@ -485,9 +537,9 @@ class QtUIGroupBox(UIGroupBox):
 class QtUITabWidget(UITabWidget):
     """Qt implementation of UITabWidget"""
     
-    def __init__(self) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__()
-        self._qt_tabs = QTabWidget()
+        self._qt_tabs = QTabWidget(parent)
         self._qt_tabs.currentChanged.connect(self._on_qt_current_changed)
     
     def _on_qt_current_changed(self, index: int) -> None:
@@ -565,8 +617,9 @@ class QtUISplitter(UISplitter):
 class QtUILayout(UILayout):
     """Qt implementation of UILayout"""
     
-    def __init__(self, orientation: str = "vertical") -> None:
+    def __init__(self, orientation: str = "vertical", parent: Optional[QWidget] = None) -> None:
         self._orientation = orientation
+        self._parent_widget = parent
         if orientation == "vertical":
             self._qt_layout = QVBoxLayout()
         elif orientation == "horizontal":
@@ -579,6 +632,9 @@ class QtUILayout(UILayout):
     def add_widget(self, widget: UIWidget, *args, **kwargs) -> None:
         """Add a widget to the layout"""
         if isinstance(widget, QtUIWidget):
+            # Ensure the widget is properly parented
+            if hasattr(self, '_parent_widget') and self._parent_widget:
+                widget.qt_widget.setParent(self._parent_widget)
             self._qt_layout.addWidget(widget.qt_widget, *args, **kwargs)
     
     def remove_widget(self, widget: UIWidget) -> None:

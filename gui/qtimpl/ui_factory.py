@@ -24,7 +24,7 @@ from curioshelf.ui_abstraction import (
 from curioshelf.ui_factory_interface import UIFactoryInterface
 from gui.ui_interface import UIImplementationInterface, UIImplementationError
 from .ui_widgets import (
-    QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
+    QtUIMainWidget, QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
     QtUICanvas, QtUIMessageBox, QtUIFileDialog, QtUIProgressBar, QtUIGroupBox,
     QtUITabWidget, QtUISplitter, QtUILayout
 )
@@ -253,26 +253,50 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
             method_name = command.get("method")
             # This would be implemented by the test
             pass
+            
+        elif cmd_type == "debug_info":
+            info_type = command.get("info_type")
+            if info_type == "windows":
+                self._debug_windows()
+            elif info_type == "main_window":
+                self._debug_main_window()
+            elif info_type == "layout":
+                self._debug_layout()
+            elif info_type == "widgets":
+                self._debug_widgets()
+            elif info_type == "parenting":
+                self._debug_parenting()
+            else:
+                print(f"[QT DEBUG] Unknown info type: {info_type}")
     
-    def create_widget(self) -> 'QtUIWidget':
+    def create_widget(self, parent: Optional['UIWidget'] = None) -> 'QtUIWidget':
         """Create a basic widget"""
-        return QtUIWidget()
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIWidget(parent=qt_parent)
     
-    def create_button(self, text: str = "") -> 'QtUIButton':
+    def create_main_widget(self) -> 'QtUIMainWidget':
+        """Create a main window widget (QMainWindow)"""
+        return QtUIMainWidget()
+    
+    def create_button(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'QtUIButton':
         """Create a button"""
-        return QtUIButton(text)
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIButton(text, parent=qt_parent)
     
-    def create_text_input(self, placeholder: str = "") -> 'QtUITextInput':
+    def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'QtUITextInput':
         """Create a text input"""
-        return QtUITextInput(placeholder)
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUITextInput(placeholder, parent=qt_parent)
     
-    def create_combo_box(self) -> 'QtUIComboBox':
+    def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'QtUIComboBox':
         """Create a combo box"""
-        return QtUIComboBox()
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIComboBox(parent=qt_parent)
     
-    def create_list_widget(self) -> 'QtUIListWidget':
+    def create_list_widget(self, parent: Optional['UIWidget'] = None) -> 'QtUIListWidget':
         """Create a list widget"""
-        return QtUIListWidget()
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIListWidget(parent=qt_parent)
     
     def create_canvas(self) -> 'QtUICanvas':
         """Create a canvas widget"""
@@ -289,17 +313,19 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a file dialog"""
         return QtUIFileDialog()
     
-    def create_progress_bar(self) -> 'QtUIProgressBar':
+    def create_progress_bar(self, parent: Optional['UIWidget'] = None) -> 'QtUIProgressBar':
         """Create a progress bar"""
-        return QtUIProgressBar()
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUIProgressBar(parent=qt_parent)
     
     def create_group_box(self, title: str = "") -> 'QtUIGroupBox':
         """Create a group box"""
         return QtUIGroupBox(title)
     
-    def create_tab_widget(self) -> 'QtUITabWidget':
+    def create_tab_widget(self, parent: Optional['UIWidget'] = None) -> 'QtUITabWidget':
         """Create a tab widget"""
-        return QtUITabWidget()
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUITabWidget(parent=qt_parent)
     
     def create_splitter(self, orientation: str = "horizontal") -> 'QtUISplitter':
         """Create a splitter widget"""
@@ -321,9 +347,64 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
         
         return pixmap
     
-    def create_layout(self, orientation: str = "vertical") -> 'QtUILayout':
+    def create_layout(self, orientation: str = "vertical", parent: Optional['UIWidget'] = None) -> 'QtUILayout':
         """Create a layout"""
-        return QtUILayout(orientation)
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUILayout(orientation, parent=qt_parent)
+    
+    def _debug_windows(self):
+        """Debug: List all windows"""
+        if self._app:
+            windows = self._app.allWindows()
+            print(f"[QT DEBUG] Found {len(windows)} windows:")
+            for i, window in enumerate(windows):
+                try:
+                    title = getattr(window, 'windowTitle', lambda: 'No Title')()
+                    name = window.objectName() or 'Unnamed'
+                    visible = window.isVisible()
+                    print(f"  Window {i}: {window.__class__.__name__} - {name} - {title} - Visible: {visible}")
+                except Exception as e:
+                    print(f"  Window {i}: {window.__class__.__name__} - Error: {e}")
+        else:
+            print("[QT DEBUG] No QApplication instance")
+    
+    def _debug_main_window(self):
+        """Debug: Get main window properties"""
+        # This would need access to the main window instance
+        print("[QT DEBUG] Main window debug - would need main window reference")
+    
+    def _debug_layout(self):
+        """Debug: Get layout information"""
+        print("[QT DEBUG] Layout debug - would need widget references")
+    
+    def _debug_widgets(self):
+        """Debug: List all widgets"""
+        if self._app:
+            widgets = self._app.allWidgets()
+            print(f"[QT DEBUG] Found {len(widgets)} widgets:")
+            for i, widget in enumerate(widgets):
+                if widget.isVisible():
+                    print(f"  Widget {i}: {widget.__class__.__name__} - {widget.objectName()} - Visible: {widget.isVisible()}")
+        else:
+            print("[QT DEBUG] No QApplication instance")
+    
+    def _debug_parenting(self):
+        """Debug: Check widget parenting"""
+        if self._app:
+            widgets = self._app.allWidgets()
+            print(f"[QT DEBUG] Widget parenting analysis:")
+            for i, widget in enumerate(widgets):
+                parent = widget.parent()
+                is_window = widget.isWindow()
+                print(f"  Widget {i}: {widget.__class__.__name__}")
+                print(f"    Parent: {parent.__class__.__name__ if parent else 'None'}")
+                print(f"    Is Window: {is_window}")
+                print(f"    Object Name: {widget.objectName() or 'Unnamed'}")
+                if is_window:
+                    print(f"    Window Title: {getattr(widget, 'windowTitle', lambda: 'No Title')()}")
+                print()
+        else:
+            print("[QT DEBUG] No QApplication instance")
 
 
 # Backward compatibility alias

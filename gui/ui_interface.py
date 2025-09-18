@@ -99,22 +99,26 @@ class UIImplementationInterface(ABC):
     # Widget Factory Methods
     
     @abstractmethod
-    def create_widget(self) -> UIWidget:
+    def create_widget(self, parent: Optional[UIWidget] = None) -> UIWidget:
         """
         Create a basic widget container
         
+        Args:
+            parent: Optional parent widget for proper hierarchy
+            
         Returns:
             UIWidget: A basic widget that can contain other widgets
         """
         pass
     
     @abstractmethod
-    def create_button(self, text: str = "") -> UIButton:
+    def create_button(self, text: str = "", parent: Optional[UIWidget] = None) -> UIButton:
         """
         Create a clickable button widget
         
         Args:
             text: The text to display on the button
+            parent: Optional parent widget for proper hierarchy
             
         Returns:
             UIButton: A button widget that emits clicked signals
@@ -122,12 +126,13 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_text_input(self, placeholder: str = "") -> UITextInput:
+    def create_text_input(self, placeholder: str = "", parent: Optional[UIWidget] = None) -> UITextInput:
         """
         Create a text input widget
         
         Args:
             placeholder: Placeholder text to show when empty
+            parent: Optional parent widget for proper hierarchy
             
         Returns:
             UITextInput: A text input widget that emits text_changed signals
@@ -135,7 +140,7 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_combo_box(self) -> UIComboBox:
+    def create_combo_box(self, parent: Optional[UIWidget] = None) -> UIComboBox:
         """
         Create a dropdown combo box widget
         
@@ -145,7 +150,7 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_list_widget(self) -> UIListWidget:
+    def create_list_widget(self, parent: Optional[UIWidget] = None) -> UIListWidget:
         """
         Create a list selection widget
         
@@ -196,7 +201,7 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_progress_bar(self) -> UIProgressBar:
+    def create_progress_bar(self, parent: Optional[UIWidget] = None) -> UIProgressBar:
         """
         Create a progress bar widget
         
@@ -222,7 +227,7 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
-    def create_tab_widget(self) -> UITabWidget:
+    def create_tab_widget(self, parent: Optional[UIWidget] = None) -> UITabWidget:
         """
         Create a tabbed widget container
         
