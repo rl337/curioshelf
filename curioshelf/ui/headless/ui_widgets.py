@@ -517,14 +517,13 @@ class HeadlessUIMenu(UIWidget):
         self.message_logger.log_ui_event("HeadlessUIMenu", "shown", {"name": self.name})
 
 
-class HeadlessUIMenuItem(UIWidget):
+class HeadlessUIMenuItem(UIMenuItem):
     """Headless implementation of UIMenuItem"""
     
-    def __init__(self, message_logger: Optional[MessageLogger] = None) -> None:
-        super().__init__()
+    def __init__(self, text: str = "", parent: Optional[Any] = None, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__(text)
         self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=True)
-        self.text = ""
-        self._callback = None
+        self._clicked_callback: Optional[Callable] = None
     
     def set_text(self, text: str) -> None:
         """Set the menu item text"""
@@ -533,7 +532,7 @@ class HeadlessUIMenuItem(UIWidget):
     
     def set_clicked_callback(self, callback: Callable) -> None:
         """Set the clicked callback"""
-        self._callback = callback
+        super().set_clicked_callback(callback)
         self.message_logger.log_ui_event("HeadlessUIMenuItem", "callback_set", {"text": self.text})
     
     def set_enabled(self, enabled: bool) -> None:
@@ -547,6 +546,21 @@ class HeadlessUIMenuItem(UIWidget):
         """Show the menu item"""
         super().show()
         self.message_logger.log_ui_event("HeadlessUIMenuItem", "shown", {"text": self.text})
+    
+    def update_state(self, state_name: str) -> None:
+        """Update the menu item state based on the callback for the given state name"""
+        super().update_state(state_name)
+        # Log the state change in headless mode
+        if state_name == "enabled":
+            self.message_logger.log_state_change("HeadlessUIMenuItem", f"enabled_{self.enabled}", {
+                "text": self.text,
+                "enabled": self.enabled
+            })
+        elif state_name == "visible":
+            self.message_logger.log_state_change("HeadlessUIMenuItem", f"visible_{self.visible}", {
+                "text": self.text,
+                "visible": self.visible
+            })
 
 
 class HeadlessUIStatusBar(UIWidget):

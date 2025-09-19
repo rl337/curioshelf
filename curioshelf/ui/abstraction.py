@@ -31,6 +31,7 @@ class UIWidget(ABC):
         self._test_mode = False
         self._test_commands: List[Dict[str, Any]] = []
         self._test_command_index = 0
+        self._state_callbacks: Dict[str, Callable[[], bool]] = {}
     
     def connect_signal(self, signal_name: str, callback: Callable[..., None]) -> None:
         """Connect a callback to a signal"""
@@ -92,6 +93,33 @@ class UIWidget(ABC):
     def set_layout(self, layout: 'UILayout') -> None:
         """Set the layout for the widget"""
         self._layout = layout
+    
+    def set_state_callback(self, state_name: str, callback: Callable[[], bool]) -> None:
+        """Set a callback that returns the state for a given state name"""
+        self._state_callbacks[state_name] = callback
+    
+    def get_state_callback(self, state_name: str) -> Optional[Callable[[], bool]]:
+        """Get the callback for a given state name"""
+        return self._state_callbacks.get(state_name)
+    
+    def has_state_callback(self, state_name: str) -> bool:
+        """Check if a state callback exists for the given state name"""
+        return state_name in self._state_callbacks
+    
+    def update_state(self, state_name: str) -> None:
+        """Update the widget state based on the callback for the given state name"""
+        if state_name in self._state_callbacks:
+            callback = self._state_callbacks[state_name]
+            new_state = callback()
+            if state_name == "enabled":
+                self.set_enabled(new_state)
+            elif state_name == "visible":
+                self.set_visible(new_state)
+    
+    def update_all_states(self) -> None:
+        """Update all widget states based on their callbacks"""
+        for state_name in self._state_callbacks:
+            self.update_state(state_name)
 
 
 class UIButton(UIWidget):
@@ -119,6 +147,14 @@ class UIButton(UIWidget):
         if self._clicked_callback:
             self._clicked_callback()
         self.emit_signal("clicked")
+    
+    def set_enabled_callback(self, callback: Callable[[], bool]) -> None:
+        """Set a callback that determines if the button should be enabled"""
+        self.set_state_callback("enabled", callback)
+    
+    def set_visible_callback(self, callback: Callable[[], bool]) -> None:
+        """Set a callback that determines if the button should be visible"""
+        self.set_state_callback("visible", callback)
 
 
 class UITextInput(UIWidget):
@@ -516,6 +552,14 @@ class UIMenuItem(UIWidget):
         if self._clicked_callback:
             self._clicked_callback()
         self.emit_signal("clicked")
+    
+    def set_enabled_callback(self, callback: Callable[[], bool]) -> None:
+        """Set a callback that determines if the menu item should be enabled"""
+        self.set_state_callback("enabled", callback)
+    
+    def set_visible_callback(self, callback: Callable[[], bool]) -> None:
+        """Set a callback that determines if the menu item should be visible"""
+        self.set_state_callback("visible", callback)
 
 
 class UIStatusBar(UIWidget):

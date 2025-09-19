@@ -182,6 +182,15 @@ class QtUIButton(UIButton):
         super().show()
         self._qt_button.show()
     
+    def update_state(self, state_name: str) -> None:
+        """Update the button state based on the callback for the given state name"""
+        super().update_state(state_name)
+        # The parent class handles the actual state change, we just need to apply it to Qt
+        if state_name == "enabled":
+            self._qt_button.setEnabled(self.enabled)
+        elif state_name == "visible":
+            self._qt_button.setVisible(self.visible)
+    
     @property
     def qt_widget(self) -> QPushButton:
         """Get the underlying Qt button"""
@@ -762,6 +771,25 @@ class QtUIMenuItem(UIMenuItem, UIDebugMixin):
         """Show the menu item"""
         super().show()
         self._qt_action.setVisible(True)
+    
+    def set_enabled(self, enabled: bool) -> None:
+        """Enable or disable the menu item"""
+        super().set_enabled(enabled)
+        self._qt_action.setEnabled(enabled)
+    
+    def set_visible(self, visible: bool) -> None:
+        """Show or hide the menu item"""
+        super().set_visible(visible)
+        self._qt_action.setVisible(visible)
+    
+    def update_state(self, state_name: str) -> None:
+        """Update the menu item state based on the callback for the given state name"""
+        super().update_state(state_name)
+        # The parent class handles the actual state change, we just need to apply it to Qt
+        if state_name == "enabled":
+            self._qt_action.setEnabled(self.enabled)
+        elif state_name == "visible":
+            self._qt_action.setVisible(self.visible)
 
 
 class QtUIStatusBar(UIStatusBar, UIDebugMixin):

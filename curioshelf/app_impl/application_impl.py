@@ -325,18 +325,90 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             "slices": slices_count
         }
     
+    # Detailed State Methods for UI Ghosting
+    def valid_project(self) -> bool:
+        """True if we have a valid, editable project loaded"""
+        return (self.is_project_loaded() and 
+                self.project_manager is not None and 
+                self.asset_manager is not None)
+    
+    def can_create_project(self) -> bool:
+        """True if we can create a new project (no project loaded or current project is closed)"""
+        return not self.is_project_loaded()
+    
+    def can_open_project(self) -> bool:
+        """True if we can open a project (no project loaded or current project is closed)"""
+        return not self.is_project_loaded()
+    
+    def can_save_project(self) -> bool:
+        """True if we can save the current project (valid project loaded with changes)"""
+        # For now, always allow saving if we have a valid project
+        # TODO: Add dirty state tracking to only enable when there are changes
+        return self.valid_project()
+    
+    def can_close_project(self) -> bool:
+        """True if we can close the current project (valid project loaded)"""
+        return self.valid_project()
+    
+    def can_import_source(self) -> bool:
+        """True if we can import a source (valid project loaded)"""
+        return self.valid_project()
+    
+    def can_create_object(self) -> bool:
+        """True if we can create an object (valid project loaded and has sources)"""
+        return self.valid_project() and self.has_sources()
+    
+    def can_create_template(self) -> bool:
+        """True if we can create a template (valid project loaded and has objects)"""
+        return self.valid_project() and self.has_objects()
+    
+    def can_export_assets(self) -> bool:
+        """True if we can export assets (valid project loaded and has assets)"""
+        return self.valid_project() and (self.has_sources() or self.has_objects() or self.has_templates())
+    
+    def can_edit_sources(self) -> bool:
+        """True if we can edit sources (valid project loaded and has sources)"""
+        return self.valid_project() and self.has_sources()
+    
+    def can_edit_objects(self) -> bool:
+        """True if we can edit objects (valid project loaded and has objects)"""
+        return self.valid_project() and self.has_objects()
+    
+    def can_edit_templates(self) -> bool:
+        """True if we can edit templates (valid project loaded and has templates)"""
+        return self.valid_project() and self.has_templates()
+    
     # UI State Management
     def get_ui_state(self) -> Dict[str, bool]:
         """Get current UI state (what should be enabled/disabled)"""
         return {
-            "new_project": True,  # Always enabled
-            "open_project": True,  # Always enabled
-            "save_project": self.is_project_loaded(),
-            "close_project": self.is_project_loaded(),
-            "import_source": self.is_project_loaded(),
-            "create_object": self.is_project_loaded(),
-            "create_template": self.is_project_loaded(),
-            "export_assets": self.is_project_loaded() and self.has_sources(),
+            # Project operations
+            "new_project": self.can_create_project(),
+            "open_project": self.can_open_project(),
+            "save_project": self.can_save_project(),
+            "close_project": self.can_close_project(),
+            
+            # Asset operations
+            "import_source": self.can_import_source(),
+            "create_object": self.can_create_object(),
+            "create_template": self.can_create_template(),
+            "export_assets": self.can_export_assets(),
+            
+            # Edit operations
+            "edit_sources": self.can_edit_sources(),
+            "edit_objects": self.can_edit_objects(),
+            "edit_templates": self.can_edit_templates(),
+            
+            # Tab visibility (for main window tabs)
+            "sources_tab_enabled": self.can_import_source(),
+            "objects_tab_enabled": self.can_create_object(),
+            "templates_tab_enabled": self.can_create_template(),
+            
+            # Legacy compatibility
+            "has_project": self.valid_project(),
+            "has_sources": self.has_sources(),
+            "has_objects": self.has_objects(),
+            "has_templates": self.has_templates(),
         }
     
     def update_ui_state(self) -> None:

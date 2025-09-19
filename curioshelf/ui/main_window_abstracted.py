@@ -165,18 +165,22 @@ class MainWindowAbstracted:
         # Create menu items
         new_project_item = self.ui.create_menu_item("New Project", parent=project_menu)
         new_project_item.set_clicked_callback(lambda: self._handle_menu_click("New Project", NewProjectCommand()))
+        new_project_item.set_enabled_callback(lambda: self.app.can_create_project())
         project_menu.add_item(new_project_item)
         
         open_project_item = self.ui.create_menu_item("Open Project", parent=project_menu)
         open_project_item.set_clicked_callback(lambda: self._handle_menu_click("Open Project", OpenProjectCommand()))
+        open_project_item.set_enabled_callback(lambda: self.app.can_open_project())
         project_menu.add_item(open_project_item)
         
         save_project_item = self.ui.create_menu_item("Save Project", parent=project_menu)
         save_project_item.set_clicked_callback(lambda: self._handle_menu_click("Save Project", SaveProjectCommand()))
+        save_project_item.set_enabled_callback(lambda: self.app.can_save_project())
         project_menu.add_item(save_project_item)
         
         close_project_item = self.ui.create_menu_item("Close Project", parent=project_menu)
         close_project_item.set_clicked_callback(lambda: self._handle_menu_click("Close Project", CloseProjectCommand()))
+        close_project_item.set_enabled_callback(lambda: self.app.can_close_project())
         project_menu.add_item(close_project_item)
         
         # Add Project menu to menu bar
@@ -187,10 +191,12 @@ class MainWindowAbstracted:
         
         import_source_item = self.ui.create_menu_item("Import Source", parent=sources_menu)
         import_source_item.set_clicked_callback(lambda: self._handle_menu_click("Import Source", ImportSourceCommand()))
+        import_source_item.set_enabled_callback(lambda: self.app.can_import_source())
         sources_menu.add_item(import_source_item)
         
         export_assets_item = self.ui.create_menu_item("Export Assets", parent=sources_menu)
         export_assets_item.set_clicked_callback(lambda: self._handle_menu_click("Export Assets", self.export_assets))
+        export_assets_item.set_enabled_callback(lambda: self.app.can_export_assets())
         sources_menu.add_item(export_assets_item)
         
         # Add Sources menu to menu bar
@@ -201,6 +207,7 @@ class MainWindowAbstracted:
         
         create_object_item = self.ui.create_menu_item("Create Object", parent=objects_menu)
         create_object_item.set_clicked_callback(lambda: self._handle_menu_click("Create Object", CreateObjectCommand()))
+        create_object_item.set_enabled_callback(lambda: self.app.can_create_object())
         objects_menu.add_item(create_object_item)
         
         # Add Objects menu to menu bar
@@ -211,6 +218,7 @@ class MainWindowAbstracted:
         
         create_template_item = self.ui.create_menu_item("Create Template", parent=templates_menu)
         create_template_item.set_clicked_callback(lambda: self._handle_menu_click("Create Template", CreateTemplateCommand()))
+        create_template_item.set_enabled_callback(lambda: self.app.can_create_template())
         templates_menu.add_item(create_template_item)
         
         # Add Templates menu to menu bar
@@ -230,6 +238,13 @@ class MainWindowAbstracted:
         
         # Set initial menu state (no project loaded)
         self._update_menu_state()
+    
+    def _update_menu_state(self) -> None:
+        """Update the enabled/disabled state of all menu items based on application state"""
+        # Update all menu items that have state callbacks
+        for action_name, action in self.actions.items():
+            if hasattr(action, 'update_all_states'):
+                action.update_all_states()
     
     def _handle_menu_click(self, menu_name: str, command) -> None:
         """Handle menu item click by emitting events to the event execution layer"""

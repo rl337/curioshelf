@@ -90,6 +90,67 @@ class ApplicationInterface(ABC):
         """Get counts of different asset types"""
         pass
     
+    # Detailed State Methods for UI Ghosting
+    @abstractmethod
+    def valid_project(self) -> bool:
+        """True if we have a valid, editable project loaded"""
+        pass
+    
+    @abstractmethod
+    def can_create_project(self) -> bool:
+        """True if we can create a new project (no project loaded or current project is closed)"""
+        pass
+    
+    @abstractmethod
+    def can_open_project(self) -> bool:
+        """True if we can open a project (no project loaded or current project is closed)"""
+        pass
+    
+    @abstractmethod
+    def can_save_project(self) -> bool:
+        """True if we can save the current project (valid project loaded with changes)"""
+        pass
+    
+    @abstractmethod
+    def can_close_project(self) -> bool:
+        """True if we can close the current project (valid project loaded)"""
+        pass
+    
+    @abstractmethod
+    def can_import_source(self) -> bool:
+        """True if we can import a source (valid project loaded)"""
+        pass
+    
+    @abstractmethod
+    def can_create_object(self) -> bool:
+        """True if we can create an object (valid project loaded and has sources)"""
+        pass
+    
+    @abstractmethod
+    def can_create_template(self) -> bool:
+        """True if we can create a template (valid project loaded and has objects)"""
+        pass
+    
+    @abstractmethod
+    def can_export_assets(self) -> bool:
+        """True if we can export assets (valid project loaded and has assets)"""
+        pass
+    
+    @abstractmethod
+    def can_edit_sources(self) -> bool:
+        """True if we can edit sources (valid project loaded and has sources)"""
+        pass
+    
+    @abstractmethod
+    def can_edit_objects(self) -> bool:
+        """True if we can edit objects (valid project loaded and has objects)"""
+        pass
+    
+    @abstractmethod
+    def can_edit_templates(self) -> bool:
+        """True if we can edit templates (valid project loaded and has templates)"""
+        pass
+    
     # UI State Management
     @abstractmethod
     def get_ui_state(self) -> Dict[str, bool]:
