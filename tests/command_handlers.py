@@ -8,10 +8,10 @@ for testing UI interactions without triggering actual business logic.
 from typing import Any, Dict, List
 import logging
 
-from .event_system import Command, CommandHandler, EventBus, UIEvent, EventType
+from curioshelf.event_system import Command, CommandHandler, EventBus, UIEvent, EventType
 
 
-class TestCommandHandler(CommandHandler):
+class MockCommandHandler(CommandHandler):
     """Test implementation of command handler that logs commands instead of executing them"""
     
     def __init__(self):

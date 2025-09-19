@@ -144,11 +144,12 @@ class TestMessageCollection:
         assert len(state_changes) > 0, "Should have state changes"
         
         # Check specific components were created
-        button_messages = logger.get_messages_by_component("HeadlessUIButton")
-        assert len(button_messages) > 0, "Should have button messages"
+        # Main window now uses menu-based interface, so check for menu components
+        menu_messages = logger.get_messages_by_component("HeadlessUIMenuBar")
+        assert len(menu_messages) > 0, "Should have menu bar messages"
         
-        text_messages = logger.get_messages_by_component("HeadlessUITextInput")
-        assert len(text_messages) > 0, "Should have text input messages"
+        status_messages = logger.get_messages_by_component("HeadlessUIStatusBar")
+        assert len(status_messages) > 0, "Should have status bar messages"
         
         # Tab widget messages might not be generated during creation
         # Let's just check that we have some layout messages instead

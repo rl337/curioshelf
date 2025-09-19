@@ -33,8 +33,11 @@ def test_simple_ui():
     qt_main_window.show()
     
     print("Main window should now be visible!")
-    print("Press Enter to continue...")
-    input()
+    
+    # In test mode, just verify the window was created successfully
+    assert main_window is not None
+    assert main_window.main_widget is not None
+    print("✓ Main window created successfully!")
 
 if __name__ == "__main__":
     test_simple_ui()
