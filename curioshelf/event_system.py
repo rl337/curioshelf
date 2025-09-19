@@ -30,6 +30,12 @@ class EventType(Enum):
     PROGRESS_UPDATE = "progress_update"
     ERROR_MESSAGE = "error_message"
     INFO_MESSAGE = "info_message"
+    # New event types for event execution layer
+    HOTKEY_PRESSED = "hotkey_pressed"
+    DIALOG_ACCEPTED = "dialog_accepted"
+    DIALOG_REJECTED = "dialog_rejected"
+    SUCCESS = "success"
+    ERROR = "error"
 
 
 @dataclass

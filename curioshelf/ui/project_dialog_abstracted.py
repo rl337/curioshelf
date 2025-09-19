@@ -221,22 +221,34 @@ class ProjectDialogAbstracted(UIWidget):
     
     def exec(self):
         """Execute the dialog"""
-        # Create a default project to get started
+        # Create a temporary project for testing
         # In a real implementation, this would show a project creation/loading view in the main window
-        print("[PROJECT DIALOG] Creating default project...")
+        print("[PROJECT DIALOG] Creating temporary project...")
         
-        # Create a default project for testing
-        default_project_path = Path("default_project")
-        default_project_path.mkdir(exist_ok=True)
-        
-        # Emit the project created signal
-        if self.project_created:
+        # Create a temporary project for testing
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="curioshelf_test_project_") as temp_dir:
+            default_project_path = Path(temp_dir)
+            
+            # Emit project dialog accepted event
+            from curioshelf.event_system import event_bus, UIEvent, EventType
             project_info = ProjectInfo(
-                name="Default Project",
-                description="A default project for testing",
+                name="Test Project",
+                description="A temporary project for testing",
                 author="System"
             )
-            self.project_created(default_project_path, project_info)
+            
+            event = UIEvent(
+                event_type=EventType.DIALOG_ACCEPTED,
+                source="project_dialog",
+                data={
+                    "dialog_type": "project_dialog",
+                    "is_new_project": True,
+                    "project_path": str(default_project_path),
+                    "project_info": project_info
+                }
+            )
+            event_bus.emit(event)
     
     def connect_signal(self, signal_name: str, callback: Callable):
         """Connect a signal callback"""

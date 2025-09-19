@@ -203,15 +203,13 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         
         if self.asset_manager:
             # Create template
-            template = Template(
+            self.asset_manager.add_template(
                 name=template_name,
                 description=f"Template: {template_name}",
                 required_views=["front", "back"]
             )
-            
-            self.asset_manager.add_template(template)
             self._update_application_state()
-            self.emit_event("template_created", {"template_name": template.name})
+            self.emit_event("template_created", {"template_name": template_name})
             return True
         
         return False

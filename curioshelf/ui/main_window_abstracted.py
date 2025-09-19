@@ -18,6 +18,7 @@ from curioshelf.event_system import (
     SaveProjectCommand, CloseProjectCommand, ImportSourceCommand,
     CreateObjectCommand, CreateTemplateCommand
 )
+from curioshelf.event_execution_layer import EventExecutionLayer
 from curioshelf.status_bar_handler import StatusBarEventHandler
 from .project_dialog_abstracted import ProjectDialogAbstracted
 
@@ -53,6 +54,10 @@ class MainWindowAbstracted:
         
         # Status bar event handler
         self.status_handler = StatusBarEventHandler()
+        
+        # Event execution layer
+        self.event_layer = EventExecutionLayer(self.app)
+        self.event_layer.start()
         
         # Menu and toolbar actions
         self.actions: Dict[str, Any] = {}
@@ -227,28 +232,34 @@ class MainWindowAbstracted:
         self._update_menu_state()
     
     def _handle_menu_click(self, menu_name: str, command) -> None:
-        """Handle menu item click by calling application methods"""
+        """Handle menu item click by emitting events to the event execution layer"""
         try:
-            # Map menu actions to application methods
-            if menu_name == "New Project":
-                self.new_project()
-            elif menu_name == "Open Project":
-                self.open_project()
-            elif menu_name == "Save Project":
-                self.app.save_project()
-            elif menu_name == "Close Project":
-                self.app.close_project()
-            elif menu_name == "Import Source":
-                self.import_source()
-            elif menu_name == "Create Object":
-                self.app.create_object("New Object")
-            elif menu_name == "Create Template":
-                self.app.create_template("New Template")
-            elif menu_name == "Export Assets":
-                self.export_assets()
+            # Map menu names to command strings
+            command_map = {
+                "New Project": "new_project",
+                "Open Project": "open_project", 
+                "Save Project": "save_project",
+                "Close Project": "close_project",
+                "Import Source": "import_source",
+                "Create Object": "create_object",
+                "Create Template": "create_template",
+                "Export Assets": "export_assets"
+            }
             
-            # Update menu state after operation
-            self._update_menu_state()
+            command_string = command_map.get(menu_name)
+            if command_string:
+                # Emit menu click event
+                event = UIEvent(
+                    event_type=EventType.MENU_ITEM_CLICKED,
+                    source="main_window",
+                    data={
+                        "menu_item": command_string,
+                        "menu_name": menu_name
+                    }
+                )
+                event_bus.emit(event)
+            else:
+                print(f"Unknown menu action: {menu_name}")
             
         except Exception as e:
             print(f"Menu action '{menu_name}' failed: {e}")
@@ -520,7 +531,7 @@ class MainWindowAbstracted:
             return
         
         # Use the application layer to create template
-        self.app.create_template("New Template", "A new template", ["front", "side"])
+        self.app.create_template("New Template")
         self.update_ui_states()
     
     def export_assets(self):
