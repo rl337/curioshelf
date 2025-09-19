@@ -195,9 +195,27 @@ class EventExecutor:
             self.logger.warning("Cannot import source - no project loaded")
             return
         
-        # This will typically trigger a file dialog
-        # The actual import happens when a file is selected
-        self.logger.info("Import source command - should show file dialog")
+        file_path = data.get('file_path')
+        if file_path:
+            # Direct import from file path
+            success = self.app.import_source(Path(file_path))
+            if success:
+                self.logger.info(f"Source imported successfully: {file_path}")
+                event_bus.emit(UIEvent(
+                    event_type=EventType.SUCCESS,
+                    source="event_executor",
+                    data={"action": "import_source", "file_path": file_path}
+                ))
+            else:
+                self.logger.error(f"Failed to import source: {file_path}")
+                event_bus.emit(UIEvent(
+                    event_type=EventType.ERROR,
+                    source="event_executor",
+                    data={"action": "import_source", "error": f"Failed to import source: {file_path}"}
+                ))
+        else:
+            # This will typically trigger a file dialog
+            self.logger.info("Import source command - should show file dialog")
     
     def _execute_create_object(self, data: Dict[str, Any]) -> None:
         """Execute object creation"""
@@ -285,17 +303,20 @@ class EventExecutor:
         project_path = data.get('project_path')
         project_info = data.get('project_info')
         
-        if not project_path or not project_info:
-            self.logger.error("Project dialog accepted but missing project_path or project_info")
+        if not project_path:
+            self.logger.error("Project dialog accepted but missing project_path")
             return
         
         # Determine if this is a new project or opening an existing one
         if data.get('is_new_project', True):
-            # Create new project
+            # Create new project - requires project_info
+            if not project_info:
+                self.logger.error("Project dialog accepted for new project but missing project_info")
+                return
             success = self.app.create_project(Path(project_path), project_info)
             action = "create_project"
         else:
-            # Open existing project
+            # Open existing project - doesn't need project_info
             success = self.app.load_project(Path(project_path))
             action = "load_project"
         

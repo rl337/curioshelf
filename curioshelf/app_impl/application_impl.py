@@ -11,7 +11,7 @@ import logging
 
 from ..application_interface import ApplicationInterface
 from ..models import AssetManager, AssetSource, Template, CurioObject
-from ..project_manager import ProjectManager, ProjectInfo
+from ..projects import ProjectManager, ProjectInfo, ProjectStructureManager, ProjectMetadata
 from ..ui_state_manager import UIStateManager
 from ..event_system import event_bus, UIEvent, EventType
 from ..status_bar_handler import (
@@ -29,6 +29,7 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         
         # Initialize managers
         self.project_manager = ProjectManager()
+        self.project_structure_manager = ProjectStructureManager()
         self.asset_manager: Optional[AssetManager] = None
         self.ui_state_manager = UIStateManager()
         
@@ -52,42 +53,103 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         # Setup initial state
         self._update_application_state()
     
-    def initialize_controllers(self, ui_factory) -> None:
-        """Initialize all controllers with the UI factory"""
-        self.ui_factory = ui_factory
-        
+    def initialize_controllers(self, ui_implementation) -> None:
+        """Initialize all controllers with the UI implementation"""
         if self.asset_manager:
-            self.sources_controller = SourcesController(self.asset_manager, ui_factory)
-            self.templates_controller = TemplatesController(self.asset_manager, ui_factory)
-            self.objects_controller = ObjectsController(self.asset_manager, ui_factory)
+            self.sources_controller = SourcesController(self.asset_manager, ui_implementation)
+            self.templates_controller = TemplatesController(self.asset_manager, ui_implementation)
+            self.objects_controller = ObjectsController(self.asset_manager, ui_implementation)
             
             # Setup controller UI
-            self.sources_controller.setup_ui(ui_factory)
-            self.templates_controller.setup_ui(ui_factory)
-            self.objects_controller.setup_ui(ui_factory)
+            self.sources_controller.setup_ui(ui_implementation)
+            self.templates_controller.setup_ui(ui_implementation)
+            self.objects_controller.setup_ui(ui_implementation)
     
     # Project Management
-    def create_project(self, project_path: Path, project_info: ProjectInfo) -> bool:
+    def create_project(self, project_path: Path, project_info) -> bool:
         """Create a new project"""
         self.logger.info(f"Creating project: {project_info.name}")
         
-        success = self.project_manager.create_project(project_path, project_info)
+        # Convert ProjectMetadata to ProjectInfo if needed
+        if hasattr(project_info, 'to_dict'):
+            # It's a ProjectMetadata object, convert to ProjectInfo
+            legacy_project_info = ProjectInfo(
+                name=project_info.name,
+                description=project_info.description,
+                author=project_info.author,
+                version=project_info.version
+            )
+        else:
+            # Assume it's already a ProjectInfo
+            legacy_project_info = project_info
+        
+        # Create project structure
+        if hasattr(project_info, 'to_dict'):
+            # Use the new project structure
+            success = self.project_structure_manager.create_project(project_path, project_info)
+        else:
+            # Use the legacy project structure
+            success = self.project_manager.create_project(project_path, project_info)
+        
         if success:
-            self.asset_manager = self.project_manager.asset_manager
+            # Set up the legacy project manager for compatibility
+            if hasattr(project_info, 'to_dict'):
+                # We created with new structure, now set up legacy
+                self.project_manager.current_project_path = project_path
+                self.project_manager.project_info = legacy_project_info
+                self.project_manager.asset_manager = AssetManager()
+                self.project_manager.is_project_loaded = True
+                self.asset_manager = self.project_manager.asset_manager
+            else:
+                # We created with legacy structure
+                self.asset_manager = self.project_manager.asset_manager
+            
             self._update_application_state()
             
             # Initialize controllers if UI factory is available
             if self.ui_factory:
-                self.initialize_controllers(self.ui_factory)
+                ui_impl = self.ui_factory.get_ui_implementation()
+                self.initialize_controllers(ui_impl)
             
-            self.emit_event("project_created", {"project_name": project_info.name})
+            self.emit_event("project_created", {"project_name": legacy_project_info.name})
+            return True
         
-        return success
+        return False
     
     def load_project(self, project_path: Path) -> bool:
         """Load an existing project"""
         self.logger.info(f"Loading project from: {project_path}")
         
+        # Try to load as new project structure first
+        if self.project_structure_manager.is_project(project_path):
+            structure = self.project_structure_manager.load_project(project_path)
+            if structure:
+                # Convert to legacy format for compatibility
+                legacy_project_info = ProjectInfo(
+                    name=structure.metadata.name,
+                    description=structure.metadata.description,
+                    author=structure.metadata.author,
+                    version=structure.metadata.version
+                )
+                
+                # Set up legacy project manager
+                self.project_manager.current_project_path = project_path
+                self.project_manager.project_info = legacy_project_info
+                self.project_manager.asset_manager = AssetManager()
+                self.project_manager.is_project_loaded = True
+                self.asset_manager = self.project_manager.asset_manager
+                
+                self._update_application_state()
+                
+                # Initialize controllers if UI factory is available
+                if self.ui_factory:
+                    ui_impl = self.ui_factory.get_ui_implementation()
+                    self.initialize_controllers(ui_impl)
+                
+                self.emit_event("project_loaded", {"project_path": str(project_path)})
+                return True
+        
+        # Try to load as legacy project structure
         success = self.project_manager.load_project(project_path)
         if success:
             self.asset_manager = self.project_manager.asset_manager
@@ -95,11 +157,14 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             
             # Initialize controllers if UI factory is available
             if self.ui_factory:
-                self.initialize_controllers(self.ui_factory)
+                ui_impl = self.ui_factory.get_ui_implementation()
+                self.initialize_controllers(ui_impl)
             
             self.emit_event("project_loaded", {"project_path": str(project_path)})
+            return True
         
-        return success
+        self.logger.error(f"Failed to load project from: {project_path}")
+        return False
     
     def save_project(self) -> bool:
         """Save the current project"""
@@ -108,12 +173,25 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             return False
         
         self.logger.info("Saving project")
-        success = self.project_manager.save_project()
         
-        if success:
+        # Save legacy project structure
+        legacy_success = self.project_manager.save_project()
+        
+        # Also save new project structure if it exists
+        if self.project_manager.current_project_path:
+            # Check if this is a new project structure
+            if self.project_structure_manager.is_project(self.project_manager.current_project_path):
+                # Load the current structure and save it (this will update the modified timestamp)
+                structure = self.project_structure_manager.load_project(self.project_manager.current_project_path)
+                if structure:
+                    new_success = self.project_structure_manager.save_project(self.project_manager.current_project_path, structure)
+                    if not new_success:
+                        self.logger.warning("Failed to save new project structure")
+        
+        if legacy_success:
             self.emit_event("project_saved", {})
         
-        return success
+        return legacy_success
     
     def close_project(self) -> bool:
         """Close the current project"""
@@ -150,18 +228,9 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         # Add source to project
         project_path = self.project_manager.add_source_file(file_path)
         if project_path:
-            # Create AssetSource object
-            source = AssetSource(
-                id=file_path.stem,
-                file_path=project_path,
-                file_type=file_path.suffix[1:],  # Remove the dot
-                width=800,  # Mock width
-                height=600,  # Mock height
-                slices=[]
-            )
-            
+            # Add source to asset manager
             if self.asset_manager:
-                self.asset_manager.add_source(source)
+                source = self.asset_manager.add_source(project_path, 800, 600)  # Mock dimensions
                 self._update_application_state()
                 self.emit_event("source_imported", {"source_id": source.id})
                 return True
@@ -178,15 +247,7 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         
         if self.asset_manager:
             # Create object
-            obj = CurioObject(
-                id=object_name.lower().replace(' ', '_'),
-                name=object_name,
-                template_name=None,
-                sources={},
-                slices=[]
-            )
-            
-            self.asset_manager.add_object(obj)
+            obj = self.asset_manager.add_object(object_name)
             self._update_application_state()
             self.emit_event("object_created", {"object_id": obj.id})
             return True

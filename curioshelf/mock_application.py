@@ -11,7 +11,7 @@ import logging
 
 from .application_interface import ApplicationInterface
 from .models import AssetSource, Template, CurioObject
-from .project_manager import ProjectInfo
+from .projects import ProjectInfo
 from .event_system import event_bus, UIEvent, EventType
 from .status_bar_handler import (
     emit_project_status, emit_asset_status, emit_info_message, 

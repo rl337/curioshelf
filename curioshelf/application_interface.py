@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Callable
 from pathlib import Path
 
 from .models import AssetManager, AssetSource, Template, CurioObject
-from .project_manager import ProjectManager, ProjectInfo
+from .projects import ProjectManager, ProjectInfo
 from .ui_state_manager import UIStateManager
 
 

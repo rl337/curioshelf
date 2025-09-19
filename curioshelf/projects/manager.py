@@ -14,8 +14,8 @@ from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from .models import AssetManager
-from .status_bar_handler import emit_project_status, emit_info_message, emit_error_message
+from ..models import AssetManager
+from ..status_bar_handler import emit_project_status, emit_info_message, emit_error_message
 
 
 @dataclass

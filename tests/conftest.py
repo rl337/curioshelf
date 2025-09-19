@@ -78,10 +78,7 @@ def project_root_path():
     return Path(__file__).parent.parent
 
 
-@pytest.fixture(scope="session")
-def test_data_dir(project_root_path):
-    """Provide the test data directory"""
-    return project_root_path / "tests" / "data"
+# Removed test_data_dir fixture - using temporary directories instead
 
 
 @pytest.fixture
@@ -100,32 +97,33 @@ def temp_project_with_files(temp_project_dir):
     (temp_project_dir / "templates").mkdir(exist_ok=True)
     (temp_project_dir / "objects").mkdir(exist_ok=True)
     
-    # Create a simple project info file
-    project_info = {
-        "name": "Test Project",
-        "description": "A test project for unit testing",
-        "author": "Test User",
-        "created": "2024-01-01T00:00:00Z"
-    }
+    # Create a curioshelf.json file with the new project structure
+    from curioshelf.projects import ProjectMetadata, ProjectStructure
+    
+    metadata = ProjectMetadata(
+        name="Test Project",
+        description="A test project for unit testing",
+        author="Test User"
+    )
+    
+    structure = ProjectStructure(metadata=metadata)
     
     import json
-    with open(temp_project_dir / "project.json", "w") as f:
-        json.dump(project_info, f, indent=2)
+    with open(temp_project_dir / "curioshelf.json", "w") as f:
+        json.dump(structure.to_dict(), f, indent=2)
     
     return temp_project_dir
 
 
 @pytest.fixture
-def sample_image_path(test_data_dir):
+def sample_image_path(tmp_path):
     """Provide a path to a sample image for testing"""
-    # Create a simple test image if it doesn't exist
-    image_path = test_data_dir / "sample.png"
-    if not image_path.exists():
-        test_data_dir.mkdir(exist_ok=True)
-        # Create a simple 100x100 PNG image
-        from PIL import Image
-        img = Image.new('RGB', (100, 100), color='red')
-        img.save(image_path)
+    # Create a simple test image in a temporary directory
+    image_path = tmp_path / "sample.png"
+    # Create a simple 100x100 PNG image
+    from PIL import Image
+    img = Image.new('RGB', (100, 100), color='red')
+    img.save(image_path)
     return image_path
 
 

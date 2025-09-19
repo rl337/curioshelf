@@ -12,7 +12,7 @@ from curioshelf.application_interface import ApplicationInterface
 from curioshelf.application import CurioShelfApplication
 from curioshelf.mock_application import MockCurioShelfApplication
 from curioshelf.app_impl.application_impl import CurioShelfApplicationImpl
-from curioshelf.project_manager import ProjectInfo
+from curioshelf.projects import ProjectInfo
 from curioshelf.event_system import (
     event_bus, UIEvent, EventType, NewProjectCommand, OpenProjectCommand,
     SaveProjectCommand, CloseProjectCommand, ImportSourceCommand,

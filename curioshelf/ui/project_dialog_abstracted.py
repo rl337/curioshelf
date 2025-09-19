@@ -7,7 +7,7 @@ This version uses the UI abstraction layer instead of direct PySide6 imports.
 from typing import Optional, Callable
 from pathlib import Path
 
-from curioshelf.project_manager import ProjectManager, ProjectInfo
+from curioshelf.projects import ProjectManager, ProjectInfo
 from curioshelf.ui_abstraction import UIWidget
 
 
