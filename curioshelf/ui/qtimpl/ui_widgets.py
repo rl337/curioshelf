@@ -16,12 +16,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QRect, QTimer, Signal, QObject
 from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QWheelEvent, QAction
 
-from curioshelf.ui_abstraction import (
+from ..abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
-from curioshelf.ui_debug import UIDebugMixin, get_global_debugger
+from tests.ui_debug import UIDebugMixin, get_global_debugger
 
 
 class QtUIMainWidget(UIWidget, UIDebugMixin):

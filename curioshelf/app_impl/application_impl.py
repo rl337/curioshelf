@@ -12,7 +12,7 @@ import logging
 from ..application_interface import ApplicationInterface
 from ..models import AssetManager, AssetSource, Template, CurioObject
 from ..projects import ProjectManager, ProjectInfo, ProjectStructureManager, ProjectMetadata
-from ..ui_state_manager import UIStateManager
+from ..ui.state_manager import UIStateManager
 from ..event_system import event_bus, UIEvent, EventType
 from ..status_bar_handler import (
     emit_project_status, emit_asset_status, emit_info_message, 

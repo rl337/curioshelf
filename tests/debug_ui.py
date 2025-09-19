@@ -15,7 +15,7 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from curioshelf.ui_instrumentation_server import UIDebugClient
+from tests.ui_instrumentation_server import UIDebugClient
 
 
 def print_help():

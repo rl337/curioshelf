@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, List
 from pathlib import Path
 
-from .ui_abstraction import (
+from .abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout

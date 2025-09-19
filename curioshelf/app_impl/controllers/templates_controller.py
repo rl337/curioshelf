@@ -8,11 +8,11 @@ from typing import List, Optional, Dict, Any, Callable
 from pathlib import Path
 
 from ...models import AssetManager, AssetSource, ObjectSlice, CurioObject, Template
-from ...ui_abstraction import (
+from ...ui.abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget
 )
-from ...ui_factory_interface import UIFactoryInterface, UIComponentManager
+from ...ui.factory_interface import UIFactoryInterface, UIComponentManager
 
 
 class TemplatesController:

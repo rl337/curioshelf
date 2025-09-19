@@ -8,12 +8,12 @@ that emit messages instead of rendering GUI components.
 from typing import Any, Optional, Dict, List
 from pathlib import Path
 
-from curioshelf.ui_abstraction import (
+from ..abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
-    UISplitter, UILayout
+    UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
-from curioshelf.ui_factory_interface import UIFactoryInterface
+from ..factory_interface import UIFactoryInterface
 from .ui_widgets import (
     HeadlessUIWidget, HeadlessUIButton, HeadlessUITextInput, HeadlessUIComboBox, 
     HeadlessUIListWidget, HeadlessUICanvas, HeadlessUIMessageBox, HeadlessUIFileDialog, 

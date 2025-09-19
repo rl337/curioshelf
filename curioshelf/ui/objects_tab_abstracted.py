@@ -8,7 +8,7 @@ from typing import Optional, Callable, Any
 from pathlib import Path
 
 from curioshelf.models import AssetManager, CurioObject, ObjectSlice, Template
-from curioshelf.ui_abstraction import UIWidget
+from .abstraction import UIWidget
 
 
 class ObjectsTabAbstracted:

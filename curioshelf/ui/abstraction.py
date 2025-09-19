@@ -10,7 +10,7 @@ from typing import List, Optional, Dict, Any, Callable
 from pathlib import Path
 from dataclasses import dataclass
 
-from .models import AssetSource, ObjectSlice, CurioObject, Template
+from ..models import AssetSource, ObjectSlice, CurioObject, Template
 
 
 @dataclass

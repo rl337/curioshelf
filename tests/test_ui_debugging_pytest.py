@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any
 
-from curioshelf.ui_debug import (
+from tests.ui_debug import (
     create_debugger, UIDebugger, DebugMessage, DebugMessageType,
     UIDebugMixin, UIRemoteController
 )

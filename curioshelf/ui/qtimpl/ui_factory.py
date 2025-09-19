@@ -16,12 +16,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QRect, QTimer
 from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QScreen
 
-from curioshelf.ui_abstraction import (
+from ..abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
-from curioshelf.ui_factory_interface import UIFactoryInterface
+from ..factory_interface import UIFactoryInterface
 from ..ui_interface import UIImplementationInterface, UIImplementationError
 from .ui_widgets import (
     QtUIMainWidget, QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,

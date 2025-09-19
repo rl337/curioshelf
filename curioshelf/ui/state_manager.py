@@ -7,7 +7,7 @@ Uses the UI abstraction layer for framework independence.
 """
 
 from typing import Dict, List, Optional, Callable, Any
-from .ui_abstraction import UIWidget
+from .abstraction import UIWidget
 
 
 class UIStateManager:

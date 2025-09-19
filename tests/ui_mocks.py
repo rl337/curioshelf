@@ -9,7 +9,7 @@ from typing import List, Optional, Dict, Any, Callable
 from pathlib import Path
 from dataclasses import dataclass
 
-from .ui_abstraction import (
+from curioshelf.ui.abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIDialog, UIMessageBox, UIFileDialog, UIProgressBar, UILayout,
     UIGroupBox, UITabWidget, UISplitter

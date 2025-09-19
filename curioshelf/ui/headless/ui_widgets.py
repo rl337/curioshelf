@@ -8,10 +8,10 @@ that emit messages instead of rendering GUI components.
 from typing import Any, Optional, Callable, List
 from pathlib import Path
 
-from curioshelf.ui_abstraction import (
+from ..abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
-    UISplitter, UILayout
+    UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
 from .message_system import MessageLogger, MessageType
 

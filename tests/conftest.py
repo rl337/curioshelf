@@ -147,7 +147,7 @@ def qt_ui_factory():
 @pytest.fixture
 def debugger():
     """Provide a debugger for testing"""
-    from curioshelf.ui_debug import create_debugger
+    from tests.ui_debug import create_debugger
     return create_debugger(enabled=True)
 
 

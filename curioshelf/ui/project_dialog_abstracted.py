@@ -8,7 +8,7 @@ from typing import Optional, Callable
 from pathlib import Path
 
 from curioshelf.projects import ProjectManager, ProjectInfo
-from curioshelf.ui_abstraction import UIWidget
+from .abstraction import UIWidget
 
 
 class ProjectDialogAbstracted(UIWidget):

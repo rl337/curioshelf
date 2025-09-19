@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, List, Dict, Callable
 from pathlib import Path
 
-from curioshelf.ui_abstraction import (
+from .abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar

@@ -5,11 +5,11 @@ Tests for UI abstraction layer
 import unittest
 from unittest.mock import Mock
 
-from curioshelf.ui_abstraction import (
+from curioshelf.ui.abstraction import (
     UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget
 )
-from curioshelf.ui_mocks import MockUIFactory
+from tests.ui_mocks import MockUIFactory
 
 
 class TestUIAbstraction(unittest.TestCase):

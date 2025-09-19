@@ -8,7 +8,7 @@ from typing import Optional, Callable
 from pathlib import Path
 
 from curioshelf.models import AssetManager, Template
-from curioshelf.ui_abstraction import UIWidget
+from .abstraction import UIWidget
 
 
 class TemplatesTabAbstracted:

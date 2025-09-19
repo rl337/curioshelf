@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .models import AssetManager, AssetSource, Template, CurioObject
 from .projects import ProjectManager, ProjectInfo
-from .ui_state_manager import UIStateManager
+from .ui.state_manager import UIStateManager
 
 
 class ApplicationInterface(ABC):
