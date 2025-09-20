@@ -1,5 +1,5 @@
 # CurioShelf Script Test: Scripting Language Features
-# @expect_budget_exceeded
+# @expect_normal_exit
 # This script demonstrates variables, conditionals, loops, and functions
 
 # Test 1: Variables and basic operations
@@ -137,19 +137,17 @@ create_result2 := create_project(project_path2, project_info2)
 if create_result2 && is_project_loaded():
     print("Second project created and loaded successfully")
     
-    # Add some assets with conditional logic
-    asset_count := 0
+    # Add some assets with conditional logic using foreach and range
     max_test_assets := 3
     
-    while asset_count < max_test_assets:
-        asset_name := "test_asset_" + toString(asset_count + 1)
+    foreach (i in range(max_test_assets)):
+        asset_name := "test_asset_" + toString(i + 1)
         create_object(asset_name)
-        asset_count := asset_count + 1
         
-        if asset_count == 2:
+        if i == 1:  # i is 0-based, so i==1 means second iteration
             print("Halfway through asset creation")
     
-    print("Created", asset_count, "test assets")
+    print("Created", max_test_assets, "test assets")
     
     # Get final status
     final_status := get_project_status()

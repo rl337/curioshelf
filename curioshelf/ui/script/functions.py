@@ -197,6 +197,32 @@ class Functions:
         print(f"[DEBUG] {value}")
     
     @staticmethod
+    @script_function("range", "Generate a range of numbers for iteration")
+    def range_func(start: int, stop: int = None, step: int = 1) -> List[int]:
+        """Generate a range of numbers for iteration, similar to Python's range().
+        
+        Args:
+            start: Starting value (inclusive). If stop is None, this becomes the stop value and start becomes 0.
+            stop: Ending value (exclusive). If None, start is used as stop and 0 as start.
+            step: Step size between values (default: 1)
+        
+        Returns:
+            List[int]: A list of integers in the specified range
+            
+        Examples:
+            range(5)        # Returns [0, 1, 2, 3, 4]
+            range(1, 5)     # Returns [1, 2, 3, 4]
+            range(0, 10, 2) # Returns [0, 2, 4, 6, 8]
+            range(5, 0, -1) # Returns [5, 4, 3, 2, 1]
+        """
+        if stop is None:
+            # Single argument: range(5) means 0 to 5
+            return list(range(start))
+        else:
+            # Multiple arguments: range(start, stop, step)
+            return list(range(start, stop, step))
+    
+    @staticmethod
     @script_function("pop", "Pop a value from the stack")
     def pop_value() -> Any:
         """Pop a value from the stack and return it.

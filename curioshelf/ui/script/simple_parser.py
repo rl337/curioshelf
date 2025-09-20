@@ -76,6 +76,9 @@ class SimpleCurioParser:
     
     def _parse_line(self, line: str) -> Optional[Dict[str, Any]]:
         """Parse a single line into a statement"""
+        # Remove inline comments (but not inside strings)
+        line = self._remove_inline_comments(line)
+        
         # Assignment: variable := value (Pascal-like syntax)
         if ':=' in line and not self._is_inside_string(line, line.find(':=')):
             return self._parse_assignment(line)
@@ -195,7 +198,19 @@ class SimpleCurioParser:
         """Parse a foreach statement"""
         # Extract var and list from foreach (var in list)
         start = line.find('(') + 1
-        end = line.find(')')
+        
+        # Find the matching closing parenthesis, handling nested parentheses
+        paren_count = 0
+        end = start
+        for i, char in enumerate(line[start:], start):
+            if char == '(':
+                paren_count += 1
+            elif char == ')':
+                if paren_count == 0:
+                    end = i
+                    break
+                paren_count -= 1
+        
         content = line[start:end].strip()
         
         # Split by ' in '
@@ -332,9 +347,14 @@ class SimpleCurioParser:
         line = lines[start_i].strip()
         foreach_line = line[8:].strip()  # Remove 'foreach '
         
+        
         # Parse foreach (var in list) or foreach var in list:
-        if foreach_line.startswith('(') and foreach_line.endswith(')'):
-            content = foreach_line[1:-1].strip()
+        if foreach_line.startswith('(') and (foreach_line.endswith(')') or foreach_line.endswith('):')):
+            # Remove the opening parenthesis and closing parenthesis/colon
+            if foreach_line.endswith('):'):
+                content = foreach_line[1:-2].strip()
+            else:
+                content = foreach_line[1:-1].strip()
         else:
             content = foreach_line.rstrip(':').strip()
         
@@ -350,11 +370,11 @@ class SimpleCurioParser:
             if var_name.endswith(')'):
                 var_name = var_name[:-1].strip()
             
-            # Clean up iterable expression (remove any leading/trailing parentheses)
-            if iterable_expr.startswith('('):
-                iterable_expr = iterable_expr[1:].strip()
-            if iterable_expr.endswith(')'):
-                iterable_expr = iterable_expr[:-1].strip()
+            # For the iterable expression, only remove parentheses if they're from the foreach syntax
+            # Don't remove parentheses that are part of function calls like range(inner_max)
+            if iterable_expr.startswith('(') and iterable_expr.endswith(')') and not '(' in iterable_expr[1:-1]:
+                # This is a simple parenthesized expression, remove the outer parentheses
+                iterable_expr = iterable_expr[1:-1].strip()
             
             iterable = self._parse_expression(iterable_expr)
         else:
@@ -652,6 +672,22 @@ class SimpleCurioParser:
                     string_char = None
         
         return in_string
+    
+    def _remove_inline_comments(self, line: str) -> str:
+        """Remove inline comments from a line, but not from inside strings"""
+        # Find the first # that's not inside a string
+        comment_pos = -1
+        i = 0
+        while i < len(line):
+            if line[i] == '#':
+                if not self._is_inside_string(line, i):
+                    comment_pos = i
+                    break
+            i += 1
+        
+        if comment_pos >= 0:
+            return line[:comment_pos].strip()
+        return line
     
     def _is_inside_nested_structure(self, line: str, pos: int) -> bool:
         """Check if a position is inside a nested structure (string, function call, etc.)"""
