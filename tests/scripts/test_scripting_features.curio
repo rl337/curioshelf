@@ -1,0 +1,159 @@
+# CurioShelf Script Test: Scripting Language Features
+# This script demonstrates variables, conditionals, loops, and functions
+
+# Test 1: Variables and basic operations
+print("=== Test 1: Variables and Operations ===")
+
+# Set some variables
+project_name = "Scripting Test Project"
+author_name = "Script Tester"
+max_assets = 5
+current_assets = 0
+
+print("Project name:", project_name)
+print("Author:", author_name)
+print("Max assets:", max_assets)
+
+# Test arithmetic operations
+total = max_assets + 3
+half = total / 2
+print("Total (max_assets + 3):", total)
+print("Half of total:", half)
+
+# Test string operations
+full_name = project_name + " by " + author_name
+print("Full name:", full_name)
+
+# Test 2: Conditionals
+print("\n=== Test 2: Conditionals ===")
+
+if current_assets < max_assets:
+    print("Can add more assets")
+else:
+    print("Asset limit reached")
+
+# Test comparison operations
+if max_assets > 3:
+    print("Max assets is greater than 3")
+else:
+    print("Max assets is 3 or less")
+
+# Test 3: Loops and asset creation
+print("\n=== Test 3: Loops and Asset Creation ===")
+
+# Create a project first
+project_path = "/tmp/scripting_test_project"
+project_info = {
+    "name": project_name,
+    "author": author_name,
+    "description": "Test project for scripting features"
+}
+
+create_result = create_project(project_path, project_info)
+print("Project created:", create_result)
+
+# Use a loop to create multiple assets
+asset_names = ["asset1", "asset2", "asset3", "asset4", "asset5"]
+
+foreach (asset_name in asset_names):
+    print("Creating asset:", asset_name)
+    add_object(asset_name)
+    current_assets = current_assets + 1
+
+print("Created", current_assets, "assets")
+
+# Test 4: Functions and string manipulation
+print("\n=== Test 4: Functions and String Manipulation ===")
+
+# Test string functions
+upper_name = upper(project_name)
+lower_name = lower(project_name)
+name_length = len(project_name)
+
+print("Upper case name:", upper_name)
+print("Lower case name:", lower_name)
+print("Name length:", name_length)
+
+# Test contains function
+if contains(project_name, "Test"):
+    print("Project name contains 'Test'")
+else:
+    print("Project name does not contain 'Test'")
+
+# Test 5: Stack operations
+print("\n=== Test 5: Stack Operations ===")
+
+# Push some values
+push("first_value")
+push("second_value")
+push("third_value")
+
+print("Pushed 3 values to stack")
+
+# Pop values
+value1 = pop()
+value2 = pop()
+value3 = pop()
+
+print("Popped values:", value1, value2, value3)
+
+# Test 6: Error handling and validation
+print("\n=== Test 6: Error Handling ===")
+
+# Test project state validation
+if is_project_loaded():
+    print("Project is loaded - can perform operations")
+    
+    # Test saving
+    if can_save_project():
+        save_result = save_project()
+        print("Project saved:", save_result)
+    else:
+        print("Cannot save project")
+    
+    # Test closing
+    if can_close_project():
+        close_result = close_project()
+        print("Project closed:", close_result)
+    else:
+        print("Cannot close project")
+else:
+    print("No project loaded")
+
+# Test 7: Complex conditional logic
+print("\n=== Test 7: Complex Logic ===")
+
+# Create another project for testing
+project_path2 = "/tmp/scripting_test_project2"
+project_info2 = {
+    "name": "Second Test Project",
+    "author": author_name,
+    "description": "Second test project"
+}
+
+create_result2 = create_project(project_path2, project_info2)
+
+if create_result2 && is_project_loaded():
+    print("Second project created and loaded successfully")
+    
+    # Add some assets with conditional logic
+    asset_count = 0
+    max_test_assets = 3
+    
+    while asset_count < max_test_assets:
+        asset_name = "test_asset_" + toString(asset_count + 1)
+        add_object(asset_name)
+        asset_count = asset_count + 1
+        
+        if asset_count == 2:
+            print("Halfway through asset creation")
+    
+    print("Created", asset_count, "test assets")
+    
+    # Get final status
+    final_status = get_project_status()
+    print("Final project status:", final_status)
+else:
+    print("Failed to create or load second project")
+
+print("\n=== Scripting Features Test Complete ===")

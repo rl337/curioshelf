@@ -81,6 +81,10 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
             self.handle_error(e, "Qt cleanup")
             return False
     
+    def get_ui_implementation(self) -> 'UIImplementationInterface':
+        """Get the UI implementation instance"""
+        return self
+    
     def is_initialized(self) -> bool:
         """Check if Qt is initialized"""
         return self._initialized and QApplication.instance() is not None

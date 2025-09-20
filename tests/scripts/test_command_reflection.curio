@@ -1,0 +1,138 @@
+# CurioShelf Script Test: Command Reflection
+# This script tests the reflection system by calling various application methods
+
+print("=== CurioShelf Command Reflection Test ===")
+print("This script tests the reflection system by calling application methods")
+print()
+
+# Test 1: Project management commands
+print("=== Test 1: Project Management Commands ===")
+
+# Test project state queries
+print("Initial project state:")
+print("  is_project_loaded():", is_project_loaded())
+print("  valid_project():", valid_project())
+print("  can_create_project():", can_create_project())
+print("  can_open_project():", can_open_project())
+print("  can_save_project():", can_save_project())
+print("  can_close_project():", can_close_project())
+
+# Test 2: Create a project
+print("\n=== Test 2: Create Project ===")
+project_path = "/tmp/reflection_test_project"
+project_info = {
+    "name": "Reflection Test Project",
+    "author": "Script Tester",
+    "description": "Testing command reflection"
+}
+
+print("Creating project at:", project_path)
+create_result = create_project(project_path, project_info)
+print("Create project result:", create_result)
+
+# Test 3: Verify state after creation
+print("\n=== Test 3: State After Creation ===")
+print("  is_project_loaded():", is_project_loaded())
+print("  valid_project():", valid_project())
+print("  can_save_project():", can_save_project())
+print("  can_close_project():", can_close_project())
+
+# Test 4: Get project information
+print("\n=== Test 4: Project Information ===")
+project_status = get_project_status()
+print("Project status:", project_status)
+
+project_info_loaded = get_project_info()
+print("Project info:", project_info_loaded)
+
+# Test 5: Asset management commands
+print("\n=== Test 5: Asset Management Commands ===")
+
+# Test adding assets
+print("Adding mock assets...")
+add_source("reflection_test_source_1.jpg")
+add_source("reflection_test_source_2.png")
+add_object("reflection_test_object_1")
+add_object("reflection_test_object_2")
+add_template("reflection_test_template_1")
+add_template("reflection_test_template_2")
+
+# Test getting asset counts
+asset_counts = get_asset_counts()
+print("Asset counts:", asset_counts)
+
+# Test getting asset lists
+sources = get_sources()
+objects = get_objects()
+templates = get_templates()
+
+print("Sources:", sources)
+print("Objects:", objects)
+print("Templates:", templates)
+
+# Test 6: Asset creation commands
+print("\n=== Test 6: Asset Creation Commands ===")
+
+# Test importing a source (this will fail with fake path, but tests the method)
+print("Testing import_source with fake path...")
+import_result = import_source("/tmp/fake_image.jpg")
+print("Import source result:", import_result)
+
+# Test creating objects
+print("Testing create_object...")
+create_obj_result = create_object("reflection_created_object")
+print("Create object result:", create_obj_result)
+
+# Test creating templates
+print("Testing create_template...")
+create_tmpl_result = create_template("reflection_created_template")
+print("Create template result:", create_tmpl_result)
+
+# Test 7: Save and close operations
+print("\n=== Test 7: Save and Close Operations ===")
+
+# Test saving
+print("Testing save_project...")
+save_result = save_project()
+print("Save project result:", save_result)
+
+# Test closing
+print("Testing close_project...")
+close_result = close_project()
+print("Close project result:", close_result)
+
+# Test 8: Verify final state
+print("\n=== Test 8: Final State ===")
+print("  is_project_loaded():", is_project_loaded())
+print("  valid_project():", valid_project())
+print("  can_create_project():", can_create_project())
+print("  can_open_project():", can_open_project())
+print("  can_save_project():", can_save_project())
+print("  can_close_project():", can_close_project())
+
+# Test 9: Load the project back
+print("\n=== Test 9: Load Project Back ===")
+load_result = load_project(project_path)
+print("Load project result:", load_result)
+
+# Verify assets are still there
+final_counts = get_asset_counts()
+print("Final asset counts after reload:", final_counts)
+
+# Test 10: Error handling
+print("\n=== Test 10: Error Handling ===")
+
+# Test operations without a project
+close_result2 = close_project()
+print("Close project again result:", close_result2)
+
+# Try to save without a project
+save_result2 = save_project()
+print("Save without project result:", save_result2)
+
+# Try to create objects without a project
+create_obj_result2 = create_object("should_fail_object")
+print("Create object without project result:", create_obj_result2)
+
+print("\n=== Command Reflection Test Complete ===")
+print("All available commands have been tested through the reflection system")

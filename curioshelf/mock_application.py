@@ -42,9 +42,15 @@ class MockCurioShelfApplication(ApplicationInterface):
         self._update_application_state()
     
     # Project Management
-    def create_project(self, project_path: Path, project_info: ProjectInfo) -> bool:
+    def create_project(self, project_path: Path, project_info) -> bool:
         """Mock project creation"""
-        self.logger.info(f"MOCK: Creating project: {project_info.name}")
+        # Handle both ProjectInfo objects and dictionaries
+        if isinstance(project_info, dict):
+            project_name = project_info.get('name', 'Unknown Project')
+        else:
+            project_name = project_info.name
+        
+        self.logger.info(f"MOCK: Creating project: {project_name}")
         
         self._project_loaded = True
         self._project_info = project_info
@@ -54,13 +60,13 @@ class MockCurioShelfApplication(ApplicationInterface):
         
         self.operations_performed.append({
             "operation": "create_project",
-            "project_name": project_info.name,
+            "project_name": project_name,
             "project_path": str(project_path)
         })
         
         # Emit mock events
-        emit_info_message(f"Mock: Project '{project_info.name}' created successfully", "mock_application")
-        emit_project_status(project_info.name, "mock_application")
+        emit_info_message(f"Mock: Project '{project_name}' created successfully", "mock_application")
+        emit_project_status(project_name, "mock_application")
         
         return True
     
@@ -141,11 +147,84 @@ class MockCurioShelfApplication(ApplicationInterface):
         
         return True
     
+    def import_source(self, file_path: Path) -> bool:
+        """Mock source import"""
+        if not self._project_loaded:
+            self.logger.warning("MOCK: Cannot import source: no project loaded")
+            return False
+        
+        self.logger.info(f"MOCK: Importing source: {file_path}")
+        
+        # Add to mock sources
+        self._sources.append(str(file_path))
+        
+        self.operations_performed.append({
+            "operation": "import_source",
+            "file_path": str(file_path)
+        })
+        
+        return True
+    
+    def create_object(self, object_name: str, source_id: str = None) -> bool:
+        """Mock object creation"""
+        if not self._project_loaded:
+            self.logger.warning("MOCK: Cannot create object: no project loaded")
+            return False
+        
+        self.logger.info(f"MOCK: Creating object: {object_name}")
+        
+        # Add to mock objects
+        self._objects.append(object_name)
+        
+        self.operations_performed.append({
+            "operation": "create_object",
+            "object_name": object_name
+        })
+        
+        return True
+    
+    def create_template(self, template_name: str, object_id: str = None) -> bool:
+        """Mock template creation"""
+        if not self._project_loaded:
+            self.logger.warning("MOCK: Cannot create template: no project loaded")
+            return False
+        
+        self.logger.info(f"MOCK: Creating template: {template_name}")
+        
+        # Add to mock templates
+        self._templates.append(template_name)
+        
+        self.operations_performed.append({
+            "operation": "create_template",
+            "template_name": template_name
+        })
+        
+        return True
+    
+    def add_source(self, source_name: str) -> None:
+        """Mock adding a source (for testing)"""
+        self._sources.append(source_name)
+    
+    def add_object(self, object_name: str) -> None:
+        """Mock adding an object (for testing)"""
+        self._objects.append(object_name)
+    
+    def add_template(self, template_name: str) -> None:
+        """Mock adding a template (for testing)"""
+        self._templates.append(template_name)
+    
     def get_project_status(self) -> Dict[str, Any]:
         """Get mock project status"""
+        project_name = None
+        if self._project_info:
+            if isinstance(self._project_info, dict):
+                project_name = self._project_info.get('name')
+            else:
+                project_name = self._project_info.name
+        
         return {
             "loaded": self._project_loaded,
-            "name": self._project_info.name if self._project_info else None,
+            "name": project_name,
             "path": None
         }
     
@@ -277,7 +356,7 @@ class MockCurioShelfApplication(ApplicationInterface):
             "sources": len(self._sources),
             "objects": len(self._objects),
             "templates": len(self._templates),
-            "slices": sum(len(source.slices) for source in self._sources)
+            "slices": 0  # Mock doesn't track slices
         }
     
     # Detailed State Methods for UI Ghosting

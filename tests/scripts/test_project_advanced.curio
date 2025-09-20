@@ -1,0 +1,83 @@
+# CurioShelf Script Test: Advanced Project Operations
+# This script tests project loading, asset management, and state transitions
+
+# Test 1: Create and populate a project
+print("=== Test 1: Create and Populate Project ===")
+project_path = "/tmp/test_curio_advanced"
+project_name = "Advanced Test Project"
+
+# Create project
+project_info = {
+    "name": project_name,
+    "author": "Script Tester",
+    "description": "Advanced test project with assets"
+}
+
+create_result = create_project(project_path, project_info)
+print("Project created:", create_result)
+
+# Add some mock assets
+print("\n--- Adding mock assets ---")
+add_source("test_image_1.jpg")
+add_source("test_image_2.png")
+add_object("test_object_1")
+add_object("test_object_2")
+add_template("test_template_1")
+add_template("test_template_2")
+
+# Check asset counts
+counts = get_asset_counts()
+print("Asset counts:", counts)
+
+# Test 2: Save and close project
+print("\n=== Test 2: Save and Close Project ===")
+save_result = save_project()
+print("Project saved:", save_result)
+
+close_result = close_project()
+print("Project closed:", close_result)
+
+# Test 3: Load the project back
+print("\n=== Test 3: Load Project ===")
+load_result = load_project(project_path)
+print("Project loaded:", load_result)
+
+# Verify assets are still there
+counts_after_load = get_asset_counts()
+print("Asset counts after load:", counts_after_load)
+
+# Test 4: Test project validation
+print("\n=== Test 4: Project Validation ===")
+print("Valid project:", valid_project())
+print("Project loaded:", is_project_loaded())
+
+# Get project info
+project_info_loaded = get_project_info()
+print("Loaded project info:", project_info_loaded)
+
+# Test 5: Test state transitions
+print("\n=== Test 5: State Transitions ===")
+print("Can create project:", can_create_project())
+print("Can open project:", can_open_project())
+print("Can save project:", can_save_project())
+print("Can close project:", can_close_project())
+
+# Test 6: Import a source
+print("\n=== Test 6: Import Source ===")
+# This would normally import a real file, but we'll test the method
+import_result = import_source("/tmp/fake_image.jpg")
+print("Import source result:", import_result)
+
+# Test 7: Create objects and templates
+print("\n=== Test 7: Create Objects and Templates ===")
+create_obj_result = create_object("script_created_object")
+print("Create object result:", create_obj_result)
+
+create_tmpl_result = create_template("script_created_template")
+print("Create template result:", create_tmpl_result)
+
+# Final asset counts
+final_counts = get_asset_counts()
+print("Final asset counts:", final_counts)
+
+print("\n=== Advanced Test Complete ===")

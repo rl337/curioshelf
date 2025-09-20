@@ -13,7 +13,8 @@ from typing import Optional
 from .ui_interface import create_ui_implementation, UIImplementationError
 
 # Import implementations to register them
-from . import headless
+from . import debug
+from . import script
 
 # Try to import Qt implementation (may fail if PySide6 not available)
 try:
@@ -30,7 +31,7 @@ class UIFactory:
         Initialize the UI factory
         
         Args:
-            ui_backend: UI backend to use ("qt", "headless", etc.)
+            ui_backend: UI backend to use ("qt", "debug", "script", etc.)
             verbose: Enable verbose logging
         """
         self.ui_backend = ui_backend
@@ -50,22 +51,22 @@ class UIFactory:
                 if self.verbose:
                     print(f"Failed to create {self.ui_backend} UI implementation: {e}")
                 
-                # Fallback to headless if available
-                if self.ui_backend != "headless":
+                # Fallback to debug if available
+                if self.ui_backend != "debug":
                     try:
                         self._ui_implementation = create_ui_implementation(
-                            "headless", verbose=self.verbose
+                            "debug", verbose=self.verbose
                         )
                         self._ui_implementation.initialize()
                         if self.verbose:
-                            print("Falling back to headless implementation")
+                            print("Falling back to debug implementation")
                     except Exception as fallback_error:
                         raise UIImplementationError(
                             f"Failed to create any UI implementation. "
                             f"Original error: {e}, Fallback error: {fallback_error}"
                         )
                 else:
-                    raise UIImplementationError(f"Failed to create headless UI: {e}")
+                    raise UIImplementationError(f"Failed to create debug UI: {e}")
         
         return self._ui_implementation
     
@@ -97,7 +98,7 @@ def create_ui_factory(ui_backend: str = "qt", verbose: bool = False) -> UIFactor
     Create a UI factory with the specified backend
     
     Args:
-        ui_backend: UI backend to use ("qt", "headless", etc.)
+        ui_backend: UI backend to use ("qt", "debug", "script", etc.)
         verbose: Enable verbose logging
     
     Returns:
@@ -141,8 +142,8 @@ def main():
         print(f"UI Implementation: {factory.get_ui_implementation().__class__.__name__}")
         
         # Run the application
-        if args.ui == "headless":
-            print("Headless mode - no GUI will be shown")
+        if args.ui in ["debug", "script"]:
+            print(f"{args.ui.title()} mode - no GUI will be shown")
         else:
             print("Starting GUI application...")
             factory.get_ui_implementation().run_event_loop()

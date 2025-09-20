@@ -139,6 +139,9 @@ class CurioShelfApplicationImpl(ApplicationInterface):
                 self.project_manager.is_project_loaded = True
                 self.asset_manager = self.project_manager.asset_manager
                 
+                # Load existing assets from the project
+                self._load_project_assets(project_path)
+                
                 self._update_application_state()
                 
                 # Initialize controllers if UI factory is available
@@ -166,6 +169,115 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         self.logger.error(f"Failed to load project from: {project_path}")
         return False
     
+    def _load_project_assets(self, project_path: Path) -> None:
+        """Load existing assets from a project directory"""
+        if not self.asset_manager:
+            return
+        
+        # Load sources from the sources directory
+        sources_dir = project_path / "sources"
+        if sources_dir.exists():
+            for source_file in sources_dir.iterdir():
+                if source_file.is_file() and source_file.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif', '.bmp']:
+                    try:
+                        # Add source to asset manager
+                        source = self.asset_manager.add_source(source_file, 800, 600)  # Mock dimensions
+                        self.logger.info(f"Loaded source: {source_file.name}")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to load source {source_file.name}: {e}")
+        
+        # Load objects from the objects directory
+        objects_dir = project_path / "objects"
+        if objects_dir.exists():
+            for object_file in objects_dir.iterdir():
+                if object_file.is_file() and object_file.suffix == '.json':
+                    try:
+                        # For now, just create a basic object
+                        object_name = object_file.stem
+                        obj = self.asset_manager.add_object(object_name)
+                        self.logger.info(f"Loaded object: {object_name}")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to load object {object_file.name}: {e}")
+        
+        # Load templates from the templates directory
+        templates_dir = project_path / "templates"
+        if templates_dir.exists():
+            for template_file in templates_dir.iterdir():
+                if template_file.is_file() and template_file.suffix == '.json':
+                    try:
+                        # For now, just create a basic template
+                        template_name = template_file.stem
+                        template = self.asset_manager.add_template(
+                            name=template_name,
+                            description=f"Template: {template_name}",
+                            required_views=["front", "back"]
+                        )
+                        self.logger.info(f"Loaded template: {template_name}")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to load template {template_file.name}: {e}")
+    
+    def _save_project_assets(self, project_path: Path) -> None:
+        """Save current assets to project directory"""
+        if not self.asset_manager:
+            return
+        
+        # Ensure project directory exists
+        project_path.mkdir(parents=True, exist_ok=True)
+        
+        # Save sources
+        sources_dir = project_path / "sources"
+        sources_dir.mkdir(exist_ok=True)
+        
+        for source in self.asset_manager.get_sources():
+            # Copy source file to project directory if it's not already there
+            source_path = Path(source.file_path)
+            if not source_path.is_absolute() or str(source_path).startswith(str(project_path)):
+                continue  # Already in project directory
+            
+            dest_path = sources_dir / source_path.name
+            if not dest_path.exists():
+                try:
+                    import shutil
+                    shutil.copy2(source_path, dest_path)
+                    self.logger.info(f"Saved source: {dest_path.name}")
+                except Exception as e:
+                    self.logger.warning(f"Failed to save source {source_path.name}: {e}")
+        
+        # Save objects
+        objects_dir = project_path / "objects"
+        objects_dir.mkdir(exist_ok=True)
+        
+        for obj in self.asset_manager.get_objects():
+            object_file = objects_dir / f"{obj.name}.json"
+            try:
+                import json
+                with open(object_file, 'w') as f:
+                    json.dump({
+                        "name": obj.name,
+                        "slices": [{"name": slice.name, "source_id": slice.source_id} for slice in obj.slices]
+                    }, f, indent=2)
+                self.logger.info(f"Saved object: {obj.name}")
+            except Exception as e:
+                self.logger.warning(f"Failed to save object {obj.name}: {e}")
+        
+        # Save templates
+        templates_dir = project_path / "templates"
+        templates_dir.mkdir(exist_ok=True)
+        
+        for template in self.asset_manager.get_templates():
+            template_file = templates_dir / f"{template.name}.json"
+            try:
+                import json
+                with open(template_file, 'w') as f:
+                    json.dump({
+                        "name": template.name,
+                        "description": template.description,
+                        "required_views": template.required_views
+                    }, f, indent=2)
+                self.logger.info(f"Saved template: {template.name}")
+            except Exception as e:
+                self.logger.warning(f"Failed to save template {template.name}: {e}")
+    
     def save_project(self) -> bool:
         """Save the current project"""
         if not self.is_project_loaded():
@@ -173,6 +285,10 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             return False
         
         self.logger.info("Saving project")
+        
+        # Save assets to project directory
+        if self.project_manager.current_project_path and self.asset_manager:
+            self._save_project_assets(self.project_manager.current_project_path)
         
         # Save legacy project structure
         legacy_success = self.project_manager.save_project()

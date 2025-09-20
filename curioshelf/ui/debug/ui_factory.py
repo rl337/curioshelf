@@ -1,8 +1,9 @@
 """
-Headless UI Factory for creating command-line UI components
+Debug UI Factory for creating command-line UI components
 
-This factory creates headless implementations of the UI abstraction layer
-that emit messages instead of rendering GUI components.
+This factory creates debug implementations of the UI abstraction layer
+that emit messages instead of rendering GUI components. Used for development
+and debugging purposes.
 """
 
 from typing import Any, Optional, Dict, List
@@ -15,17 +16,17 @@ from ..abstraction import (
 )
 from ..factory_interface import UIFactoryInterface
 from .ui_widgets import (
-    HeadlessUIWidget, HeadlessUIButton, HeadlessUITextInput, HeadlessUIComboBox, 
-    HeadlessUIListWidget, HeadlessUICanvas, HeadlessUIMessageBox, HeadlessUIFileDialog, 
-    HeadlessUIProgressBar, HeadlessUIGroupBox, HeadlessUITabWidget, HeadlessUISplitter,
-    HeadlessUILayout, HeadlessUIMenuBar, HeadlessUIMenu, HeadlessUIMenuItem, HeadlessUIStatusBar
+    DebugUIWidget, DebugUIButton, DebugUITextInput, DebugUIComboBox, 
+    DebugUIListWidget, DebugUICanvas, DebugUIMessageBox, DebugUIFileDialog, 
+    DebugUIProgressBar, DebugUIGroupBox, DebugUITabWidget, DebugUISplitter,
+    DebugUILayout, DebugUIMenuBar, DebugUIMenu, DebugUIMenuItem, DebugUIStatusBar
 )
 from .message_system import MessageLogger, MessageType
 from ..ui_interface import UIImplementationInterface, UIImplementationError
 
 
-class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
-    """Headless implementation of the UI interface for testing"""
+class DebugUIImplementation(UIImplementationInterface, UIFactoryInterface):
+    """Debug implementation of the UI interface for development and testing"""
     
     def __init__(self, verbose: bool = True, collect_messages: bool = True) -> None:
         super().__init__(verbose)
@@ -44,7 +45,7 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Initialize the headless UI implementation"""
         self._initialized = True
         if self.verbose:
-            print("[HEADLESS] UI implementation initialized")
+            print("[DEBUG] UI implementation initialized")
         return True
     
     def cleanup(self) -> bool:
@@ -52,8 +53,12 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         self._initialized = False
         self._running = False
         if self.verbose:
-            print("[HEADLESS] UI implementation cleaned up")
+            print("[DEBUG] UI implementation cleaned up")
         return True
+    
+    def get_ui_implementation(self) -> 'UIImplementationInterface':
+        """Get the UI implementation instance"""
+        return self
     
     def is_initialized(self) -> bool:
         """Check if headless is initialized"""
@@ -194,62 +199,62 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
         if self.verbose:
             print(f"[HEADLESS] {message}")
     
-    def create_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIWidget':
+    def create_widget(self, parent: Optional['UIWidget'] = None) -> 'DebugUIWidget':
         """Create a basic widget"""
-        return HeadlessUIWidget(self.verbose, self._message_logger)
+        return DebugUIWidget(self.verbose, self._message_logger)
     
-    def create_button(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'HeadlessUIButton':
+    def create_button(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'DebugUIButton':
         """Create a button"""
-        return HeadlessUIButton(text, self.verbose, self._message_logger)
+        return DebugUIButton(text, self.verbose, self._message_logger)
     
-    def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'HeadlessUITextInput':
+    def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'DebugUITextInput':
         """Create a text input"""
-        return HeadlessUITextInput(placeholder, self.verbose, self._message_logger)
+        return DebugUITextInput(placeholder, self.verbose, self._message_logger)
     
-    def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIComboBox':
+    def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'DebugUIComboBox':
         """Create a combo box"""
-        return HeadlessUIComboBox(self.verbose, self._message_logger)
+        return DebugUIComboBox(self.verbose, self._message_logger)
     
-    def create_list_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIListWidget':
+    def create_list_widget(self, parent: Optional['UIWidget'] = None) -> 'DebugUIListWidget':
         """Create a list widget"""
-        return HeadlessUIListWidget(self.verbose, self._message_logger)
+        return DebugUIListWidget(self.verbose, self._message_logger)
     
-    def create_canvas(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUICanvas':
+    def create_canvas(self, parent: Optional['UIWidget'] = None) -> 'DebugUICanvas':
         """Create a canvas widget"""
-        return HeadlessUICanvas(self.verbose, self._message_logger)
+        return DebugUICanvas(self.verbose, self._message_logger)
     
-    def create_message_box(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIMessageBox':
+    def create_message_box(self, parent: Optional['UIWidget'] = None) -> 'DebugUIMessageBox':
         """Create a message box"""
-        return HeadlessUIMessageBox(self.verbose, self._message_logger)
+        return DebugUIMessageBox(self.verbose, self._message_logger)
     
-    def create_file_dialog(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIFileDialog':
+    def create_file_dialog(self, parent: Optional['UIWidget'] = None) -> 'DebugUIFileDialog':
         """Create a file dialog"""
-        return HeadlessUIFileDialog(self.verbose, self._message_logger)
+        return DebugUIFileDialog(self.verbose, self._message_logger)
     
-    def create_progress_bar(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUIProgressBar':
+    def create_progress_bar(self, parent: Optional['UIWidget'] = None) -> 'DebugUIProgressBar':
         """Create a progress bar"""
-        return HeadlessUIProgressBar(self.verbose, self._message_logger)
+        return DebugUIProgressBar(self.verbose, self._message_logger)
     
-    def create_group_box(self, title: str = "") -> 'HeadlessUIGroupBox':
+    def create_group_box(self, title: str = "") -> 'DebugUIGroupBox':
         """Create a group box"""
-        return HeadlessUIGroupBox(title, self.verbose, self._message_logger)
+        return DebugUIGroupBox(title, self.verbose, self._message_logger)
     
-    def create_tab_widget(self, parent: Optional['UIWidget'] = None) -> 'HeadlessUITabWidget':
+    def create_tab_widget(self, parent: Optional['UIWidget'] = None) -> 'DebugUITabWidget':
         """Create a tab widget"""
-        return HeadlessUITabWidget(self.verbose, self._message_logger)
+        return DebugUITabWidget(self.verbose, self._message_logger)
     
-    def create_splitter(self, orientation: str = "horizontal", parent: Optional['UIWidget'] = None) -> 'HeadlessUISplitter':
+    def create_splitter(self, orientation: str = "horizontal", parent: Optional['UIWidget'] = None) -> 'DebugUISplitter':
         """Create a splitter widget"""
-        return HeadlessUISplitter(orientation, self.verbose, self._message_logger)
+        return DebugUISplitter(orientation, self.verbose, self._message_logger)
     
     def create_pixmap(self, width: int, height: int) -> 'HeadlessPixmap':
         """Create a pixmap for testing"""
         self._pixmap_counter += 1
         return HeadlessPixmap(width, height, self._pixmap_counter)
     
-    def create_layout(self, orientation: str = "vertical", parent: Optional['UIWidget'] = None) -> 'HeadlessUILayout':
+    def create_layout(self, orientation: str = "vertical", parent: Optional['UIWidget'] = None) -> 'DebugUILayout':
         """Create a layout"""
-        return HeadlessUILayout(orientation, self.verbose, self._message_logger)
+        return DebugUILayout(orientation, self.verbose, self._message_logger)
     
     def get_message_logger(self) -> MessageLogger:
         """Get the message logger for testing and debugging"""
@@ -266,36 +271,36 @@ class HeadlessUIImplementation(UIImplementationInterface, UIFactoryInterface):
     
     def create_menu_bar(self, parent: Optional['UIWidget'] = None) -> 'UIMenuBar':
         """Create a menu bar widget"""
-        return HeadlessUIMenuBar(self._message_logger)
+        return DebugUIMenuBar(self._message_logger)
     
     def create_menu(self, title: str, parent: Optional['UIMenuBar'] = None) -> 'UIMenu':
         """Create a menu widget"""
-        menu = HeadlessUIMenu(self._message_logger)
+        menu = DebugUIMenu(self._message_logger)
         menu.set_title(title)
         return menu
     
     def create_menu_item(self, text: str, parent: Optional['UIMenu'] = None) -> 'UIMenuItem':
         """Create a menu item widget"""
-        item = HeadlessUIMenuItem(self._message_logger)
+        item = DebugUIMenuItem(self._message_logger)
         item.set_text(text)
         return item
     
     def create_status_bar(self, parent: Optional['UIWidget'] = None) -> 'UIStatusBar':
         """Create a status bar widget"""
-        return HeadlessUIStatusBar(self._message_logger)
+        return DebugUIStatusBar(self._message_logger)
     
     def create_main_widget(self, parent: Optional['UIWidget'] = None) -> 'UIWidget':
         """Create a main widget (main window)"""
-        return HeadlessUIWidget(self.verbose, self._message_logger)
+        return DebugUIWidget(self.verbose, self._message_logger)
 
 
 # Backward compatibility alias
-HeadlessUIFactory = HeadlessUIImplementation
+DebugUIFactory = DebugUIImplementation
 
 
 # Register the implementation
 from ..ui_interface import UIImplementationRegistry
-UIImplementationRegistry.register("headless", HeadlessUIImplementation)
+UIImplementationRegistry.register("debug", DebugUIImplementation)
 
 
 class HeadlessPixmap:

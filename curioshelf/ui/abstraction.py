@@ -549,6 +549,10 @@ class UIMenuItem(UIWidget):
     
     def _on_clicked(self) -> None:
         """Handle menu item click"""
+        # Only execute callback if the item is enabled
+        if not self.enabled:
+            return
+        
         if self._clicked_callback:
             self._clicked_callback()
         self.emit_signal("clicked")

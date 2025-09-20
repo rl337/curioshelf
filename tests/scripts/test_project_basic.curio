@@ -1,0 +1,53 @@
+# CurioShelf Script Test: Basic Project Operations
+# This script tests basic project creation, loading, and management
+
+# Test 1: Check initial state
+print("=== Test 1: Initial State ===")
+print("Project loaded:", is_project_loaded())
+print("Can create project:", can_create_project())
+print("Can open project:", can_open_project())
+print("Can save project:", can_save_project())
+print("Can close project:", can_close_project())
+
+# Test 2: Create a new project
+print("\n=== Test 2: Create Project ===")
+project_path = "/tmp/test_curio_project"
+project_name = "Test Project"
+author = "Test Author"
+
+# Create project info
+project_info = {
+    "name": project_name,
+    "author": author,
+    "description": "A test project for CurioShelf scripting"
+}
+
+# Create the project
+result = create_project(project_path, project_info)
+print("Project creation result:", result)
+
+# Check state after creation
+print("Project loaded after creation:", is_project_loaded())
+print("Can save project after creation:", can_save_project())
+print("Can close project after creation:", can_close_project())
+
+# Test 3: Get project status
+print("\n=== Test 3: Project Status ===")
+status = get_project_status()
+print("Project status:", status)
+
+# Test 4: Save the project
+print("\n=== Test 4: Save Project ===")
+save_result = save_project()
+print("Save project result:", save_result)
+
+# Test 5: Close the project
+print("\n=== Test 5: Close Project ===")
+close_result = close_project()
+print("Close project result:", close_result)
+
+# Check final state
+print("Project loaded after close:", is_project_loaded())
+print("Can create project after close:", can_create_project())
+
+print("\n=== Test Complete ===")

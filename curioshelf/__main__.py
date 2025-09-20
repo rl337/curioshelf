@@ -31,9 +31,9 @@ def main():
         help="Enable verbose logging"
     )
     parser.add_argument(
-        "--headless",
+        "--debug-ui",
         action="store_true",
-        help="Run in headless mode (equivalent to --ui headless)"
+        help="Run in debug UI mode (equivalent to --ui debug)"
     )
     parser.add_argument(
         "--run-for-real",
@@ -59,8 +59,8 @@ def main():
     
     args = parser.parse_args()
     
-    # Override UI backend if headless flag is set
-    ui_backend = "headless" if args.headless else args.ui
+    # Override UI backend if debug-ui flag is set
+    ui_backend = "debug" if args.debug_ui else args.ui
     
     print(f"Starting CurioShelf with {ui_backend} UI backend")
     
@@ -82,22 +82,30 @@ def main():
         # Create UI factory
         factory = create_ui_factory(ui_backend, args.verbose)
         
-        # Create main window
-        main_window = factory.create_main_window()
-        
-        # Register main window with instrumentation server if debugging is enabled
-        if instrumentation_server:
-            instrumentation_server.register_controller("main_window", main_window)
-            print("Main window registered with instrumentation server")
-        
-        if args.verbose:
-            print(f"UI Implementation: {factory.get_ui_implementation().__class__.__name__}")
-            print("Main window created successfully!")
+        # Create main window (not needed for script UI)
+        if ui_backend != "script":
+            main_window = factory.create_main_window()
+            
+            # Register main window with instrumentation server if debugging is enabled
+            if instrumentation_server:
+                instrumentation_server.register_controller("main_window", main_window)
+                print("Main window registered with instrumentation server")
+            
+            if args.verbose:
+                print(f"UI Implementation: {factory.get_ui_implementation().__class__.__name__}")
+                print("Main window created successfully!")
+        else:
+            if args.verbose:
+                print(f"UI Implementation: {factory.get_ui_implementation().__class__.__name__}")
         
         # Run the application
-        if ui_backend == "headless":
-            print("Running in headless mode - no GUI will be shown")
+        if ui_backend == "debug":
+            print("Running in debug mode - no GUI will be shown")
             print("Use Ctrl+C to exit")
+        elif ui_backend == "script":
+            print("Running in script mode - command interface")
+            print("Use Ctrl+C to exit")
+            factory.get_ui_implementation().run_event_loop()
         elif args.run_for_real:
             print("Starting GUI application (--run-for-real flag set)...")
             # Show the main window for GUI applications

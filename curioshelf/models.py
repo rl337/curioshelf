@@ -203,6 +203,18 @@ class AssetManager:
         self.templates[name] = template
         return template
     
+    def get_sources(self) -> List[AssetSource]:
+        """Get all sources"""
+        return list(self.sources.values())
+    
+    def get_objects(self) -> List[CurioObject]:
+        """Get all objects"""
+        return list(self.objects.values())
+    
+    def get_templates(self) -> List[Template]:
+        """Get all templates"""
+        return list(self.templates.values())
+    
     def get_object_completeness(self, object_id: str) -> Dict[str, bool]:
         """Get completeness status for an object's required views"""
         obj = self.objects.get(object_id)
