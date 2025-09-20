@@ -1,0 +1,7 @@
+# Simple assertion test
+print("Testing basic assertions")
+
+# Test 1: Simple comparison
+assert(5 > 3, "Basic math")
+
+print("Basic assertion passed")

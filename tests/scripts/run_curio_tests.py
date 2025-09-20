@@ -16,7 +16,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from curioshelf.ui.script.ui_factory import ScriptUIImplementation
-from curioshelf.mock_application import MockCurioShelfApplication
+from tests.test_application_impl import ConcreteTestApplicationImpl
 
 
 def run_curio_script(script_path: Path, verbose: bool = True) -> bool:
@@ -25,14 +25,14 @@ def run_curio_script(script_path: Path, verbose: bool = True) -> bool:
     print(f"Running CurioScript: {script_path.name}")
     print(f"{'='*60}")
     
-    # Create mock application for testing
-    mock_app = MockCurioShelfApplication()
+    # Create concrete test application for testing
+    test_app = ConcreteTestApplicationImpl()
     
     # Create script UI implementation
     script_ui = ScriptUIImplementation(
         verbose=verbose,
         interactive=False,
-        application_interface=mock_app
+        application_interface=test_app
     )
     
     # Initialize the UI
@@ -55,6 +55,9 @@ def run_curio_script(script_path: Path, verbose: bool = True) -> bool:
             result = script_ui._script_runtime.execute_script_content(script_content)
             if result is not None:
                 print(f"Script result: {result}")
+        except AssertionError as e:
+            print(f"SCRIPT ASSERTION FAILED: {e}")
+            return False
         except Exception as e:
             print(f"Script execution error: {e}")
             traceback.print_exc()

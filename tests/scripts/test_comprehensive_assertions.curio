@@ -1,0 +1,124 @@
+# CurioShelf Script Test: Comprehensive Assertions
+# This script demonstrates comprehensive assertion testing for project operations
+
+print("=== CurioShelf Comprehensive Assertion Test ===")
+print("This script demonstrates comprehensive assertion testing")
+print()
+
+# Test 1: Basic assertions
+print("=== Test 1: Basic Assertions ===")
+assert(5 > 3, "Basic math should work")
+assert(10 == 10, "Equality should work")
+assert(not isEmpty("hello"), "String should not be empty")
+assert(isEmpty(""), "Empty string should be empty")
+print("✓ Basic assertions passed")
+print()
+
+# Test 2: Project state assertions
+print("=== Test 2: Project State Assertions ===")
+print("Initial state:")
+print("Project loaded:", is_project_loaded())
+print("Has sources:", has_sources())
+print("Asset counts:", get_asset_counts())
+
+# Assert initial state
+assert(not is_project_loaded(), "No project should be loaded initially")
+assert(not has_sources(), "Should have no sources initially")
+assert(not has_objects(), "Should have no objects initially")
+assert(not has_templates(), "Should have no templates initially")
+
+counts = get_asset_counts()
+assert(counts["sources"] == 0, "Source count should be 0")
+assert(counts["objects"] == 0, "Object count should be 0")
+assert(counts["templates"] == 0, "Template count should be 0")
+print("✓ Initial state assertions passed")
+print()
+
+# Test 3: Project creation assertions
+print("=== Test 3: Project Creation Assertions ===")
+project_path = "/tmp/comprehensive_assertion_test_project"
+project_info = {"name": "Comprehensive Assertion Test", "author": "Script Tester", "description": "Testing comprehensive assertions"}
+
+print("Creating project...")
+result = create_project(project_path, project_info)
+assert(result == True, "Project creation should succeed")
+assert(is_project_loaded(), "Project should be loaded after creation")
+
+status = get_project_status()
+assert(status["loaded"] == True, "Project status should show loaded")
+assert(status["name"] == "Comprehensive Assertion Test", "Project name should match")
+print("✓ Project creation assertions passed")
+print()
+
+# Test 4: Asset creation assertions
+print("=== Test 4: Asset Creation Assertions ===")
+print("Adding assets...")
+
+# Import source
+source_result = import_source("test_source.jpg")
+assert(source_result == True, "Source import should succeed")
+assert(has_sources(), "Should have sources after import")
+
+# Create object
+object_result = create_object("test_object")
+assert(object_result == True, "Object creation should succeed")
+assert(has_objects(), "Should have objects after creation")
+
+# Create template
+template_result = create_template("test_template")
+assert(template_result == True, "Template creation should succeed")
+assert(has_templates(), "Should have templates after creation")
+
+# Check counts
+counts = get_asset_counts()
+assert(counts["sources"] == 1, "Should have 1 source")
+assert(counts["objects"] == 1, "Should have 1 object")
+assert(counts["templates"] == 1, "Should have 1 template")
+print("✓ Asset creation assertions passed")
+print()
+
+# Test 5: State query assertions
+print("=== Test 5: State Query Assertions ===")
+assert(valid_project(), "Project should be valid")
+assert(not can_create_project(), "Should not be able to create project when one is loaded")
+assert(can_save_project(), "Should be able to save project")
+assert(can_close_project(), "Should be able to close project")
+assert(can_import_source(), "Should be able to import source")
+assert(can_create_object(), "Should be able to create object (has sources)")
+assert(can_create_template(), "Should be able to create template (has objects)")
+print("✓ State query assertions passed")
+print()
+
+# Test 6: Logical operator assertions
+print("=== Test 6: Logical Operator Assertions ===")
+assert(5 > 3 and 10 > 5, "Logical AND should work")
+assert(5 < 3 or 10 > 5, "Logical OR should work")
+assert(not (5 < 3), "Logical NOT should work")
+print("✓ Logical operator assertions passed")
+print()
+
+# Test 7: Complex expression assertions
+print("=== Test 7: Complex Expression Assertions ===")
+counts = get_asset_counts()
+total_assets = counts["sources"] + counts["objects"] + counts["templates"]
+assert(total_assets == 3, "Total assets should be 3")
+assert(total_assets > 0, "Should have at least one asset")
+assert(total_assets >= 3, "Should have at least 3 assets")
+assert(total_assets <= 10, "Should have at most 10 assets")
+print("✓ Complex expression assertions passed")
+print()
+
+# Test 8: String and function assertions
+print("=== Test 8: String and Function Assertions ===")
+project_name = status["name"]
+assert(len(project_name) > 0, "Project name should not be empty")
+assert(contains(project_name, "Comprehensive"), "Project name should contain 'Comprehensive'")
+assert(startsWith(project_name, "Comprehensive"), "Project name should start with 'Comprehensive'")
+assert(endsWith(project_name, "Test"), "Project name should end with 'Test'")
+print("✓ String and function assertions passed")
+print()
+
+print("=== All Comprehensive Assertions Passed! ===")
+print("The assert function is working correctly for comprehensive test validation.")
+print("This demonstrates that CurioScript can now be used for rigorous testing")
+print("of the CurioShelf application interface with proper validation.")

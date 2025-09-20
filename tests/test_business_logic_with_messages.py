@@ -16,7 +16,7 @@ sys.path.insert(0, str(project_root))
 from curioshelf.models import AssetManager, AssetSource, ObjectSlice, CurioObject, Template
 from curioshelf.app_impl.controllers import SourcesController, TemplatesController, ObjectsController
 from curioshelf.ui.ui_factory import create_ui_factory
-from curioshelf.ui.headless.message_system import MessageCollector, MessageType
+from curioshelf.ui.debug.message_system import MessageCollector, MessageType
 
 
 class TestBusinessLogicWithMessages:
@@ -58,7 +58,7 @@ class TestBusinessLogicWithMessages:
         controller.source_combo.set_current_index(0)
         
         # Check that combo box interactions were logged
-        combo_events = logger.get_messages_by_component("HeadlessUIComboBox")
+        combo_events = logger.get_messages_by_component("DebugUIComboBox")
         assert len(combo_events) > 0, "Should have combo box interaction messages"
         
         factory.cleanup()
@@ -90,7 +90,7 @@ class TestBusinessLogicWithMessages:
         controller.templates_list.set_current_index(0)
         
         # Check that interactions were logged
-        list_events = logger.get_messages_by_component("HeadlessUIListWidget")
+        list_events = logger.get_messages_by_component("DebugUIListWidget")
         assert len(list_events) > 0, "Should have list widget interaction messages"
         
         factory.cleanup()
@@ -123,7 +123,7 @@ class TestBusinessLogicWithMessages:
         controller.objects_list.set_current_index(0)
         
         # Check that interactions were logged
-        list_events = logger.get_messages_by_component("HeadlessUIListWidget")
+        list_events = logger.get_messages_by_component("DebugUIListWidget")
         assert len(list_events) > 0, "Should have list widget interaction messages"
         
         factory.cleanup()
@@ -146,13 +146,13 @@ class TestBusinessLogicWithMessages:
         user_actions = logger.get_messages_by_type(MessageType.USER_ACTION)
         assert len(user_actions) == 1, "Should have 1 user action"
         assert user_actions[0].action == "clicked"
-        assert user_actions[0].component == "HeadlessUIButton"
+        assert user_actions[0].component == "DebugUIButton"
         
         # Check that UI events were logged
         ui_events = logger.get_messages_by_type(MessageType.UI_EVENT)
         assert len(ui_events) == 1, "Should have 1 UI event"
         assert ui_events[0].action == "text_changed"
-        assert ui_events[0].component == "HeadlessUITextInput"
+        assert ui_events[0].component == "DebugUITextInput"
         
         factory.cleanup()
     
@@ -173,11 +173,11 @@ class TestBusinessLogicWithMessages:
         
         # Test user interactions that generate messages
         controller.import_btn.click()
-        collector.assert_user_action("HeadlessUIButton", "clicked")
+        collector.assert_user_action("DebugUIButton", "clicked")
         
         # Test state changes
         controller.source_combo.set_enabled(False)
-        collector.assert_state_change("HeadlessUIComboBox", "disabled")
+        collector.assert_state_change("DebugUIComboBox", "disabled")
         
         factory.cleanup()
     
@@ -201,8 +201,8 @@ class TestBusinessLogicWithMessages:
         
         # Test sequence
         expected_sequence = [
-            {"component": "HeadlessUITextInput", "action": "text_changed", "message_type": "ui_event"},
-            {"component": "HeadlessUIButton", "action": "clicked", "message_type": "user_action"}
+            {"component": "DebugUITextInput", "action": "text_changed", "message_type": "ui_event"},
+            {"component": "DebugUIButton", "action": "clicked", "message_type": "user_action"}
         ]
         
         collector.assert_message_sequence(expected_sequence)

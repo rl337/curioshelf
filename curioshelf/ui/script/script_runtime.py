@@ -133,6 +133,40 @@ class ScriptRuntime:
             # Handle variable references from the simple parser
             var_name = node['name']
             return self.state_machine.get_variable(var_name)
+        elif node_type == 'comparison':
+            # Handle comparison expressions
+            left = self._evaluate_expression(node['left'])
+            right = self._evaluate_expression(node['right'])
+            operator = node['operator']
+            
+            if operator == '==':
+                return left == right
+            elif operator == '!=':
+                return left != right
+            elif operator == '<':
+                return left < right
+            elif operator == '>':
+                return left > right
+            elif operator == '<=':
+                return left <= right
+            elif operator == '>=':
+                return left >= right
+            else:
+                raise ValueError(f"Unknown comparison operator: {operator}")
+        elif node_type == 'logical_and':
+            # Handle logical AND
+            left = self._evaluate_expression(node['left'])
+            right = self._evaluate_expression(node['right'])
+            return bool(left) and bool(right)
+        elif node_type == 'logical_or':
+            # Handle logical OR
+            left = self._evaluate_expression(node['left'])
+            right = self._evaluate_expression(node['right'])
+            return bool(left) or bool(right)
+        elif node_type == 'logical_not':
+            # Handle logical NOT
+            operand = self._evaluate_expression(node['operand'])
+            return not bool(operand)
         else:
             raise ValueError(f"Unknown node type: {node_type}")
     
@@ -224,7 +258,7 @@ class ScriptRuntime:
         help_text = "CurioScript Help\n"
         help_text += "=" * 50 + "\n\n"
         
-        # Commands
+        # Commands by category
         help_text += self.command_reflector.get_command_help()
         help_text += "\n"
         

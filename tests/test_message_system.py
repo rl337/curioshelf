@@ -14,7 +14,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from curioshelf.ui.ui_factory import create_ui_factory
-from curioshelf.ui.headless.message_system import MessageCollector, MessageType
+from curioshelf.ui.debug.message_system import MessageCollector, MessageType
 
 
 class TestMessageCollection:
@@ -53,10 +53,10 @@ class TestMessageCollection:
         assert len(user_actions) > 0, "Should have user actions"
         
         # Check specific message types
-        button_messages = logger.get_messages_by_component("HeadlessUIButton")
+        button_messages = logger.get_messages_by_component("DebugUIButton")
         assert len(button_messages) > 0, "Should have button messages"
         
-        text_messages = logger.get_messages_by_component("HeadlessUITextInput")
+        text_messages = logger.get_messages_by_component("DebugUITextInput")
         assert len(text_messages) > 0, "Should have text input messages"
         
         # Cleanup
@@ -78,10 +78,10 @@ class TestMessageCollection:
         text_input.set_text("Test text")
         
         # Test filtering
-        button_messages = logger.get_messages_by_component("HeadlessUIButton")
+        button_messages = logger.get_messages_by_component("DebugUIButton")
         assert len(button_messages) == 2, "Should have 2 button messages"
         
-        text_messages = logger.get_messages_by_component("HeadlessUITextInput")
+        text_messages = logger.get_messages_by_component("DebugUITextInput")
         assert len(text_messages) == 1, "Should have 1 text input message"
         
         user_actions = logger.get_messages_by_type(MessageType.USER_ACTION)
@@ -108,13 +108,13 @@ class TestMessageCollection:
         test_button.set_enabled(False)
         
         # Test assertions
-        test_collector.assert_user_action("HeadlessUIButton", "clicked")
-        test_collector.assert_state_change("HeadlessUIButton", "disabled")
+        test_collector.assert_user_action("DebugUIButton", "clicked")
+        test_collector.assert_state_change("DebugUIButton", "disabled")
         
         # Test message sequence
         expected_sequence = [
-            {"component": "HeadlessUIButton", "action": "clicked", "message_type": "user_action"},
-            {"component": "HeadlessUIButton", "action": "disabled", "message_type": "state_change"}
+            {"component": "DebugUIButton", "action": "clicked", "message_type": "user_action"},
+            {"component": "DebugUIButton", "action": "disabled", "message_type": "state_change"}
         ]
         test_collector.assert_message_sequence(expected_sequence)
         
@@ -145,15 +145,15 @@ class TestMessageCollection:
         
         # Check specific components were created
         # Main window now uses menu-based interface, so check for menu components
-        menu_messages = logger.get_messages_by_component("HeadlessUIMenuBar")
+        menu_messages = logger.get_messages_by_component("DebugUIMenuBar")
         assert len(menu_messages) > 0, "Should have menu bar messages"
         
-        status_messages = logger.get_messages_by_component("HeadlessUIStatusBar")
+        status_messages = logger.get_messages_by_component("DebugUIStatusBar")
         assert len(status_messages) > 0, "Should have status bar messages"
         
         # Tab widget messages might not be generated during creation
         # Let's just check that we have some layout messages instead
-        layout_messages = logger.get_messages_by_component("HeadlessUILayout")
+        layout_messages = logger.get_messages_by_component("DebugUILayout")
         assert len(layout_messages) > 0, "Should have layout messages"
         
         factory.cleanup()

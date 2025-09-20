@@ -62,8 +62,8 @@ class SimpleCurioParser:
     
     def _parse_line(self, line: str) -> Optional[Dict[str, Any]]:
         """Parse a single line into a statement"""
-        # Assignment: variable = value
-        if '=' in line and not self._is_inside_string(line, line.find('=')):
+        # Assignment: variable := value (Pascal-like syntax)
+        if ':=' in line and not self._is_inside_string(line, line.find(':=')):
             return self._parse_assignment(line)
         
         # Function/command call: name(args)
@@ -110,9 +110,9 @@ class SimpleCurioParser:
     
     def _parse_assignment(self, line: str) -> Dict[str, Any]:
         """Parse an assignment statement"""
-        equals_pos = line.find('=')
-        var_name = line[:equals_pos].strip()
-        value_expr = line[equals_pos + 1:].strip()
+        assign_pos = line.find(':=')
+        var_name = line[:assign_pos].strip()
+        value_expr = line[assign_pos + 2:].strip()
         
         return {
             'type': 'assignment',
@@ -313,12 +313,26 @@ class SimpleCurioParser:
         # Variable reference or function call
         if '(' in expr and ')' in expr:
             return self._parse_function_call(expr)
-        else:
-            # Variable reference
-            return {
-                'type': 'variable',
-                'name': expr
-            }
+        
+        # Check for comparison operators (but not inside strings or function calls)
+        comparison_ops = ['==', '!=', '<=', '>=', '<', '>']
+        for op in comparison_ops:
+            if op in expr and not self._is_inside_string(expr, expr.find(op)):
+                return self._parse_comparison(expr, op)
+        
+        # Check for logical operators
+        if ' and ' in expr:
+            return self._parse_logical_and(expr)
+        if ' or ' in expr:
+            return self._parse_logical_or(expr)
+        if expr.startswith('not '):
+            return self._parse_logical_not(expr)
+        
+        # Variable reference
+        return {
+            'type': 'variable',
+            'name': expr
+        }
     
     def _parse_simple_dict(self, content: str) -> Dict[str, Any]:
         """Parse a simple dictionary literal"""
@@ -425,3 +439,65 @@ class SimpleCurioParser:
                         string_char = None
         
         return -1  # Not found
+    
+    def _parse_comparison(self, expr: str, op: str) -> Dict[str, Any]:
+        """Parse a comparison expression"""
+        parts = expr.split(op, 1)
+        if len(parts) != 2:
+            # If we can't split properly, treat as a variable
+            return {
+                'type': 'variable',
+                'name': expr
+            }
+        
+        left = parts[0].strip()
+        right = parts[1].strip()
+        
+        return {
+            'type': 'comparison',
+            'operator': op,
+            'left': self._parse_expression(left),
+            'right': self._parse_expression(right)
+        }
+    
+    def _parse_logical_and(self, expr: str) -> Dict[str, Any]:
+        """Parse a logical AND expression"""
+        parts = expr.split(' and ', 1)
+        if len(parts) != 2:
+            return self._parse_expression(expr)
+        
+        left = parts[0].strip()
+        right = parts[1].strip()
+        
+        return {
+            'type': 'logical_and',
+            'left': self._parse_expression(left),
+            'right': self._parse_expression(right)
+        }
+    
+    def _parse_logical_or(self, expr: str) -> Dict[str, Any]:
+        """Parse a logical OR expression"""
+        parts = expr.split(' or ', 1)
+        if len(parts) != 2:
+            return self._parse_expression(expr)
+        
+        left = parts[0].strip()
+        right = parts[1].strip()
+        
+        return {
+            'type': 'logical_or',
+            'left': self._parse_expression(left),
+            'right': self._parse_expression(right)
+        }
+    
+    def _parse_logical_not(self, expr: str) -> Dict[str, Any]:
+        """Parse a logical NOT expression"""
+        if not expr.startswith('not '):
+            return self._parse_expression(expr)
+        
+        operand = expr[4:].strip()  # Remove 'not '
+        
+        return {
+            'type': 'logical_not',
+            'operand': self._parse_expression(operand)
+        }

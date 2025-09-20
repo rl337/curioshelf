@@ -25,7 +25,18 @@ class Functions:
     @staticmethod
     @script_function("len", "Get the length of a string or list")
     def length(value: Any) -> int:
-        """Get the length of a value"""
+        """Get the length of a string, list, or other sequence.
+        
+        Args:
+            value: A string, list, tuple, or other sequence to measure
+            
+        Returns:
+            int: The length of the value, or length of string representation if not a sequence
+            
+        Example:
+            len("hello")  # Returns 5
+            len([1, 2, 3])  # Returns 3
+        """
         if isinstance(value, (str, list, tuple)):
             return len(value)
         else:
@@ -138,12 +149,46 @@ class Functions:
     @staticmethod
     @script_function("print", "Print values to output")
     def print_value(*values: Any) -> None:
-        """Print values (returns None)"""
+        """Print one or more values to the console output.
+        
+        Args:
+            *values: One or more values to print. Can be strings, numbers, booleans, etc.
+        
+        Returns:
+            None
+            
+        Example:
+            print("Hello, world!")
+            print("Value:", 42, "is", True)
+        """
         if len(values) == 1:
             print(str(values[0]))
         else:
             # Join multiple values with spaces
             print(' '.join(str(v) for v in values))
+    
+    @staticmethod
+    @script_function("assert", "Assert a condition and exit with error if false")
+    def assert_condition(condition: Any, message: str = "Assertion failed") -> None:
+        """Assert a condition and exit with error if false.
+        
+        Args:
+            condition: The condition to test (will be converted to boolean)
+            message: Optional error message to display if assertion fails
+        
+        Returns:
+            None
+            
+        Raises:
+            AssertionError: If the condition is false
+            
+        Example:
+            assert(5 > 3, "Math is broken!")
+            assert(is_project_loaded(), "Project should be loaded")
+        """
+        if not bool(condition):
+            raise AssertionError(f"ASSERTION FAILED: {message}")
+        # If we get here, the assertion passed
     
     @staticmethod
     @script_function("debug", "Print debug information")

@@ -10,15 +10,44 @@ from typing import Any, Dict, List, Callable, Optional, get_type_hints
 from functools import wraps
 
 
-def script_command(name: str = None, description: str = "", category: str = "general"):
-    """Decorator for script commands"""
+def script_command(name: str = None, description: str = "", category: str = "general", discoverable: bool = True):
+    """Decorator for script commands
+    
+    Args:
+        name: Custom name for the command (defaults to function name)
+        description: Custom description (defaults to docstring)
+        category: Category for grouping commands
+        discoverable: Whether this command should be discoverable by reflection
+    """
     def decorator(func: Callable) -> Callable:
         func._script_name = name or func.__name__
-        func._script_description = description
+        func._script_description = description or func.__doc__ or f"Call {func.__name__} method"
         func._script_category = category
         func._script_type = 'command'
+        func._script_discoverable = discoverable
         return func
     return decorator
+
+
+def script_discoverable(category: str = "application", description: str = ""):
+    """Decorator to mark a method as discoverable for scripts
+    
+    Args:
+        category: Category for grouping commands
+        description: Custom description (defaults to docstring)
+    """
+    def decorator(func: Callable) -> Callable:
+        func._script_discoverable = True
+        func._script_category = category
+        func._script_description = description or func.__doc__ or f"Call {func.__name__} method"
+        return func
+    return decorator
+
+
+def script_hidden(func: Callable) -> Callable:
+    """Decorator to mark a method as NOT discoverable for scripts"""
+    func._script_discoverable = False
+    return func
 
 
 class CommandReflector:
@@ -45,15 +74,36 @@ class CommandReflector:
             if name.startswith('_'):
                 continue  # Skip private methods
             
+            # Check if method should be discoverable
+            # Default to True for backward compatibility, but check for explicit flags
+            discoverable = True
+            if hasattr(method, '_script_discoverable'):
+                discoverable = method._script_discoverable
+            elif hasattr(method, '_script_type') and method._script_type == 'command':
+                # Commands are discoverable by default
+                discoverable = True
+            else:
+                # For methods without explicit decorators, only discover if they're from the interface
+                # This prevents internal implementation methods from being discovered
+                discoverable = True  # Keep current behavior for now
+            
+            if not discoverable:
+                continue  # Skip hidden methods
+            
             # Check if it's a script command with decorator
             if hasattr(method, '_script_type') and method._script_type == 'command':
                 command_name = method._script_name
                 description = method._script_description
                 category = method._script_category
-            else:
-                # Auto-discover all public methods as commands
+            elif hasattr(method, '_script_discoverable') and method._script_discoverable:
+                # Method marked as discoverable with decorator
                 command_name = name
-                description = f"Call {name} method"
+                description = method._script_description
+                category = method._script_category
+            else:
+                # Auto-discover public methods as commands (default behavior)
+                command_name = name
+                description = method.__doc__ or f"Call {name} method"
                 category = "application"
             
             if prefix:

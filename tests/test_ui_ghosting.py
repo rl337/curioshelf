@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 
 from curioshelf.app_impl.application_impl import CurioShelfApplicationImpl
 from curioshelf.mock_application import MockCurioShelfApplication
-from curioshelf.ui.headless.ui_factory import HeadlessUIImplementation
+from curioshelf.ui.debug.ui_factory import DebugUIImplementation
 from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
 from curioshelf.projects import ProjectMetadata, ProjectInfo
 from curioshelf.event_system import UIEvent, EventType, event_bus
@@ -21,7 +21,7 @@ class TestUIGhostingBehavior:
     
     def test_initial_menu_state_no_project(self):
         """Test initial menu state when no project is loaded"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -42,7 +42,7 @@ class TestUIGhostingBehavior:
     
     def test_menu_state_after_project_creation(self):
         """Test menu state after creating a project"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -70,7 +70,7 @@ class TestUIGhostingBehavior:
     
     def test_menu_state_with_sources(self):
         """Test menu state after adding sources"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -93,7 +93,7 @@ class TestUIGhostingBehavior:
     
     def test_menu_state_with_objects(self):
         """Test menu state after adding objects"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -117,7 +117,7 @@ class TestUIGhostingBehavior:
     
     def test_menu_state_after_project_close(self):
         """Test menu state after closing a project"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -155,7 +155,7 @@ class TestMenuClickBehavior:
     
     def test_disabled_menu_item_click_ignored(self):
         """Test that clicking a disabled menu item doesn't execute the callback"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -184,7 +184,7 @@ class TestMenuClickBehavior:
     
     def test_enabled_menu_item_click_executes(self):
         """Test that clicking an enabled menu item executes the callback"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -212,7 +212,7 @@ class TestMenuClickBehavior:
     
     def test_menu_state_updates_after_operations(self):
         """Test that menu state updates automatically after operations"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -242,7 +242,7 @@ class TestUIStateConsistency:
     
     def test_state_callback_updates(self):
         """Test that state callbacks properly update UI elements"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -273,7 +273,7 @@ class TestUIStateConsistency:
     
     def test_all_states_update_together(self):
         """Test that update_all_states updates all menu items"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -297,13 +297,13 @@ class TestUIStateEdgeCases:
     
     def test_menu_item_without_state_callback(self):
         """Test menu items that don't have state callbacks"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
         # Create a menu item without state callback
-        from curioshelf.ui.headless.ui_widgets import HeadlessUIMenuItem
-        test_item = HeadlessUIMenuItem("Test Item")
+        from curioshelf.ui.debug.ui_widgets import DebugUIMenuItem
+        test_item = DebugUIMenuItem("Test Item")
         
         # Should not crash when updating state
         test_item.update_state("enabled")
@@ -314,7 +314,7 @@ class TestUIStateEdgeCases:
     
     def test_invalid_state_name(self):
         """Test updating with invalid state name"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
@@ -328,7 +328,7 @@ class TestUIStateEdgeCases:
     
     def test_state_callback_returns_false(self):
         """Test state callback that returns False"""
-        ui = HeadlessUIImplementation(verbose=False, collect_messages=True)
+        ui = DebugUIImplementation(verbose=False, collect_messages=True)
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         

@@ -1,0 +1,18 @@
+# CurioShelf Script Test: Assertion Failure
+# This script demonstrates what happens when an assertion fails
+
+print("=== CurioShelf Assertion Failure Test ===")
+print("This script demonstrates assertion failure handling")
+print()
+
+# Test 1: This should pass
+print("=== Test 1: Passing Assertion ===")
+assert(5 > 3, "Basic math should work")
+print("✓ This assertion passed")
+print()
+
+# Test 2: This should fail
+print("=== Test 2: Failing Assertion ===")
+print("About to run: assert(5 < 3, 'Math is broken!')")
+assert(5 < 3, "Math is broken!")
+print("This line should never be reached")

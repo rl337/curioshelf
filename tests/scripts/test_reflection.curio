@@ -1,0 +1,58 @@
+# CurioShelf Script Test: Reflection System
+# This script tests the improved reflection system with decorators and docstrings
+
+print("=== CurioShelf Reflection System Test ===")
+print("This script demonstrates the improved reflection system")
+print()
+
+# Test 1: Check that we can see the improved help
+print("=== Test 1: Help System ===")
+print("The help system now shows:")
+print("- Categorized commands (project, assets, state)")
+print("- Better descriptions from docstrings")
+print("- Hidden methods are not shown")
+print()
+
+# Test 2: Test some basic functionality
+print("=== Test 2: Basic Functionality ===")
+print("Project loaded:", is_project_loaded())
+print("Has sources:", has_sources())
+print("Has objects:", has_objects())
+print("Has templates:", has_templates())
+print()
+
+# Test 3: Create a project to test more functionality
+print("=== Test 3: Project Operations ===")
+project_path = "/tmp/reflection_test_project"
+project_info = {"name": "Reflection Test", "author": "Script Tester", "description": "Testing reflection"}
+
+print("Creating project...")
+result = create_project(project_path, project_info)
+print("Project created:", result)
+
+print("Project loaded after creation:", is_project_loaded())
+print("Project status:", get_project_status())
+print()
+
+# Test 4: Test asset operations
+print("=== Test 4: Asset Operations ===")
+print("Adding some assets...")
+add_source("test_source.jpg")
+add_object("test_object")
+add_template("test_template")
+
+print("Asset counts:", get_asset_counts())
+print("Has sources:", has_sources())
+print("Has objects:", has_objects())
+print("Has templates:", has_templates())
+print()
+
+# Test 5: Test state queries
+print("=== Test 5: State Queries ===")
+print("Valid project:", valid_project())
+print("Can create project:", can_create_project())
+print("Can save project:", can_save_project())
+print("Can close project:", can_close_project())
+print()
+
+print("=== Reflection System Test Complete ===")
