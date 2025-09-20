@@ -23,11 +23,11 @@ print()
 
 # Test 3: Create a project to test more functionality
 print("=== Test 3: Project Operations Test ===")
-project_path = "/tmp/detailed_help_test_project"
-project_info = {"name": "Detailed Help Test", "author": "Script Tester", "description": "Testing detailed help"}
+project_path := "/tmp/detailed_help_test_project"
+project_info := {"name": "Detailed Help Test", "author": "Script Tester", "description": "Testing detailed help"}
 
 print("Creating project...")
-result = create_project(project_path, project_info)
+result := create_project(project_path, project_info)
 print("Project created:", result)
 
 print("Project loaded after creation:", is_project_loaded())

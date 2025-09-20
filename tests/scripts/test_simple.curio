@@ -8,14 +8,14 @@ print("Can create project:", can_create_project())
 
 # Test 2: Create a simple project
 print("\n=== Test 2: Create Project ===")
-project_path = "/tmp/test_simple_project"
-project_name = "Simple Test Project"
+project_path := "/tmp/test_simple_project"
+project_name := "Simple Test Project"
 
 # Create project info as a simple dictionary
-project_info = {"name": project_name, "author": "Script Tester", "description": "Simple test project"}
+project_info := {"name": project_name, "author": "Script Tester", "description": "Simple test project"}
 
 # Create the project
-result = create_project(project_path, project_info)
+result := create_project(project_path, project_info)
 print("Project creation result:", result)
 
 # Check state after creation
@@ -24,17 +24,17 @@ print("Can save project after creation:", can_save_project())
 
 # Test 3: Get project status
 print("\n=== Test 3: Project Status ===")
-status = get_project_status()
+status := get_project_status()
 print("Project status:", status)
 
 # Test 4: Save the project
 print("\n=== Test 4: Save Project ===")
-save_result = save_project()
+save_result := save_project()
 print("Save project result:", save_result)
 
 # Test 5: Close the project
 print("\n=== Test 5: Close Project ===")
-close_result = close_project()
+close_result := close_project()
 print("Close project result:", close_result)
 
 # Check final state

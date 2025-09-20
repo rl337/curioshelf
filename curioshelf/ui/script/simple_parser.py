@@ -8,7 +8,7 @@ solution until the full ANTLR integration is complete.
 
 import re
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from pathlib import Path
 
 
@@ -36,17 +36,31 @@ class SimpleCurioParser:
                 continue
             
             # Check for multi-line structures
-            if line.endswith('=') and i + 1 < len(lines):
-                # This might be a multi-line assignment
-                next_line = lines[i + 1].strip()
-                if next_line.startswith('{'):
+            if ':=' in line:
+                # Check if this line starts a multi-line dictionary assignment
+                if line.strip().endswith('{') or (i + 1 < len(lines) and lines[i + 1].strip().startswith('{')):
                     # Multi-line dictionary assignment
                     statement = self._parse_multiline_assignment(lines, i)
                     if statement:
                         statements.append(statement)
                     # Skip the lines we processed
-                    i = self._find_matching_brace(lines, i + 1) + 1
+                    if line.strip().endswith('{'):
+                        # The { is on the same line, start looking from the next line
+                        i = self._find_matching_brace(lines, i + 1) + 1
+                    else:
+                        # The { is on the next line
+                        i = self._find_matching_brace(lines, i + 1) + 1
                     continue
+            
+            # Check for control structures that might have bodies
+            if (line.startswith('while ') or line.startswith('if ') or 
+                line.startswith('foreach ') or line.startswith('for ')):
+                # Parse control structure with potential body
+                statement, next_i = self._parse_control_structure_with_body(lines, i)
+                if statement:
+                    statements.append(statement)
+                i = next_i
+                continue
             
             try:
                 statement = self._parse_line(line)
@@ -66,14 +80,6 @@ class SimpleCurioParser:
         if ':=' in line and not self._is_inside_string(line, line.find(':=')):
             return self._parse_assignment(line)
         
-        # Function/command call: name(args)
-        elif '(' in line and ')' in line:
-            return self._parse_function_call(line)
-        
-        # Print statement: print(...)
-        elif line.startswith('print('):
-            return self._parse_print_statement(line)
-        
         # If statement: if (condition) statement
         elif line.startswith('if '):
             return self._parse_if_statement(line)
@@ -86,13 +92,23 @@ class SimpleCurioParser:
         elif line.startswith('while '):
             return self._parse_while_statement(line)
         
-        # Push statement: push value
+        # Push statement: push value or push(value)
         elif line.startswith('push '):
             return self._parse_push_statement(line)
+        elif line.startswith('push('):
+            return self._parse_push_statement(line)
         
-        # Pop statement: pop [variable]
+        # Pop statement: pop [variable] or pop()
         elif line.startswith('pop'):
             return self._parse_pop_statement(line)
+        
+        # Print statement: print(...)
+        elif line.startswith('print('):
+            return self._parse_print_statement(line)
+        
+        # Function/command call: name(args)
+        elif '(' in line and ')' in line:
+            return self._parse_function_call(line)
         
         # Block start/end
         elif line == '{':
@@ -159,10 +175,16 @@ class SimpleCurioParser:
     
     def _parse_if_statement(self, line: str) -> Dict[str, Any]:
         """Parse an if statement"""
-        # Extract condition from if (condition)
-        start = line.find('(') + 1
-        end = line.find(')')
-        condition = line[start:end].strip()
+        # Remove 'if ' from the beginning
+        condition_line = line[3:].strip()
+        
+        # Check if condition is in parentheses
+        if condition_line.startswith('(') and condition_line.endswith(')'):
+            # Extract condition from if (condition)
+            condition = condition_line[1:-1].strip()
+        else:
+            # Extract condition from if condition: (remove trailing colon if present)
+            condition = condition_line.rstrip(':').strip()
         
         return {
             'type': 'if',
@@ -190,12 +212,206 @@ class SimpleCurioParser:
             'iterable': self._parse_expression(list_expr)
         }
     
+    def _parse_control_structure_with_body(self, lines: List[str], start_i: int) -> Tuple[Optional[Dict[str, Any]], int]:
+        """Parse a control structure (while, if, foreach) with its body"""
+        line = lines[start_i].strip()
+        
+        if line.startswith('while '):
+            return self._parse_while_with_body(lines, start_i)
+        elif line.startswith('if '):
+            return self._parse_if_with_body(lines, start_i)
+        elif line.startswith('foreach '):
+            return self._parse_foreach_with_body(lines, start_i)
+        else:
+            # Fallback to single line parsing
+            statement = self._parse_line(line)
+            return statement, start_i + 1
+    
+    def _parse_while_with_body(self, lines: List[str], start_i: int) -> Tuple[Optional[Dict[str, Any]], int]:
+        """Parse a while statement with its body"""
+        line = lines[start_i].strip()
+        condition_line = line[6:].strip()  # Remove 'while '
+        
+        # Check if condition is in parentheses
+        if condition_line.startswith('(') and condition_line.endswith(')'):
+            condition = condition_line[1:-1].strip()
+        else:
+            condition = condition_line.rstrip(':').strip()
+        
+        # Parse the body (indented lines following the while statement)
+        body_statements = []
+        i = start_i + 1
+        
+        # Determine base indentation from the while line
+        base_indent = len(lines[start_i]) - len(lines[start_i].lstrip())
+        
+        while i < len(lines):
+            current_line = lines[i]
+            
+            # Skip empty lines and comments
+            if not current_line.strip() or current_line.strip().startswith('#'):
+                i += 1
+                continue
+            
+            # Check if this line is part of the while body (indented more than the while line)
+            current_indent = len(current_line) - len(current_line.lstrip())
+            
+            if current_indent <= base_indent:
+                # This line is not indented enough to be part of the while body
+                break
+            
+            # Parse this line as a statement
+            try:
+                statement = self._parse_line(current_line.strip())
+                if statement:
+                    body_statements.append(statement)
+            except Exception as e:
+                print(f"Parse error in while body at line {i + 1}: {e}")
+                print(f"  Line: {current_line}")
+            
+            i += 1
+        
+        return {
+            'type': 'while',
+            'condition': self._parse_expression(condition),
+            'body': body_statements
+        }, i
+    
+    def _parse_if_with_body(self, lines: List[str], start_i: int) -> Tuple[Optional[Dict[str, Any]], int]:
+        """Parse an if statement with its body"""
+        line = lines[start_i].strip()
+        condition_line = line[3:].strip()  # Remove 'if '
+        
+        # Check if condition is in parentheses
+        if condition_line.startswith('(') and condition_line.endswith(')'):
+            condition = condition_line[1:-1].strip()
+        else:
+            condition = condition_line.rstrip(':').strip()
+        
+        # Parse the body (indented lines following the if statement)
+        body_statements = []
+        i = start_i + 1
+        
+        # Determine base indentation from the if line
+        base_indent = len(lines[start_i]) - len(lines[start_i].lstrip())
+        
+        while i < len(lines):
+            current_line = lines[i]
+            
+            # Skip empty lines and comments
+            if not current_line.strip() or current_line.strip().startswith('#'):
+                i += 1
+                continue
+            
+            # Check if this line is part of the if body (indented more than the if line)
+            current_indent = len(current_line) - len(current_line.lstrip())
+            
+            if current_indent <= base_indent:
+                # This line is not indented enough to be part of the if body
+                break
+            
+            # Parse this line as a statement
+            try:
+                statement = self._parse_line(current_line.strip())
+                if statement:
+                    body_statements.append(statement)
+            except Exception as e:
+                print(f"Parse error in if body at line {i + 1}: {e}")
+                print(f"  Line: {current_line}")
+            
+            i += 1
+        
+        return {
+            'type': 'if',
+            'condition': self._parse_expression(condition),
+            'then': body_statements
+        }, i
+    
+    def _parse_foreach_with_body(self, lines: List[str], start_i: int) -> Tuple[Optional[Dict[str, Any]], int]:
+        """Parse a foreach statement with its body"""
+        line = lines[start_i].strip()
+        foreach_line = line[8:].strip()  # Remove 'foreach '
+        
+        # Parse foreach (var in list) or foreach var in list:
+        if foreach_line.startswith('(') and foreach_line.endswith(')'):
+            content = foreach_line[1:-1].strip()
+        else:
+            content = foreach_line.rstrip(':').strip()
+        
+        # Parse "var in list" pattern
+        if ' in ' in content:
+            var_name, iterable_expr = content.split(' in ', 1)
+            var_name = var_name.strip()
+            iterable_expr = iterable_expr.strip()
+            
+            # Clean up variable name (remove any leading/trailing parentheses)
+            if var_name.startswith('('):
+                var_name = var_name[1:].strip()
+            if var_name.endswith(')'):
+                var_name = var_name[:-1].strip()
+            
+            # Clean up iterable expression (remove any leading/trailing parentheses)
+            if iterable_expr.startswith('('):
+                iterable_expr = iterable_expr[1:].strip()
+            if iterable_expr.endswith(')'):
+                iterable_expr = iterable_expr[:-1].strip()
+            
+            iterable = self._parse_expression(iterable_expr)
+        else:
+            raise ValueError(f"Invalid foreach syntax: {content}")
+        
+        # Parse the body (indented lines following the foreach statement)
+        body_statements = []
+        i = start_i + 1
+        
+        # Determine base indentation from the foreach line
+        base_indent = len(lines[start_i]) - len(lines[start_i].lstrip())
+        
+        while i < len(lines):
+            current_line = lines[i]
+            
+            # Skip empty lines and comments
+            if not current_line.strip() or current_line.strip().startswith('#'):
+                i += 1
+                continue
+            
+            # Check if this line is part of the foreach body (indented more than the foreach line)
+            current_indent = len(current_line) - len(current_line.lstrip())
+            
+            if current_indent <= base_indent:
+                # This line is not indented enough to be part of the foreach body
+                break
+            
+            # Parse this line as a statement
+            try:
+                statement = self._parse_line(current_line.strip())
+                if statement:
+                    body_statements.append(statement)
+            except Exception as e:
+                print(f"Parse error in foreach body at line {i + 1}: {e}")
+                print(f"  Line: {current_line}")
+            
+            i += 1
+        
+        return {
+            'type': 'foreach',
+            'variable': var_name,
+            'iterable': iterable,
+            'body': body_statements
+        }, i
+
     def _parse_while_statement(self, line: str) -> Dict[str, Any]:
-        """Parse a while statement"""
-        # Extract condition from while (condition)
-        start = line.find('(') + 1
-        end = line.find(')')
-        condition = line[start:end].strip()
+        """Parse a while statement (single line, no body)"""
+        # Remove 'while ' from the beginning
+        condition_line = line[6:].strip()
+        
+        # Check if condition is in parentheses
+        if condition_line.startswith('(') and condition_line.endswith(')'):
+            # Extract condition from while (condition)
+            condition = condition_line[1:-1].strip()
+        else:
+            # Extract condition from while condition: (remove trailing colon if present)
+            condition = condition_line.rstrip(':').strip()
         
         return {
             'type': 'while',
@@ -204,7 +420,15 @@ class SimpleCurioParser:
     
     def _parse_push_statement(self, line: str) -> Dict[str, Any]:
         """Parse a push statement"""
-        value = line[5:].strip()  # Remove 'push '
+        if line.startswith('push('):
+            # Handle push(value) format
+            start = line.find('(') + 1
+            end = line.rfind(')')
+            value = line[start:end].strip()
+        else:
+            # Handle push value format
+            value = line[5:].strip()  # Remove 'push '
+        
         return {
             'type': 'push',
             'value': self._parse_expression(value)
@@ -214,6 +438,18 @@ class SimpleCurioParser:
         """Parse a pop statement"""
         if line == 'pop':
             return {'type': 'pop'}
+        elif line.startswith('pop('):
+            # Handle pop() format
+            start = line.find('(') + 1
+            end = line.rfind(')')
+            content = line[start:end].strip()
+            if content:
+                return {
+                    'type': 'pop',
+                    'variable': content
+                }
+            else:
+                return {'type': 'pop'}
         else:
             var_name = line[4:].strip()  # Remove 'pop '
             return {
@@ -310,23 +546,55 @@ class SimpleCurioParser:
                 # Fallback to simple parsing
                 return self._parse_simple_dict(dict_content)
         
+        # Check for parenthesized expressions first
+        if expr.startswith('(') and expr.endswith(')'):
+            # Check if this is a parenthesized expression or a function call
+            # by looking for a function name before the opening parenthesis
+            paren_pos = expr.find('(')
+            if paren_pos > 0:
+                # This might be a function call
+                return self._parse_function_call(expr)
+            else:
+                # This is a parenthesized expression
+                inner_expr = expr[1:-1].strip()
+                return self._parse_expression(inner_expr)
+        
+        # Check for logical operators first (before function calls)
+        if ' and ' in expr:
+            return self._parse_logical_and(expr)
+        if ' && ' in expr:
+            return self._parse_logical_and(expr)
+        if ' or ' in expr:
+            return self._parse_logical_or(expr)
+        if ' || ' in expr:
+            return self._parse_logical_or(expr)
+        if expr.startswith('not '):
+            return self._parse_logical_not(expr)
+        
+        # Check for arithmetic operators (before function calls)
+        arithmetic_ops = ['+', '-', '*', '/']
+        for op in arithmetic_ops:
+            if op in expr and not self._is_inside_nested_structure(expr, expr.find(op)):
+                return self._parse_arithmetic(expr, op)
+        
+        # Check for comparison operators (but not inside strings or function calls)
+        # Check for == first, then single = if it's not part of := assignment
+        comparison_ops = ['==', '!=', '<=', '>=', '<', '>']
+        for op in comparison_ops:
+            if op in expr and not self._is_inside_nested_structure(expr, expr.find(op)):
+                return self._parse_comparison(expr, op)
+        
+        # Check for single = if it's not part of := assignment
+        if '=' in expr and ':=' not in expr and not self._is_inside_nested_structure(expr, expr.find('=')):
+            return self._parse_comparison(expr, '=')
+
         # Variable reference or function call
         if '(' in expr and ')' in expr:
             return self._parse_function_call(expr)
         
-        # Check for comparison operators (but not inside strings or function calls)
-        comparison_ops = ['==', '!=', '<=', '>=', '<', '>']
-        for op in comparison_ops:
-            if op in expr and not self._is_inside_string(expr, expr.find(op)):
-                return self._parse_comparison(expr, op)
-        
-        # Check for logical operators
-        if ' and ' in expr:
-            return self._parse_logical_and(expr)
-        if ' or ' in expr:
-            return self._parse_logical_or(expr)
-        if expr.startswith('not '):
-            return self._parse_logical_not(expr)
+        # Check for dictionary access (variable["key"])
+        if '[' in expr and ']' in expr and not self._is_inside_nested_structure(expr, expr.find('[')):
+            return self._parse_dict_access(expr)
         
         # Variable reference
         return {
@@ -385,14 +653,42 @@ class SimpleCurioParser:
         
         return in_string
     
+    def _is_inside_nested_structure(self, line: str, pos: int) -> bool:
+        """Check if a position is inside a nested structure (string, function call, etc.)"""
+        in_string = False
+        string_char = None
+        paren_depth = 0
+        bracket_depth = 0
+        
+        for i, char in enumerate(line[:pos]):
+            if not in_string:
+                if char in ['"', "'"]:
+                    in_string = True
+                    string_char = char
+                elif char == '(':
+                    paren_depth += 1
+                elif char == ')':
+                    paren_depth -= 1
+                elif char == '[':
+                    bracket_depth += 1
+                elif char == ']':
+                    bracket_depth -= 1
+            else:
+                if char == string_char and (i == 0 or line[i-1] != '\\'):
+                    in_string = False
+                    string_char = None
+        
+        return in_string or paren_depth > 0 or bracket_depth > 0
+    
     def _parse_multiline_assignment(self, lines: List[str], start_idx: int) -> Optional[Dict[str, Any]]:
         """Parse a multi-line assignment (like dictionary)"""
         # Get the variable name from the first line
         first_line = lines[start_idx].strip()
-        if not first_line.endswith('='):
+        if ':=' not in first_line:
             return None
         
-        var_name = first_line[:-1].strip()
+        # Extract variable name (everything before :=)
+        var_name = first_line[:first_line.find(':=')].strip()
         
         # Find the matching closing brace
         end_idx = self._find_matching_brace(lines, start_idx + 1)
@@ -404,18 +700,19 @@ class SimpleCurioParser:
         for i in range(start_idx + 1, end_idx + 1):
             dict_lines.append(lines[i].strip())
         
-        # Join them and parse as a dictionary
+        # Join them and create a proper dictionary string
         dict_content = ' '.join(dict_lines)
+        dict_string = '{' + dict_content + '}'
         
         return {
             'type': 'assignment',
             'variable': var_name,
-            'value': self._parse_expression(dict_content)
+            'value': self._parse_expression(dict_string)
         }
     
     def _find_matching_brace(self, lines: List[str], start_idx: int) -> int:
         """Find the matching closing brace for a dictionary or list"""
-        brace_count = 0
+        brace_count = 1  # Start at 1 because we're looking for the closing brace of an already opened brace
         in_string = False
         string_char = None
         
@@ -462,7 +759,14 @@ class SimpleCurioParser:
     
     def _parse_logical_and(self, expr: str) -> Dict[str, Any]:
         """Parse a logical AND expression"""
-        parts = expr.split(' and ', 1)
+        # Check for && first, then and
+        if ' && ' in expr:
+            parts = expr.split(' && ', 1)
+        elif ' and ' in expr:
+            parts = expr.split(' and ', 1)
+        else:
+            return self._parse_expression(expr)
+        
         if len(parts) != 2:
             return self._parse_expression(expr)
         
@@ -500,4 +804,48 @@ class SimpleCurioParser:
         return {
             'type': 'logical_not',
             'operand': self._parse_expression(operand)
+        }
+    
+    def _parse_dict_access(self, expr: str) -> Dict[str, Any]:
+        """Parse dictionary access expression (variable["key"])"""
+        # Find the opening bracket
+        bracket_pos = expr.find('[')
+        if bracket_pos == -1:
+            return self._parse_expression(expr)
+        
+        # Extract variable name
+        var_name = expr[:bracket_pos].strip()
+        
+        # Find the closing bracket
+        close_bracket_pos = expr.rfind(']')
+        if close_bracket_pos == -1 or close_bracket_pos <= bracket_pos:
+            return self._parse_expression(expr)
+        
+        # Extract key expression
+        key_expr = expr[bracket_pos + 1:close_bracket_pos].strip()
+        
+        return {
+            'type': 'dict_access',
+            'variable': self._parse_expression(var_name),
+            'key': self._parse_expression(key_expr)
+        }
+    
+    def _parse_arithmetic(self, expr: str, op: str) -> Dict[str, Any]:
+        """Parse arithmetic expression"""
+        parts = expr.split(op, 1)
+        if len(parts) != 2:
+            # If we can't split properly, treat as a variable
+            return {
+                'type': 'variable',
+                'name': expr
+            }
+        
+        left = parts[0].strip()
+        right = parts[1].strip()
+        
+        return {
+            'type': 'arithmetic',
+            'operator': op,
+            'left': self._parse_expression(left),
+            'right': self._parse_expression(right)
         }

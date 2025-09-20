@@ -26,7 +26,7 @@ assert(not has_sources(), "Should have no sources initially")
 assert(not has_objects(), "Should have no objects initially")
 assert(not has_templates(), "Should have no templates initially")
 
-counts = get_asset_counts()
+counts := get_asset_counts()
 assert(counts["sources"] == 0, "Source count should be 0")
 assert(counts["objects"] == 0, "Object count should be 0")
 assert(counts["templates"] == 0, "Template count should be 0")
@@ -35,15 +35,15 @@ print()
 
 # Test 3: Project creation assertions
 print("=== Test 3: Project Creation Assertions ===")
-project_path = "/tmp/assertion_test_project"
-project_info = {"name": "Assertion Test", "author": "Script Tester", "description": "Testing assertions"}
+project_path := "/tmp/assertion_test_project"
+project_info := {"name": "Assertion Test", "author": "Script Tester", "description": "Testing assertions"}
 
 print("Creating project...")
-result = create_project(project_path, project_info)
+result := create_project(project_path, project_info)
 assert(result == True, "Project creation should succeed")
 assert(is_project_loaded(), "Project should be loaded after creation")
 
-status = get_project_status()
+status := get_project_status()
 assert(status["loaded"] == True, "Project status should show loaded")
 assert(status["name"] == "Assertion Test", "Project name should match")
 print("✓ Project creation assertions passed")
@@ -54,22 +54,22 @@ print("=== Test 4: Asset Creation Assertions ===")
 print("Adding assets...")
 
 # Import source
-source_result = import_source("test_source.jpg")
+source_result := import_source("test_source.jpg")
 assert(source_result == True, "Source import should succeed")
 assert(has_sources(), "Should have sources after import")
 
 # Create object
-object_result = create_object("test_object")
+object_result := create_object("test_object")
 assert(object_result == True, "Object creation should succeed")
 assert(has_objects(), "Should have objects after creation")
 
 # Create template
-template_result = create_template("test_template")
+template_result := create_template("test_template")
 assert(template_result == True, "Template creation should succeed")
 assert(has_templates(), "Should have templates after creation")
 
 # Check counts
-counts = get_asset_counts()
+counts := get_asset_counts()
 assert(counts["sources"] == 1, "Should have 1 source")
 assert(counts["objects"] == 1, "Should have 1 object")
 assert(counts["templates"] == 1, "Should have 1 template")

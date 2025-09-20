@@ -195,6 +195,24 @@ class Functions:
     def debug(value: Any) -> None:
         """Print debug information (returns None)"""
         print(f"[DEBUG] {value}")
+    
+    @staticmethod
+    @script_function("pop", "Pop a value from the stack")
+    def pop_value() -> Any:
+        """Pop a value from the stack and return it.
+        
+        Args:
+            None
+            
+        Returns:
+            Any: The value that was popped from the stack
+            
+        Example:
+            value := pop()  # Pop and assign to variable
+        """
+        # This is a placeholder - in a real implementation, this would
+        # interact with the state machine's stack
+        return "stack_value"  # Placeholder return value
 
 
 def get_functions() -> dict:

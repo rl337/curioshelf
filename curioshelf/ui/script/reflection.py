@@ -6,6 +6,8 @@ interface and make them available to the scripting language.
 """
 
 import inspect
+import time
+import threading
 from typing import Any, Dict, List, Callable, Optional, get_type_hints
 from functools import wraps
 
@@ -156,15 +158,66 @@ class CommandReflector:
         return list(self._categories.keys())
     
     def execute_command(self, name: str, *args, **kwargs) -> Any:
-        """Execute a command by name"""
+        """Execute a command by name with timeout-based budget consumption"""
         command_info = self.get_command(name)
         if not command_info:
             raise NameError(f"Command '{name}' not found")
         
-        try:
-            return command_info['function'](*args, **kwargs)
-        except Exception as e:
-            raise RuntimeError(f"Error executing command '{name}': {e}")
+        # Check if we have a budget system available
+        budget_system = getattr(self, '_budget_system', None)
+        
+        if budget_system:
+            return self._execute_with_timeout_budget(command_info['function'], name, args, kwargs, budget_system)
+        else:
+            # Fallback to direct execution if no budget system
+            try:
+                return command_info['function'](*args, **kwargs)
+            except Exception as e:
+                raise RuntimeError(f"Error executing command '{name}': {e}")
+    
+    def _execute_with_timeout_budget(self, func: Callable, name: str, args: tuple, kwargs: dict, budget_system) -> Any:
+        """Execute a command with timeout-based budget consumption"""
+        result = [None]
+        exception = [None]
+        start_time = time.time()
+        
+        def target():
+            try:
+                result[0] = func(*args, **kwargs)
+            except Exception as e:
+                exception[0] = e
+        
+        # Start the command in a separate thread
+        thread = threading.Thread(target=target)
+        thread.daemon = True
+        thread.start()
+        
+        # Monitor execution time and consume budget
+        while thread.is_alive():
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= 1.0:  # Every second
+                # Consume budget based on elapsed time
+                cost = int(elapsed_time) * budget_system.command_costs.get('command_call', 10)
+                try:
+                    budget_system._consume_budget(cost, f'command_{name}_timeout')
+                except Exception as budget_error:
+                    # If budget exceeded, we can't stop the thread, but we can raise the error
+                    raise budget_error
+                start_time = time.time()  # Reset for next second
+            
+            time.sleep(0.1)  # Check every 100ms
+        
+        # Wait for thread to complete
+        thread.join()
+        
+        if exception[0]:
+            raise RuntimeError(f"Error executing command '{name}': {exception[0]}")
+        
+        return result[0]
+    
+    def set_budget_system(self, budget_system):
+        """Set the budget system for timeout-based cost calculation"""
+        self._budget_system = budget_system
     
     def get_command_help(self, name: str = None) -> str:
         """Get help text for commands"""

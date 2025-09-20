@@ -161,6 +161,14 @@ class ConcreteTestApplicationImpl(ApplicationInterface):
         })
         return True
     
+    def add_source(self, file_path: Path) -> bool:
+        """Add a source image file to the current project (alias for import_source)."""
+        return self.import_source(file_path)
+    
+    def add_object(self, object_name: str, source_id: str = None) -> bool:
+        """Add a new object to the current project (alias for create_object)."""
+        return self.create_object(object_name, source_id)
+    
     def create_object(self, object_name: str, source_id: str = None) -> bool:
         """Create a new object with the specified name, optionally from a source.
         
@@ -190,6 +198,10 @@ class ConcreteTestApplicationImpl(ApplicationInterface):
             "source_id": source_id
         })
         return True
+    
+    def add_template(self, template_name: str, object_id: str = None) -> bool:
+        """Add a new template to the current project (alias for create_template)."""
+        return self.create_template(template_name, object_id)
     
     def create_template(self, template_name: str, object_id: str = None) -> bool:
         """Create a new template with the specified name, optionally from an object.
@@ -441,6 +453,15 @@ class ConcreteTestApplicationImpl(ApplicationInterface):
     def clear_operations(self) -> None:
         """Clear operations list (for testing)"""
         self._operations_performed.clear()
+    
+    def reset_state(self) -> None:
+        """Reset the application state (for testing)"""
+        self._project_loaded = False
+        self._project_info = None
+        self._sources = []
+        self._objects = []
+        self._templates = []
+        self._operations_performed = []
 
 
 def main():

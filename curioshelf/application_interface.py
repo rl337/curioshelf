@@ -130,6 +130,25 @@ class ApplicationInterface(ABC):
         pass
     
     @abstractmethod
+    @script_discoverable("assets", "Add a source image file to the current project (alias for import_source)")
+    def add_source(self, file_path: Path) -> bool:
+        """Add a source image file to the current project (alias for import_source).
+        
+        Args:
+            file_path (Path): The file system path to the image file to add
+        
+        Returns:
+            bool: True if the source was added successfully, False otherwise
+            
+        Note:
+            This is an alias for import_source(). Requires a valid project to be loaded.
+            
+        Example:
+            success = add_source("/path/to/image.jpg")
+        """
+        pass
+    
+    @abstractmethod
     @script_discoverable("assets", "Create a new object, optionally from a source")
     def create_object(self, object_name: str, source_id: str = None) -> bool:
         """Create a new object with the specified name, optionally from a source.
@@ -150,6 +169,54 @@ class ApplicationInterface(ABC):
             
             # Create object from source
             success = create_object("my_object", "source_123")
+        """
+        pass
+    
+    @abstractmethod
+    @script_discoverable("assets", "Add a new object to the current project (alias for create_object)")
+    def add_object(self, object_name: str, source_id: str = None) -> bool:
+        """Add a new object to the current project (alias for create_object).
+        
+        Args:
+            object_name (str): The name for the new object
+            source_id (str, optional): ID of the source to create the object from. If None, creates an empty object.
+        
+        Returns:
+            bool: True if the object was added successfully, False otherwise
+            
+        Note:
+            This is an alias for create_object(). Requires a valid project to be loaded.
+            
+        Example:
+            # Add empty object
+            success = add_object("my_object")
+            
+            # Add object from source
+            success = add_object("my_object", "source_123")
+        """
+        pass
+    
+    @abstractmethod
+    @script_discoverable("assets", "Add a new template to the current project (alias for create_template)")
+    def add_template(self, template_name: str, object_id: str = None) -> bool:
+        """Add a new template to the current project (alias for create_template).
+        
+        Args:
+            template_name (str): The name for the new template
+            object_id (str, optional): ID of the object to create the template from. If None, creates an empty template.
+        
+        Returns:
+            bool: True if the template was added successfully, False otherwise
+            
+        Note:
+            This is an alias for create_template(). Requires a valid project to be loaded.
+            
+        Example:
+            # Add empty template
+            success = add_template("my_template")
+            
+            # Add template from object
+            success = add_template("my_template", "object_123")
         """
         pass
     

@@ -353,6 +353,14 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         
         return False
     
+    def add_source(self, file_path: Path) -> bool:
+        """Add a source image file to the current project (alias for import_source)"""
+        return self.import_source(file_path)
+    
+    def add_object(self, object_name: str, source_id: str = None) -> bool:
+        """Add a new object to the current project (alias for create_object)"""
+        return self.create_object(object_name, source_id)
+    
     def create_object(self, object_name: str, source_id: str = None) -> bool:
         """Create a new object"""
         if not self.is_project_loaded():
@@ -369,6 +377,10 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             return True
         
         return False
+    
+    def add_template(self, template_name: str, object_id: str = None) -> bool:
+        """Add a new template to the current project (alias for create_template)"""
+        return self.create_template(template_name, object_id)
     
     def create_template(self, template_name: str, object_id: str = None) -> bool:
         """Create a new template"""

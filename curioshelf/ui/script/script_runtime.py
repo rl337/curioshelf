@@ -17,11 +17,27 @@ from .functions import get_functions, get_function_help
 from .simple_parser import SimpleCurioParser
 
 
+class BudgetExceededError(Exception):
+    """Raised when the execution budget is exceeded"""
+    def __init__(self, budget_used: int, budget_limit: int, operation: str = None):
+        self.budget_used = budget_used
+        self.budget_limit = budget_limit
+        self.operation = operation
+        super().__init__(f"Execution budget exceeded: used {budget_used}/{budget_limit}" + 
+                        (f" during {operation}" if operation else ""))
+
+
 class ScriptRuntime:
     """Runtime for executing CurioScript programs"""
     
-    def __init__(self, application_interface: Any = None, verbose: bool = True):
-        """Initialize the script runtime"""
+    def __init__(self, application_interface: Any = None, verbose: bool = True, execution_budget: int = 1000):
+        """Initialize the script runtime
+        
+        Args:
+            application_interface: The application interface for command execution
+            verbose: Whether to print verbose output
+            execution_budget: Maximum execution cost before raising BudgetExceededError
+        """
         self.verbose = verbose
         self.state_machine = StateMachine()
         self.command_reflector = create_command_reflector(application_interface)
@@ -29,9 +45,69 @@ class ScriptRuntime:
         self.functions = get_functions()
         self.parser = SimpleCurioParser()
         
+        # Execution budget system
+        self.execution_budget = execution_budget
+        self.current_budget = execution_budget
+        self.command_costs = {
+            # Basic operations
+            'assignment': 1,
+            'variable_access': 1,
+            'arithmetic': 2,
+            'comparison': 2,
+            'logical': 2,
+            'function_call': 5,
+            'command_call': 10,
+            
+            # Control structures
+            'if_statement': 3,
+            'while_loop': 5,
+            'foreach_loop': 5,
+            'block': 1,
+            
+            # High-cost operations
+            'project_operations': 20,
+            'file_operations': 15,
+            'asset_operations': 10,
+        }
+        
         # Set up error handling
         self.state_machine.set_error_handler(self._handle_error)
         self.state_machine.set_execution_context(application_interface)
+        
+        # Connect budget system to command reflector
+        self.command_reflector.set_budget_system(self)
+    
+    def _consume_budget(self, cost: int, operation: str = None) -> None:
+        """Consume execution budget and raise error if exceeded
+        
+        Args:
+            cost: The cost to consume
+            operation: Optional operation name for error reporting
+        """
+        if self.current_budget < cost:
+            raise BudgetExceededError(
+                self.execution_budget - self.current_budget + cost,
+                self.execution_budget,
+                operation
+            )
+        self.current_budget -= cost
+    
+    def reset_budget(self) -> None:
+        """Reset the execution budget to its initial value"""
+        self.current_budget = self.execution_budget
+    
+    def get_remaining_budget(self) -> int:
+        """Get the remaining execution budget"""
+        return self.current_budget
+    
+    def get_budget_usage(self) -> Dict[str, int]:
+        """Get budget usage information"""
+        return {
+            'total_budget': self.execution_budget,
+            'remaining_budget': self.current_budget,
+            'used_budget': self.execution_budget - self.current_budget,
+            'usage_percentage': ((self.execution_budget - self.current_budget) / self.execution_budget) * 100
+        }
         
         # Register built-in functions as runnables
         for name, func_info in self.functions.items():
@@ -62,8 +138,16 @@ class ScriptRuntime:
             # Boolean literal
             return expression
         elif isinstance(expression, dict):
-            # Expression node from ANTLR
-            return self._evaluate_node(expression)
+            # Check if it's a parsed node (has 'type' field) or a direct dictionary value
+            if 'type' in expression:
+                # Expression node from ANTLR
+                return self._evaluate_node(expression)
+            else:
+                # Direct dictionary value (e.g., {"name": "value"})
+                return expression
+        elif isinstance(expression, list):
+            # Direct list value
+            return expression
         else:
             return expression
     
@@ -81,8 +165,10 @@ class ScriptRuntime:
                 return node
         
         if node_type == 'IDENTIFIER':
+            self._consume_budget(self.command_costs['variable_access'], 'variable_access')
             return self.state_machine.get_variable(node['value'])
         elif node_type == 'BINARY_OPERATION':
+            self._consume_budget(self.command_costs['arithmetic'], 'binary_operation')
             left = self._evaluate_expression(node['left'])
             right = self._evaluate_expression(node['right'])
             operator = node['operator']
@@ -117,10 +203,12 @@ class ScriptRuntime:
             
             # Check if it's a built-in function
             if func_name in self.functions:
+                self._consume_budget(self.command_costs['function_call'], f'function_{func_name}')
                 func = self.functions[func_name]['function']
                 return func(*args)
             # Check if it's a command
             elif self.command_reflector.get_command(func_name):
+                self._consume_budget(self.command_costs['command_call'], f'command_{func_name}')
                 return self.command_reflector.execute_command(func_name, *args)
             else:
                 raise NameError(f"Unknown function or command: {func_name}")
@@ -139,7 +227,7 @@ class ScriptRuntime:
             right = self._evaluate_expression(node['right'])
             operator = node['operator']
             
-            if operator == '==':
+            if operator == '=' or operator == '==':
                 return left == right
             elif operator == '!=':
                 return left != right
@@ -167,6 +255,33 @@ class ScriptRuntime:
             # Handle logical NOT
             operand = self._evaluate_expression(node['operand'])
             return not bool(operand)
+        elif node_type == 'dict_access':
+            # Handle dictionary access (variable["key"])
+            variable = self._evaluate_expression(node['variable'])
+            key = self._evaluate_expression(node['key'])
+            
+            if isinstance(variable, dict):
+                return variable.get(key)
+            else:
+                raise TypeError(f"Expected dictionary for access, got {type(variable)}")
+        elif node_type == 'arithmetic':
+            # Handle arithmetic operations
+            left = self._evaluate_expression(node['left'])
+            right = self._evaluate_expression(node['right'])
+            operator = node['operator']
+            
+            if operator == '+':
+                return left + right
+            elif operator == '-':
+                return left - right
+            elif operator == '*':
+                return left * right
+            elif operator == '/':
+                if right == 0:
+                    raise ZeroDivisionError("Division by zero")
+                return left / right
+            else:
+                raise ValueError(f"Unknown arithmetic operator: {operator}")
         else:
             raise ValueError(f"Unknown node type: {node_type}")
     
@@ -175,21 +290,35 @@ class ScriptRuntime:
         statement_type = statement.get('type') if isinstance(statement, dict) else 'expression'
         
         if statement_type == 'assignment':
+            self._consume_budget(self.command_costs['assignment'], 'assignment')
             var_name = statement['variable']
             value = self._evaluate_expression(statement['value'])
             self.state_machine.set_variable(var_name, value)
             return value
         elif statement_type == 'command':
+            self._consume_budget(self.command_costs['command_call'], f'command_{statement["name"]}')
             cmd_name = statement['name']
             args = [self._evaluate_expression(arg) for arg in statement.get('args', [])]
             return self.command_reflector.execute_command(cmd_name, *args)
         elif statement_type == 'if':
+            self._consume_budget(self.command_costs['if_statement'], 'if_statement')
             condition = self._evaluate_expression(statement['condition'])
             if condition:
-                return self.execute_statement(statement['then'])
+                if 'then' in statement:
+                    # Execute each statement in the then block
+                    results = []
+                    for then_stmt in statement['then']:
+                        result = self.execute_statement(then_stmt)
+                        results.append(result)
+                    return results[-1] if results else None
+                # If no 'then' block, just return the condition result
+                return condition
             elif 'else' in statement:
                 return self.execute_statement(statement['else'])
+            else:
+                return False
         elif statement_type == 'foreach':
+            self._consume_budget(self.command_costs['foreach_loop'], 'foreach_loop')
             var_name = statement['variable']
             iterable = self._evaluate_expression(statement['iterable'])
             
@@ -198,9 +327,38 @@ class ScriptRuntime:
             
             results = []
             for item in iterable:
+                # Consume budget for each iteration
+                self._consume_budget(self.command_costs['foreach_loop'], 'foreach_loop_iteration')
                 self.state_machine.set_variable(var_name, item)
-                result = self.execute_statement(statement['body'])
-                results.append(result)
+                if 'body' in statement:
+                    # Execute each statement in the body
+                    for body_stmt in statement['body']:
+                        result = self.execute_statement(body_stmt)
+                        results.append(result)
+                else:
+                    # If no body, just set the variable and continue
+                    results.append(item)
+            
+            return results
+        elif statement_type == 'while':
+            self._consume_budget(self.command_costs['while_loop'], 'while_loop')
+            condition = self._evaluate_expression(statement['condition'])
+            results = []
+            
+            while condition:
+                # Consume budget for each loop iteration
+                self._consume_budget(self.command_costs['while_loop'], 'while_loop_iteration')
+                if 'body' in statement:
+                    # Execute each statement in the body
+                    for body_stmt in statement['body']:
+                        result = self.execute_statement(body_stmt)
+                        results.append(result)
+                else:
+                    # If no body, just continue the loop
+                    pass
+                
+                # Re-evaluate the condition
+                condition = self._evaluate_expression(statement['condition'])
             
             return results
         elif statement_type == 'push':
@@ -210,6 +368,11 @@ class ScriptRuntime:
         elif statement_type == 'pop':
             var_name = statement.get('variable')
             return self.state_machine.pop_value(var_name)
+        elif statement_type == 'else':
+            # Handle standalone else statements (should not happen in well-formed code)
+            if self.verbose:
+                print("[SCRIPT WARNING] Standalone else statement - this should be part of an if statement")
+            return None
         elif statement_type == 'block':
             results = []
             for stmt in statement.get('statements', []):
@@ -223,6 +386,8 @@ class ScriptRuntime:
     def execute_script_content(self, script_content: str) -> Any:
         """Execute a script from its content string"""
         try:
+            # Reset budget at the start of script execution
+            self.reset_budget()
             statements = self.parser.parse_script(script_content)
             return self.execute_program(statements)
         except Exception as e:

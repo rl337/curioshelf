@@ -1,4 +1,5 @@
 # CurioShelf Script Test: Assertion Failure
+# @expect_assert_failed
 # This script demonstrates what happens when an assertion fails
 
 print("=== CurioShelf Assertion Failure Test ===")
