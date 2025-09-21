@@ -130,9 +130,16 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
         
         try:
             for line in sys.stdin:
+                if not self._running:
+                    break
+                    
                 command = line.strip()
                 if command:
                     self._execute_command(command)
+                    
+                    # Check if script requested exit
+                    if not self._running:
+                        break
         except KeyboardInterrupt:
             if self.verbose:
                 print("\n[SCRIPT] Interrupted by user")
@@ -151,6 +158,14 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
             # Convert parsed command to a statement that the runtime can execute
             statement = self._convert_to_statement(parsed)
             result = self._script_runtime.execute_statement(statement)
+            
+            # Check if the script requested an exit
+            if self._script_runtime.state_machine.get_variable("_script_exit_requested"):
+                exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code", 0)
+                if self.verbose:
+                    print(f"[SCRIPT] Exit requested with code: {exit_code}")
+                self._running = False
+                return
             
             if result is not None:
                 self._output_buffer.append(f"Result: {result}")
@@ -305,6 +320,33 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
     def is_test_mode(self) -> bool:
         """Check if in test mode (not applicable for script UI)"""
         return False
+    
+    def execute_script_content(self, script_content: str) -> Any:
+        """Execute script content directly"""
+        if not self._initialized:
+            self.initialize()
+        
+        self._running = True
+        try:
+            # Execute the script content directly
+            result = self._script_runtime.execute_script_content(script_content)
+            
+            # Check if script requested exit
+            try:
+                if self._script_runtime.state_machine.get_variable("_script_exit_requested"):
+                    exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code", 0)
+                    if self.verbose:
+                        print(f"[SCRIPT] Exit requested with code: {exit_code}")
+                    self._running = False
+            except NameError:
+                # Variable not set, continue normally
+                pass
+            
+            return result
+        except Exception as e:
+            if self.verbose:
+                print(f"[SCRIPT ERROR] {e}")
+            raise
 
 
 # Alias for backward compatibility

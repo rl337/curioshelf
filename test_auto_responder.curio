@@ -1,0 +1,74 @@
+# Test Auto-Responder Script
+# This script tests the auto-responder functionality for dialogs
+
+print("=== Test Auto-Responder Script ===")
+print("This script will test automatic dialog responses")
+
+# Test 1: Initial state
+print("\n1. Initial state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 2: Trigger New Project dialog with auto-response
+print("\n2. Testing New Project dialog with auto-response...")
+print("   The dialog should appear and automatically fill in project details")
+print("   Project name will be set to 'Script Test Project'")
+print("   Project path will be set to a temporary directory")
+print("   The 'Create Project' button will be clicked automatically")
+
+trigger_menu("Project", "New Project")
+
+print("\n3. After auto-responded project creation:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful with auto-response!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project creation failed with auto-response!")
+
+# Test 4: Test Sources menu (should be unghosted now)
+print("\n4. Testing Sources menu (should be unghosted now):")
+print("   Can import source:", can_import_source())
+print("   Has sources:", has_sources())
+
+# Test 5: Test Open Project dialog with auto-response (should cancel)
+print("\n5. Testing Open Project dialog with auto-response...")
+print("   The dialog should appear and automatically cancel")
+print("   This tests the auto-response for the open dialog")
+
+trigger_menu("Project", "Open Project")
+
+print("\n6. After auto-responded project open (should be cancelled):")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 7: Close project
+print("\n7. Closing project...")
+trigger_menu("Project", "Close Project")
+
+print("\n8. After closing project:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+print("\n=== Auto-Responder Test Results ===")
+print("Expected results:")
+print("  ✅ New Project dialog auto-filled and created project")
+print("  ✅ Open Project dialog auto-cancelled")
+print("  ✅ Project creation and closing worked correctly")
+print("  ✅ UI state updated properly throughout")
+
+print("\nIf all tests passed, the auto-responder is working correctly!")
+exit(0)
+

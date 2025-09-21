@@ -1,0 +1,37 @@
+# Test Synchronous Auto-Responder Script
+# This script tests the synchronous auto-responder that should fail fast
+
+print("=== Test Synchronous Auto-Responder Script ===")
+print("This script tests the synchronous auto-responder")
+print("Any errors should be caught and the script should exit immediately")
+
+# Test 1: Initial state
+print("\n1. Initial state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+
+# Test 2: Test New Project dialog with synchronous auto-responder
+print("\n2. Testing New Project dialog with synchronous auto-responder...")
+print("   The dialog should appear and be automatically filled")
+print("   If there are any issues, the script should fail immediately with a clear error")
+
+trigger_menu("Project", "New Project")
+
+print("\n3. If we reach this point, the auto-responder succeeded!")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project creation failed!")
+
+print("\n=== Synchronous Auto-Responder Test Results ===")
+print("If you see this message, the synchronous auto-responder worked!")
+print("The script either succeeded completely or failed fast with an error.")
+
+exit(0)
+

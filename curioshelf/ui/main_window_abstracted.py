@@ -59,6 +59,9 @@ class MainWindowAbstracted:
         self.event_layer = EventExecutionLayer(self.app)
         self.event_layer.start()
         
+        # Register event handlers
+        self._register_event_handlers()
+        
         # Menu and toolbar actions
         self.actions: Dict[str, Any] = {}
         
@@ -66,6 +69,27 @@ class MainWindowAbstracted:
         self.setup_ui()
         # Don't show project dialog immediately - let the user choose
         # self.show_project_dialog()
+    
+    def _register_event_handlers(self) -> None:
+        """Register event handlers for dialog events"""
+        event_bus.subscribe(EventType.SHOW_DIALOG, self._handle_show_dialog)
+    
+    def _handle_show_dialog(self, event: UIEvent) -> None:
+        """Handle show dialog events"""
+        print(f"[DEBUG] Received SHOW_DIALOG event: {event.data}")
+        dialog_type = event.data.get('dialog_type')
+        mode = event.data.get('mode')
+        
+        print(f"[DEBUG] Dialog type: {dialog_type}, mode: {mode}")
+        
+        if dialog_type == 'project_dialog':
+            print(f"[DEBUG] Showing project dialog in {mode} mode")
+            if mode == 'create':
+                self.show_project_dialog(create_mode=True)
+            elif mode == 'open':
+                self.show_project_dialog(create_mode=False)
+        else:
+            print(f"[DEBUG] Unknown dialog type: {dialog_type}")
     
     def setup_ui(self):
         """Setup the user interface using abstraction layer"""
@@ -354,11 +378,16 @@ class MainWindowAbstracted:
             "open_project", self.actions["open_project"], ["always_enabled"]
         )
     
-    def show_project_dialog(self):
+    def show_project_dialog(self, create_mode: bool = True):
         """Show the project management dialog"""
         dialog = ProjectDialogAbstracted(self.ui)
         dialog.connect_signal("project_created", self.on_project_created)
         dialog.connect_signal("project_loaded", self.on_project_loaded)
+        
+        # Set the dialog mode
+        if hasattr(dialog, 'set_mode'):
+            dialog.set_mode('create' if create_mode else 'open')
+        
         dialog.exec()
     
     def on_project_created(self, project_path: Path, project_info: ProjectInfo):

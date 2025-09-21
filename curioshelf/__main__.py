@@ -6,6 +6,7 @@ Main application entry point
 
 import sys
 import argparse
+import logging
 from pathlib import Path
 
 # Add the project root to Python path
@@ -15,6 +16,31 @@ sys.path.insert(0, str(project_root))
 from .ui.ui_factory import create_ui_factory, get_available_ui_backends
 from tests.ui_debug import get_global_debugger, create_debugger
 from tests.ui_instrumentation_server import UIInstrumentationServer
+
+
+def configure_logging(debug: bool = False, verbose: bool = False):
+    """Configure logging levels based on flags"""
+    if debug:
+        level = logging.DEBUG
+    elif verbose:
+        level = logging.INFO
+    else:
+        level = logging.WARNING
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%H:%M:%S'
+    )
+    
+    # Set specific loggers to appropriate levels
+    if debug:
+        # Enable debug logging for all CurioShelf modules
+        logging.getLogger('curioshelf').setLevel(logging.DEBUG)
+    else:
+        # Only show warnings and errors for CurioShelf modules
+        logging.getLogger('curioshelf').setLevel(logging.WARNING)
 
 
 def main():
@@ -41,7 +67,17 @@ def main():
         help="Run the actual GUI application (default: runs in scripted mode for testing)"
     )
     parser.add_argument(
+        "--script",
+        type=str,
+        help="Run the actual GUI with scripted instrumentation from the specified .curio file"
+    )
+    parser.add_argument(
         "--debug",
+        action="store_true",
+        help="Enable debug logging (DEBUG level)"
+    )
+    parser.add_argument(
+        "--ui-debug",
         action="store_true",
         help="Enable UI debugging and instrumentation server"
     )
@@ -59,15 +95,23 @@ def main():
     
     args = parser.parse_args()
     
+    # Configure logging first
+    configure_logging(debug=args.debug, verbose=args.verbose)
+    
     # Override UI backend if debug-ui flag is set
     ui_backend = "debug" if args.debug_ui else args.ui
     
+    # Check for mutually exclusive flags
+    if args.run_for_real and args.script:
+        print("Error: --run-for-real and --script are mutually exclusive")
+        sys.exit(1)
+    
     print(f"Starting CurioShelf with {ui_backend} UI backend")
     
-    # Set up debugging if requested
+    # Set up UI debugging if requested
     debugger = None
     instrumentation_server = None
-    if args.debug:
+    if args.ui_debug:
         print("Setting up UI debugging and instrumentation...")
         debug_log_file = Path(args.debug_log) if args.debug_log else None
         debugger = create_debugger(enabled=True, log_file=debug_log_file)
@@ -81,6 +125,54 @@ def main():
     try:
         # Create UI factory
         factory = create_ui_factory(ui_backend, args.verbose)
+        
+        # Handle script execution mode
+        if args.script:
+            script_path = Path(args.script)
+            if not script_path.exists():
+                print(f"Error: Script file not found: {script_path}")
+                sys.exit(1)
+            
+            print(f"Running GUI with scripted instrumentation from: {script_path}")
+            
+            # Read the script content
+            with open(script_path, 'r') as f:
+                script_content = f.read()
+            
+            # Create main window
+            main_window = factory.create_main_window()
+            
+            # Get the application instance from the main window
+            app_instance = main_window.app
+            
+            # Load test plugins for scripted execution
+            from test_support.test_plugin_loader import load_test_plugins, initialize_test_plugins, get_heartbeat_monitor
+            
+            # Load and initialize test plugins
+            load_test_plugins()
+            if not initialize_test_plugins(app_instance):
+                print("Warning: Some test plugins failed to initialize")
+            
+            # Get the UI implementation and run the script with test plugins
+            ui_impl = factory.get_ui_implementation()
+            if hasattr(ui_impl, 'execute_script_content'):
+                print("Executing script with test plugins...")
+                
+                # Get heartbeat monitor from plugin system
+                heartbeat = get_heartbeat_monitor()
+                
+                # Execute script with heartbeat monitoring
+                try:
+                    result = ui_impl.execute_script_content(script_content, app_instance, heartbeat)
+                    print(f"Script execution completed with result: {result}")
+                except Exception as e:
+                    print(f"Script execution failed: {e}")
+                    sys.exit(1)
+            else:
+                print("Error: UI implementation does not support script execution")
+                sys.exit(1)
+            
+            return
         
         # Create main window (not needed for script UI)
         if ui_backend != "script":

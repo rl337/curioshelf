@@ -39,15 +39,14 @@ class ScriptRuntime:
             execution_budget: Maximum execution cost before raising BudgetExceededError
         """
         self.verbose = verbose
+        self.execution_budget = execution_budget
         self.state_machine = StateMachine()
         self.command_reflector = create_command_reflector(application_interface)
         self.operators = get_operators()
         self.functions = get_functions()
-        self.parser = RecursiveDescentParser(budget_checker=self._check_budget)
         
-        # Execution budget system
-        self.execution_budget = execution_budget
-        self.current_budget = execution_budget
+        # Initialize budget system first
+        self.current_budget = self.execution_budget
         self.command_costs = {
             # Basic operations
             'assignment': 1,
@@ -68,12 +67,91 @@ class ScriptRuntime:
             'parse_dictionary': 2,  # Reduced cost
             'parse_function_call': 1,  # Reduced cost
             'parse_statement': 0,  # Free for basic statements
-            
-            # High-cost operations
-            'project_operations': 20,
-            'file_operations': 15,
-            'asset_operations': 10,
         }
+        
+        # Initialize parser with budget checker
+        self.parser = RecursiveDescentParser(budget_checker=self._check_budget)
+        
+        # Enable auto-responder for scripted testing
+        self._setup_auto_responder(application_interface)
+        
+        # Debug: Print available functions
+        if self.verbose:
+            print(f"[SCRIPT RUNTIME DEBUG] Available functions: {list(self.functions.keys())}")
+    
+    def _setup_auto_responder(self, application_interface: Any):
+        """Setup auto-responder for dialogs during scripted testing"""
+        try:
+            from test_support.test_plugin_loader import get_dialog_responder, get_heartbeat_monitor
+            import tempfile
+            
+            # Get auto-responder from plugin system
+            self.auto_responder = get_dialog_responder()
+            if self.auto_responder:
+                self.auto_responder.enabled = True
+                
+                # Configure project creation response
+                self.auto_responder.set_response_config("project_dialog", "create", {
+                    "project_name": "Script Test Project",
+                    "project_path": str(Path(tempfile.gettempdir()) / "curioshelf_script_test"),
+                    "action": "create"
+                })
+                
+                # Configure project opening response (cancel by default)
+                self.auto_responder.set_response_config("project_dialog", "open", {
+                    "action": "cancel"
+                })
+                
+                if self.verbose:
+                    print("[SCRIPT RUNTIME] Auto-responder enabled from plugin system")
+            else:
+                if self.verbose:
+                    print("[SCRIPT RUNTIME] Auto-responder not available from plugin system")
+            
+            # Modal detection is now handled by the heartbeat plugin
+            self.modal_detector = None  # No longer needed as separate component
+                
+        except ImportError as e:
+            if self.verbose:
+                print(f"[SCRIPT RUNTIME] Auto-responder not available: {e}")
+        except Exception as e:
+            if self.verbose:
+                print(f"[SCRIPT RUNTIME] Error setting up auto-responder: {e}")
+    
+    def _handle_unexpected_modal(self, dialog_type: str, dialog_info: str):
+        """Handle unexpected modal dialogs by raising an assertion error"""
+        error_msg = f"Unexpected modal dialog detected: {dialog_type} - {dialog_info}"
+        print(f"[SCRIPT RUNTIME ERROR] {error_msg}")
+        raise AssertionError(error_msg)
+    
+    def _handle_focus_change(self, change_type: str, window_info: Dict[str, Any]):
+        """Handle focus changes to unexpected windows"""
+        if change_type == "unexpected_focus":
+            # Format window information for debugging
+            info_lines = [
+                f"Focus changed to unexpected window:",
+                f"  Title: {window_info.get('title', 'Unknown')}",
+                f"  Type: {window_info.get('type', 'Unknown')}",
+                f"  Class: {window_info.get('class_name', 'Unknown')}",
+                f"  Visible: {window_info.get('visible', False)}",
+                f"  Modal: {window_info.get('modal', False)}",
+                f"  Is Dialog: {window_info.get('is_dialog', False)}",
+                f"  Is File Dialog: {window_info.get('is_file_dialog', False)}",
+                f"  Is Message Box: {window_info.get('is_message_box', False)}",
+                f"  Object Name: {window_info.get('object_name', 'None')}",
+                f"  Parent: {window_info.get('parent', 'None')}",
+            ]
+            
+            if window_info.get('geometry'):
+                info_lines.append(f"  Geometry: {window_info['geometry']}")
+            
+            debug_info = "\n".join(info_lines)
+            print(f"[SCRIPT RUNTIME DEBUG] {debug_info}")
+            
+            # Raise assertion error with detailed information
+            error_msg = f"Unexpected focus change detected:\n{debug_info}"
+            raise AssertionError(error_msg)
+        
         
         # Set up error handling
         self.state_machine.set_error_handler(self._handle_error)
@@ -213,9 +291,23 @@ class ScriptRuntime:
             
             # Check if it's a built-in function
             if func_name in self.functions:
+                print(f"[SCRIPT DEBUG] Calling function: {func_name} with args: {args}")
                 self._consume_budget(self.command_costs['function_call'], f'function_{func_name}')
                 func = self.functions[func_name]['function']
-                return func(*args)
+                
+                # Handle special functions that need runtime context
+                if func_name == 'trigger_menu':
+                    print(f"[SCRIPT DEBUG] Using special handler for trigger_menu")
+                    return self._handle_trigger_menu(*args)
+                elif func_name == 'exit':
+                    print(f"[SCRIPT DEBUG] Using special handler for exit")
+                    return self._handle_exit(*args)
+                elif func_name == 'get_project_structure':
+                    print(f"[SCRIPT DEBUG] Using special handler for get_project_structure")
+                    return self._handle_get_project_structure(*args)
+                else:
+                    print(f"[SCRIPT DEBUG] Using regular function handler for {func_name}")
+                    return func(*args)
             # Check if it's a command
             elif self.command_reflector.get_command(func_name):
                 self._consume_budget(self.command_costs['command_call'], f'command_{func_name}')
@@ -318,16 +410,35 @@ class ScriptRuntime:
             cmd_name = statement['name']
             args = [self._evaluate_expression(arg) for arg in statement.get('args', [])]
             
+            print(f"[SCRIPT DEBUG] Executing command: {cmd_name} with args: {args}")
+            
             # First try to execute as a command
             try:
+                print(f"[SCRIPT DEBUG] Trying to execute as command: {cmd_name}")
                 return self.command_reflector.execute_command(cmd_name, *args)
             except NameError:
+                print(f"[SCRIPT DEBUG] Command not found, trying as function: {cmd_name}")
                 # If not found as command, try as function
                 if cmd_name in self.functions:
+                    print(f"[SCRIPT DEBUG] Found as function: {cmd_name}")
                     func_info = self.functions[cmd_name]
                     func = func_info['function']
-                    return func(*args)
+                    
+                    # Handle special functions that need runtime context
+                    if cmd_name == 'trigger_menu':
+                        print(f"[SCRIPT DEBUG] Using special handler for trigger_menu")
+                        return self._handle_trigger_menu(*args)
+                    elif cmd_name == 'exit':
+                        print(f"[SCRIPT DEBUG] Using special handler for exit")
+                        return self._handle_exit(*args)
+                    elif cmd_name == 'get_project_structure':
+                        print(f"[SCRIPT DEBUG] Using special handler for get_project_structure")
+                        return self._handle_get_project_structure(*args)
+                    else:
+                        print(f"[SCRIPT DEBUG] Using regular function handler for {cmd_name}")
+                        return func(*args)
                 else:
+                    print(f"[SCRIPT DEBUG] Neither command nor function found: {cmd_name}")
                     raise NameError(f"Command or function '{cmd_name}' not found")
         elif statement_type == 'if':
             self._consume_budget(self.command_costs['if_statement'], 'if_statement')
@@ -400,13 +511,26 @@ class ScriptRuntime:
             # Treat as expression
             return self._evaluate_expression(statement)
     
-    def execute_script_content(self, script_content: str) -> Any:
-        """Execute a script from its content string"""
+    def execute_script_content(self, script_content: str, heartbeat=None) -> Any:
+        """Execute a script from its content string with optional heartbeat monitoring"""
+        if self.verbose:
+            print(f"[SCRIPT RUNTIME] Executing script content...")
+        
         try:
             # Reset budget at the start of script execution
             self.reset_budget()
             statements = self.parser.parse_script(script_content)
-            return self.execute_program(statements)
+            
+            # Store heartbeat for use during execution
+            self.heartbeat = heartbeat
+            
+            result = self.execute_program(statements)
+            
+            if self.verbose:
+                print(f"[SCRIPT RUNTIME] Script execution completed successfully")
+            
+            return result
+            
         except Exception as e:
             if self.verbose:
                 print(f"[SCRIPT ERROR] Failed to parse script: {e}")
@@ -422,8 +546,13 @@ class ScriptRuntime:
         else:
             statements = [program]
         
+        print(f"[SCRIPT DEBUG] Executing program with {len(statements)} statements")
         results = []
-        for statement in statements:
+        for i, statement in enumerate(statements):
+            print(f"[SCRIPT DEBUG] Executing statement {i}: {statement}")
+            # Update heartbeat activity for each statement
+            if self.heartbeat:
+                self.heartbeat.update_activity()
             try:
                 result = self.execute_statement(statement)
                 results.append(result)
@@ -479,3 +608,79 @@ class ScriptRuntime:
         """Set the application interface"""
         self.state_machine.set_execution_context(interface)
         self.command_reflector = create_command_reflector(interface)
+    
+    def _handle_trigger_menu(self, menu_name: str, item_name: str) -> None:
+        """Handle trigger_menu function calls"""
+        print(f"[SCRIPT DEBUG] Triggering menu: {menu_name} -> {item_name}")
+        
+        # Emit a menu click event through the event system
+        from curioshelf.event_system import event_bus, UIEvent, EventType
+        
+        # Map menu items to command names
+        menu_item_mapping = {
+            "Project": {
+                "New Project": "new_project",
+                "Open Project": "open_project",
+                "Save Project": "save_project",
+                "Close Project": "close_project"
+            },
+            "Sources": {
+                "Import Source": "import_source"
+            },
+            "Objects": {
+                "Create Object": "create_object"
+            },
+            "Templates": {
+                "Create Template": "create_template"
+            }
+        }
+        
+        # Get the command name from the mapping
+        command_name = menu_item_mapping.get(menu_name, {}).get(item_name, f"{menu_name.lower()}_{item_name.lower().replace(' ', '_')}")
+        
+        event = UIEvent(
+            event_type=EventType.MENU_ITEM_CLICKED,
+            source="script",
+            data={
+                "menu_item": command_name,
+                "menu_name": f"{menu_name} -> {item_name}",
+                "menu": menu_name,
+                "item": item_name
+            }
+        )
+        print(f"[SCRIPT DEBUG] Emitting MENU_ITEM_CLICKED event: {event.data}")
+        event_bus.emit(event)
+        print(f"[SCRIPT DEBUG] Menu event emitted successfully")
+    
+    def _handle_exit(self, exit_code: int = 0) -> None:
+        """Handle exit function calls"""
+        if self.verbose:
+            print(f"[SCRIPT] Exiting application with code: {exit_code}")
+        
+        # Set a flag to indicate the script wants to exit
+        self.state_machine.set_variable("_script_exit_requested", True)
+        self.state_machine.set_variable("_script_exit_code", exit_code)
+        
+        if self.verbose:
+            print(f"[SCRIPT] Exit requested with code: {exit_code}")
+    
+    def _handle_get_project_structure(self) -> dict:
+        """Handle get_project_structure function calls"""
+        if self.verbose:
+            print(f"[SCRIPT] Getting project structure...")
+        try:
+            # Get the application interface from the state machine context
+            app_interface = self.state_machine.get_execution_context()
+            if app_interface and hasattr(app_interface, 'get_project_structure'):
+                structure = app_interface.get_project_structure()
+                if self.verbose:
+                    print(f"[SCRIPT] Project structure retrieved: {structure}")
+                return structure
+            else:
+                if self.verbose:
+                    print(f"[SCRIPT] No application interface available for project structure")
+                return {}
+        except Exception as e:
+            if self.verbose:
+                print(f"[SCRIPT] Error getting project structure: {e}")
+            return {}

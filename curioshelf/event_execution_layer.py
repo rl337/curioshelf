@@ -121,45 +121,23 @@ class EventExecutor:
     def _execute_new_project(self, data: Dict[str, Any]) -> None:
         """Execute new project creation"""
         try:
-            # For now, create a project with default values
-            # In a real implementation, this would show a dialog
-            from .projects import ProjectMetadata
-            from pathlib import Path
-            import tempfile
+            self.logger.info("New Project menu clicked - showing project dialog")
             
-            # Create a temporary directory for the project
-            project_dir = Path(tempfile.mkdtemp(prefix="curioshelf_project_"))
-            
-            # Create project metadata
-            metadata = ProjectMetadata(
-                name="New Project",
-                description="A new CurioShelf project",
-                author="User",
-                version="1.0.0"
+            # Emit event to show project dialog
+            event = UIEvent(
+                event_type=EventType.SHOW_DIALOG,
+                source="event_executor",
+                data={
+                    "dialog_type": "project_dialog",
+                    "mode": "create",
+                    "action": "new_project"
+                }
             )
-            
-            # Create the project
-            success = self.app.create_project(project_dir, metadata)
-            
-            if success:
-                self.logger.info(f"Project created successfully at {project_dir}")
-                # Emit success event
-                event_bus.emit(UIEvent(
-                    event_type=EventType.SUCCESS,
-                    source="event_executor",
-                    data={"action": "new_project", "message": f"Project created at {project_dir}", "project_path": str(project_dir)}
-                ))
-            else:
-                self.logger.error("Failed to create project")
-                # Emit error event
-                event_bus.emit(UIEvent(
-                    event_type=EventType.ERROR,
-                    source="event_executor",
-                    data={"action": "new_project", "error": "Failed to create project"}
-                ))
-                
+            print(f"[DEBUG] Emitting SHOW_DIALOG event: {event.data}")
+            event_bus.emit(event)
+            print(f"[DEBUG] SHOW_DIALOG event emitted successfully")
         except Exception as e:
-            self.logger.error(f"Error creating project: {e}")
+            self.logger.error(f"Error showing new project dialog: {e}")
             # Emit error event
             event_bus.emit(UIEvent(
                 event_type=EventType.ERROR,
@@ -170,56 +148,23 @@ class EventExecutor:
     def _execute_open_project(self, data: Dict[str, Any]) -> None:
         """Execute project opening"""
         try:
-            # For now, try to open a project from a known location
-            # In a real implementation, this would show a file dialog
-            from pathlib import Path
-            import tempfile
-            import os
+            self.logger.info("Open Project menu clicked - showing project dialog")
             
-            # Look for existing projects in a common location
-            # For testing, we'll create a temporary project and then try to open it
-            project_dir = Path(tempfile.mkdtemp(prefix="curioshelf_test_project_"))
-            
-            # Create a test project first
-            from .projects import ProjectMetadata
-            metadata = ProjectMetadata(
-                name="Test Project",
-                description="A test CurioShelf project",
-                author="User",
-                version="1.0.0"
+            # Emit event to show project dialog
+            event = UIEvent(
+                event_type=EventType.SHOW_DIALOG,
+                source="event_executor",
+                data={
+                    "dialog_type": "project_dialog",
+                    "mode": "open",
+                    "action": "open_project"
+                }
             )
-            
-            # Create the project
-            create_success = self.app.create_project(project_dir, metadata)
-            if not create_success:
-                self.logger.error("Failed to create test project for opening")
-                return
-            
-            # Close the project first
-            self.app.close_project()
-            
-            # Now try to open it
-            success = self.app.load_project(project_dir)
-            
-            if success:
-                self.logger.info(f"Project opened successfully from {project_dir}")
-                # Emit success event
-                event_bus.emit(UIEvent(
-                    event_type=EventType.SUCCESS,
-                    source="event_executor",
-                    data={"action": "open_project", "message": f"Project opened from {project_dir}", "project_path": str(project_dir)}
-                ))
-            else:
-                self.logger.error("Failed to open project")
-                # Emit error event
-                event_bus.emit(UIEvent(
-                    event_type=EventType.ERROR,
-                    source="event_executor",
-                    data={"action": "open_project", "error": "Failed to open project"}
-                ))
-                
+            print(f"[DEBUG] Emitting SHOW_DIALOG event: {event.data}")
+            event_bus.emit(event)
+            print(f"[DEBUG] SHOW_DIALOG event emitted successfully")
         except Exception as e:
-            self.logger.error(f"Error opening project: {e}")
+            self.logger.error(f"Error showing open project dialog: {e}")
             # Emit error event
             event_bus.emit(UIEvent(
                 event_type=EventType.ERROR,

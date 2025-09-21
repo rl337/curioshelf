@@ -1,0 +1,241 @@
+# CurioShelf UI State Transitions End-to-End Test
+# This script tests UI state transitions and menu enabling/disabling behavior
+
+print("=== CurioShelf UI State Transitions E2E Test ===")
+print("Testing UI state transitions and menu behavior")
+
+# Test 1: Initial UI State
+print("\n=== Test 1: Initial UI State ===")
+print("Checking initial UI state...")
+
+# Check initial project state
+project_loaded_initial := is_project_loaded()
+print("Project loaded initially:", project_loaded_initial)
+assert(not project_loaded_initial, "Project should not be loaded initially")
+
+# Check initial menu states
+can_create_initial := can_create_project()
+can_open_initial := can_open_project()
+can_save_initial := can_save_project()
+can_close_initial := can_close_project()
+
+print("Initial menu states:")
+print("  Can create project:", can_create_initial)
+print("  Can open project:", can_open_initial)
+print("  Can save project:", can_save_initial)
+print("  Can close project:", can_close_initial)
+
+# Verify initial state
+assert(can_create_initial, "Should be able to create project initially")
+assert(can_open_initial, "Should be able to open project initially")
+assert(not can_save_initial, "Should not be able to save project initially")
+assert(not can_close_initial, "Should not be able to close project initially")
+
+print("Initial UI state verified")
+
+# Test 2: Project Creation State Transition
+print("\n=== Test 2: Project Creation State Transition ===")
+print("Testing UI state transition during project creation...")
+
+# Trigger project creation
+print("Triggering New Project menu...")
+trigger_menu("Project", "New Project")
+
+# Wait for project creation
+print("Waiting for project creation...")
+
+# Check state after project creation
+project_loaded_after_create := is_project_loaded()
+print("Project loaded after creation:", project_loaded_after_create)
+assert(project_loaded_after_create, "Project should be loaded after creation")
+
+# Check menu states after project creation
+can_create_after_create := can_create_project()
+can_open_after_create := can_open_project()
+can_save_after_create := can_save_project()
+can_close_after_create := can_close_project()
+
+print("Menu states after project creation:")
+print("  Can create project:", can_create_after_create)
+print("  Can open project:", can_open_after_create)
+print("  Can save project:", can_save_after_create)
+print("  Can close project:", can_close_after_create)
+
+# Verify state after project creation
+assert(not can_create_after_create, "Should not be able to create project when one is loaded")
+assert(not can_open_after_create, "Should not be able to open project when one is loaded")
+assert(can_save_after_create, "Should be able to save project when one is loaded")
+assert(can_close_after_create, "Should be able to close project when one is loaded")
+
+print("Project creation state transition verified")
+
+# Test 3: Project Modification State
+print("\n=== Test 3: Project Modification State ===")
+print("Testing UI state during project modification...")
+
+# Add some assets to modify the project
+print("Adding assets to modify project state...")
+
+# Add a source
+add_source_result := add_source("test_modification.jpg")
+print("Add source result:", add_source_result)
+
+# Add an object
+add_object_result := add_object("test_modification_object")
+print("Add object result:", add_object_result)
+
+# Check if project is considered modified
+# Note: This might not be implemented yet, so we'll just verify the operations succeeded
+print("Asset addition completed")
+
+# Test 4: Project Save State Transition
+print("\n=== Test 4: Project Save State Transition ===")
+print("Testing UI state during project save...")
+
+# Save the project
+print("Saving project...")
+save_result := save_project()
+print("Save result:", save_result)
+assert(save_result, "Project save should succeed")
+
+# Check state after save
+project_loaded_after_save := is_project_loaded()
+print("Project loaded after save:", project_loaded_after_save)
+assert(project_loaded_after_save, "Project should still be loaded after save")
+
+# Menu states should remain the same after save
+can_save_after_save := can_save_project()
+can_close_after_save := can_close_project()
+
+print("Menu states after save:")
+print("  Can save project:", can_save_after_save)
+print("  Can close project:", can_close_after_save)
+
+assert(can_save_after_save, "Should still be able to save project after save")
+assert(can_close_after_save, "Should still be able to close project after save")
+
+print("Project save state transition verified")
+
+# Test 5: Project Close State Transition
+print("\n=== Test 5: Project Close State Transition ===")
+print("Testing UI state transition during project close...")
+
+# Close the project
+print("Closing project...")
+close_result := close_project()
+print("Close result:", close_result)
+assert(close_result, "Project close should succeed")
+
+# Check state after close
+project_loaded_after_close := is_project_loaded()
+print("Project loaded after close:", project_loaded_after_close)
+assert(not project_loaded_after_close, "Project should not be loaded after close")
+
+# Check menu states after close
+can_create_after_close := can_create_project()
+can_open_after_close := can_open_project()
+can_save_after_close := can_save_project()
+can_close_after_close := can_close_project()
+
+print("Menu states after close:")
+print("  Can create project:", can_create_after_close)
+print("  Can open project:", can_open_after_close)
+print("  Can save project:", can_save_after_close)
+print("  Can close project:", can_close_after_close)
+
+# Verify state after close (should return to initial state)
+assert(can_create_after_close, "Should be able to create project after close")
+assert(can_open_after_close, "Should be able to open project after close")
+assert(not can_save_after_close, "Should not be able to save project after close")
+assert(not can_close_after_close, "Should not be able to close project after close")
+
+print("Project close state transition verified")
+
+# Test 6: Multiple State Transitions
+print("\n=== Test 6: Multiple State Transitions ===")
+print("Testing multiple rapid state transitions...")
+
+# Create project
+print("Creating project for multiple transitions...")
+trigger_menu("Project", "New Project")
+print("Project creation triggered")
+
+# Wait for creation
+print("Waiting for project creation...")
+
+# Verify project created
+project_loaded_multi := is_project_loaded()
+print("Project loaded in multi-test:", project_loaded_multi)
+assert(project_loaded_multi, "Project should be loaded")
+
+# Save project
+print("Saving project...")
+save_result_multi := save_project()
+print("Save result in multi-test:", save_result_multi)
+assert(save_result_multi, "Project save should succeed")
+
+# Close project
+print("Closing project...")
+close_result_multi := close_project()
+print("Close result in multi-test:", close_result_multi)
+assert(close_result_multi, "Project close should succeed")
+
+# Verify final state
+final_project_loaded := is_project_loaded()
+print("Final project loaded state:", final_project_loaded)
+assert(not final_project_loaded, "Project should not be loaded after multiple transitions")
+
+print("Multiple state transitions verified")
+
+# Test 7: Edge Case - Operations Without Project
+print("\n=== Test 7: Edge Case - Operations Without Project ===")
+print("Testing operations when no project is loaded...")
+
+# Try to save without project
+print("Attempting to save without project...")
+save_without_project := save_project()
+print("Save without project result:", save_without_project)
+assert(not save_without_project, "Should not be able to save without project")
+
+# Try to close without project
+print("Attempting to close without project...")
+close_without_project := close_project()
+print("Close without project result:", close_without_project)
+assert(not close_without_project, "Should not be able to close without project")
+
+print("Edge case operations verified")
+
+# Test 8: Final State Verification
+print("\n=== Test 8: Final State Verification ===")
+print("Verifying final application state...")
+
+# Check final project state
+final_project_state := is_project_loaded()
+print("Final project loaded:", final_project_state)
+assert(not final_project_state, "No project should be loaded at the end")
+
+# Check final menu states
+final_can_create := can_create_project()
+final_can_open := can_open_project()
+final_can_save := can_save_project()
+final_can_close := can_close_project()
+
+print("Final menu states:")
+print("  Can create project:", final_can_create)
+print("  Can open project:", final_can_open)
+print("  Can save project:", final_can_save)
+print("  Can close project:", final_can_close)
+
+# Verify final state matches initial state
+assert(final_can_create, "Should be able to create project at the end")
+assert(final_can_open, "Should be able to open project at the end")
+assert(not final_can_save, "Should not be able to save project at the end")
+assert(not final_can_close, "Should not be able to close project at the end")
+
+print("Final state verification complete")
+
+print("\n=== UI State Transitions E2E Test Complete ===")
+print("All UI state transition tests passed successfully!")
+
+# Exit gracefully
+exit(0)

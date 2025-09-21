@@ -1,0 +1,7 @@
+print("=== Simple Project Creation Test ===")
+
+print("1. Triggering New Project menu...")
+trigger_menu("Project", "New Project")
+
+print("2. Waiting for dialog...")
+# Just wait and see what happens

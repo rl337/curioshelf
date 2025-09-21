@@ -1,0 +1,31 @@
+# Test Real GUI Script
+# This script tests the actual GUI with real dialogs
+
+print("=== Test Real GUI Script ===")
+print("This script will test the actual GUI with real dialogs")
+print("The dialog should appear and wait for user interaction")
+print("Please interact with the dialog to test functionality")
+
+# Test 1: Initial state
+print("\n1. Initial state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 2: Trigger New Project dialog
+print("\n2. Triggering New Project dialog...")
+print("   A dialog should appear with input fields for project name and path")
+print("   Please fill in the fields and click 'Create Project'")
+trigger_menu("Project", "New Project")
+
+print("\n3. After dialog interaction:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+print("\n=== Test completed ===")
+print("If the dialog appeared and you could interact with it, the fix is working!")
+print("If not, there are still issues with the dialog implementation.")
+
+exit(0)
+

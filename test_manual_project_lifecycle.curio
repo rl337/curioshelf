@@ -1,0 +1,88 @@
+# Manual Project Lifecycle Test
+# This script tests the complete project workflow with real user interaction
+# Run this with: poetry run python -m curioshelf --debug --run-for-real --script test_manual_project_lifecycle.curio
+
+print("=== Manual Project Lifecycle Test ===")
+print("This test will guide you through the complete project workflow")
+print("You will need to interact with the dialogs that appear")
+
+# Test 1: Initial state verification
+print("\n1. Initial state verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+print("\n2. Testing New Project dialog...")
+print("   A dialog should appear with input fields for:")
+print("   - Project Name: Enter 'Test Project'")
+print("   - Project Path: Click Browse and select a directory")
+print("   - Click 'Create Project' button")
+print("   The dialog should close and a project should be created")
+
+# This will show the dialog and wait for user interaction
+trigger_menu("Project", "New Project")
+
+print("\n3. After creating project, verify state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project creation failed!")
+
+print("\n4. Testing Sources menu (should be unghosted now):")
+print("   Can import source:", can_import_source())
+print("   Has sources:", has_sources())
+
+print("\n5. Testing Close Project...")
+print("   Click 'Close Project' in the Project menu")
+print("   The project should be closed and UI should reset")
+
+trigger_menu("Project", "Close Project")
+
+print("\n6. After closing project, verify UI reset:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+if not is_project_loaded():
+    print("   ✅ Project close successful!")
+else:
+    print("   ❌ Project close failed!")
+
+print("\n7. Testing Open Project dialog...")
+print("   A dialog should appear with a list of recent projects")
+print("   Select a project and click 'Open Selected Project'")
+print("   Or click Cancel to close without opening")
+
+trigger_menu("Project", "Open Project")
+
+print("\n8. Final state verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+print("\n=== Manual Test Completed ===")
+print("Expected results:")
+print("  ✅ New Project dialog appears with input fields")
+print("  ✅ Project creation works and UI updates correctly")
+print("  ✅ Close Project resets UI state")
+print("  ✅ Open Project dialog appears with project list")
+print("  ✅ All menu states are properly ghosted/unghosted")
+
+print("\nIf all dialogs appeared and functioned correctly, the project system is working!")
+exit(0)
+

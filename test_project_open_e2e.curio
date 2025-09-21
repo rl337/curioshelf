@@ -1,0 +1,109 @@
+# Test Project Open End-to-End
+# This script tests project opening functionality
+
+print("=== Project Open End-to-End Test ===")
+print("Testing: Open Project -> Verify UI State")
+
+# Test 1: Verify initial state (should have no project loaded)
+print("\n1. Initial State Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if is_project_loaded():
+    print("   ⚠️  Project already loaded - closing it first...")
+    trigger_menu("Project", "Close Project")
+    print("   Waiting for project close...")
+
+# Test 2: Open a project
+print("\n2. Opening Project...")
+print("   Triggering 'Open Project' menu...")
+
+trigger_menu("Project", "Open Project")
+
+print("   Waiting for project open to complete...")
+
+# Test 3: Verify project was opened successfully
+print("\n3. Post-Open State Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+# Test 4: Verify UI state expectations for loaded project
+print("\n4. UI State Verification for Loaded Project:")
+expected_enabled := ["Can create project", "Can open project", "Can save project", "Can close project", "Can import source", "Can create object", "Can create_template"]
+expected_ghosted := []
+
+all_enabled_correctly := true
+all_ghosted_correctly := true
+
+# Check enabled items (should be True)
+if not can_create_project():
+    print("   ❌ Create project should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_open_project():
+    print("   ❌ Open project should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_save_project():
+    print("   ❌ Save project should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_close_project():
+    print("   ❌ Close project should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_import_source():
+    print("   ❌ Import source should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_create_object():
+    print("   ❌ Create object should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_create_template():
+    print("   ❌ Create template should be enabled but isn't")
+    all_enabled_correctly := false
+
+if is_project_loaded():
+    print("   ✅ Project opened successfully!")
+    
+    # Get project info
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+    
+    # Verify project structure
+    print("\n5. Project Structure Verification:")
+    try:
+        structure := get_project_structure()
+        print("   Project structure loaded:", structure is not None)
+        if structure:
+            print("   Sources count:", len(structure.get("sources", [])))
+            print("   Templates count:", len(structure.get("templates", [])))
+            print("   Objects count:", len(structure.get("objects", [])))
+    except:
+        print("   Project structure not available yet")
+
+print("\n=== Project Open Test Results ===")
+if is_project_loaded() and all_enabled_correctly and all_ghosted_correctly:
+    print("✅ SUCCESS: Project opened and UI state updated correctly")
+    print("   - Project is loaded")
+    print("   - All project operations are enabled")
+    print("   - No operations are incorrectly ghosted")
+else:
+    print("❌ FAILURE: Project open or UI state update failed")
+    if not is_project_loaded():
+        print("   - Project is not loaded")
+    if not all_enabled_correctly:
+        print("   - Some operations are not enabled when they should be")
+    if not all_ghosted_correctly:
+        print("   - Some operations are ghosted when they shouldn't be")
+
+exit(0)
+

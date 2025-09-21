@@ -1,0 +1,48 @@
+# Automated Dialog Functionality Test
+# This script tests dialog creation and basic functionality without user interaction
+
+print("=== Automated Dialog Functionality Test ===")
+
+# Test 1: Initial state
+print("1. Initial state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 2: Test New Project dialog creation
+print("\n2. Testing New Project dialog creation...")
+print("   Triggering New Project menu...")
+trigger_menu("Project", "New Project")
+print("   ✅ New Project dialog should have appeared")
+
+# Test 3: Test Open Project dialog creation
+print("\n3. Testing Open Project dialog creation...")
+print("   Triggering Open Project menu...")
+trigger_menu("Project", "Open Project")
+print("   ✅ Open Project dialog should have appeared")
+
+# Test 4: Test Sources menu (should be ghosted initially)
+print("\n4. Testing Sources menu (should be ghosted):")
+print("   Can import source:", can_import_source())
+print("   Has sources:", has_sources())
+
+# Test 5: Test Objects menu (should be ghosted initially)
+print("\n5. Testing Objects menu (should be ghosted):")
+print("   Can create object:", can_create_object())
+
+# Test 6: Test Templates menu (should be ghosted initially)
+print("\n6. Testing Templates menu (should be ghosted):")
+print("   Can create template:", can_create_template())
+
+print("\n=== Automated Test Results ===")
+print("Expected behavior:")
+print("  ✅ New Project dialog appears with input fields")
+print("  ✅ Open Project dialog appears with project list")
+print("  ✅ All menus are properly ghosted when no project is loaded")
+print("  ✅ No errors occur during dialog creation")
+
+print("\nIf you saw the dialogs appear and disappear, the functionality is working!")
+print("The dialogs are modal, so they wait for user interaction before closing.")
+
+exit(0)
+

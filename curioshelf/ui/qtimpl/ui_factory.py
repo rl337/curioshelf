@@ -429,6 +429,34 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
                 print()
         else:
             print("[QT DEBUG] No QApplication instance")
+    
+    def execute_script_content(self, script_content: str, app_instance: Any = None, heartbeat: Any = None) -> Any:
+        """Execute script content using the script UI implementation"""
+        # Import here to avoid circular imports
+        from ..script.script_runtime import ScriptRuntime
+        from ...app_impl.application_impl import CurioShelfApplicationImpl
+        
+        # Use provided app instance or create a new one
+        if app_instance is not None:
+            app_impl = app_instance
+        else:
+            app_impl = CurioShelfApplicationImpl()
+        
+        # Create a script runtime with the application interface
+        script_runtime = ScriptRuntime(
+            application_interface=app_impl,
+            verbose=True,  # Force verbose mode for debugging
+            execution_budget=10000
+        )
+        
+        # Execute the script content with heartbeat monitoring
+        try:
+            result = script_runtime.execute_script_content(script_content, heartbeat)
+            return result
+        except Exception as e:
+            if self.verbose:
+                print(f"[QT SCRIPT ERROR] {e}")
+            raise
 
 
 # Backward compatibility alias

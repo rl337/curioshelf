@@ -33,8 +33,31 @@ class ProjectDialogAbstracted(UIWidget):
         self.project_created: Optional[Callable[[Path, ProjectInfo], None]] = None
         self.project_loaded: Optional[Callable[[Path], None]] = None
         
+        # Dialog mode (create or open)
+        self.mode = "create"
+        
         self.setup_ui()
         self.refresh()
+    
+    def set_mode(self, mode: str) -> None:
+        """Set the dialog mode (create or open)"""
+        self.mode = mode
+        self._update_ui_for_mode()
+    
+    def _update_ui_for_mode(self) -> None:
+        """Update UI elements based on the current mode"""
+        if self.mode == "open":
+            # Hide create project section, show open project section
+            if hasattr(self, 'new_project_group'):
+                self.new_project_group.set_visible(False)
+            if hasattr(self, 'existing_projects_group'):
+                self.existing_projects_group.set_visible(True)
+        else:
+            # Show create project section, hide open project section
+            if hasattr(self, 'new_project_group'):
+                self.new_project_group.set_visible(True)
+            if hasattr(self, 'existing_projects_group'):
+                self.existing_projects_group.set_visible(False)
     
     def setup_ui(self):
         """Setup the UI using abstraction layer"""
@@ -46,9 +69,9 @@ class ProjectDialogAbstracted(UIWidget):
         self.dialog.set_layout(main_layout)
         
         # Create new project section
-        new_project_group = self.ui_factory.create_group_box("Create New Project")
+        self.new_project_group = self.ui_factory.create_group_box("Create New Project")
         new_project_layout = self.ui_factory.create_layout("vertical")
-        new_project_group.set_layout(new_project_layout)
+        self.new_project_group.set_layout(new_project_layout)
         
         # Project name
         name_layout = self.ui_factory.create_layout("horizontal")
@@ -73,12 +96,12 @@ class ProjectDialogAbstracted(UIWidget):
         self.create_btn.set_clicked_callback(self.create_project)
         new_project_layout.add_widget(self.create_btn)
         
-        main_layout.add_widget(new_project_group)
+        main_layout.add_widget(self.new_project_group)
         
         # Create open project section
-        open_project_group = self.ui_factory.create_group_box("Open Existing Project")
+        self.existing_projects_group = self.ui_factory.create_group_box("Open Existing Project")
         open_project_layout = self.ui_factory.create_layout("vertical")
-        open_project_group.set_layout(open_project_layout)
+        self.existing_projects_group.set_layout(open_project_layout)
         
         # Existing projects list
         self.existing_projects_list = self.ui_factory.create_list_widget()
@@ -91,7 +114,7 @@ class ProjectDialogAbstracted(UIWidget):
         self.open_btn.set_enabled(False)
         open_project_layout.add_widget(self.open_btn)
         
-        main_layout.add_widget(open_project_group)
+        main_layout.add_widget(self.existing_projects_group)
         
         # Create button row
         button_layout = self.ui_factory.create_layout("horizontal")
@@ -221,34 +244,87 @@ class ProjectDialogAbstracted(UIWidget):
     
     def exec(self):
         """Execute the dialog"""
-        # Create a temporary project for testing
-        # In a real implementation, this would show a project creation/loading view in the main window
-        print("[PROJECT DIALOG] Creating temporary project...")
+        # Import here to avoid circular imports
+        from .qtimpl.project_dialog import QtProjectDialog
+        from PySide6.QtWidgets import QDialog
+        from .dialog_auto_responder import get_auto_responder
         
-        # Create a temporary project for testing
-        import tempfile
-        with tempfile.TemporaryDirectory(prefix="curioshelf_test_project_") as temp_dir:
-            default_project_path = Path(temp_dir)
-            
-            # Emit project dialog accepted event
+        # Create and show the Qt dialog
+        dialog = QtProjectDialog(mode=self.mode)
+        
+        # Connect signals
+        dialog.project_created.connect(self._on_project_created)
+        dialog.project_loaded.connect(self._on_project_loaded)
+        
+        # Setup auto-responder for scripted testing (only if test plugins are loaded)
+        try:
+            from test_support.test_plugin_loader import get_dialog_responder
+            auto_responder = get_dialog_responder()
+            if auto_responder and auto_responder.enabled:
+                print(f"[PROJECT DIALOG] Auto-responder enabled, will auto-respond to dialog")
+                # Use a timer to allow the dialog to be shown first
+                from PySide6.QtCore import QTimer
+                QTimer.singleShot(100, lambda: self._delayed_auto_respond(dialog, auto_responder))
+        except ImportError:
+            # Test plugins not available, run normally
+            pass
+        
+        # Show the dialog
+        result = dialog.exec()
+        
+        # If dialog was accepted, the signals will have been emitted
+        # If dialog was rejected, emit a rejected event
+        if result != QDialog.Accepted:
             from curioshelf.event_system import event_bus, UIEvent, EventType
-            project_info = ProjectInfo(
-                name="Test Project",
-                description="A temporary project for testing",
-                author="System"
-            )
-            
             event = UIEvent(
-                event_type=EventType.DIALOG_ACCEPTED,
+                event_type=EventType.DIALOG_REJECTED,
                 source="project_dialog",
                 data={
                     "dialog_type": "project_dialog",
-                    "is_new_project": True,
-                    "project_path": str(default_project_path),
-                    "project_info": project_info
+                    "mode": self.mode
                 }
             )
             event_bus.emit(event)
+    
+    def _delayed_auto_respond(self, dialog, auto_responder):
+        """Delayed auto-respond to allow dialog to be shown first"""
+        try:
+            auto_responder.auto_respond_to_dialog(dialog, "project_dialog", self.mode)
+            print(f"[PROJECT DIALOG] Auto-responder completed successfully")
+        except Exception as e:
+            print(f"[PROJECT DIALOG] Auto-responder failed: {e}")
+            # Close the dialog and re-raise the error
+            dialog.reject()
+            raise
+    
+    def _on_project_created(self, project_path: Path, project_info: ProjectInfo):
+        """Handle project created signal"""
+        from curioshelf.event_system import event_bus, UIEvent, EventType
+        event = UIEvent(
+            event_type=EventType.DIALOG_ACCEPTED,
+            source="project_dialog",
+            data={
+                "dialog_type": "project_dialog",
+                "mode": "create",
+                "project_path": str(project_path),
+                "project_info": project_info
+            }
+        )
+        event_bus.emit(event)
+    
+    def _on_project_loaded(self, project_path: Path):
+        """Handle project loaded signal"""
+        from curioshelf.event_system import event_bus, UIEvent, EventType
+        event = UIEvent(
+            event_type=EventType.DIALOG_ACCEPTED,
+            source="project_dialog",
+            data={
+                "dialog_type": "project_dialog",
+                "mode": "open",
+                "project_path": str(project_path)
+            }
+        )
+        event_bus.emit(event)
     
     def connect_signal(self, signal_name: str, callback: Callable):
         """Connect a signal callback"""

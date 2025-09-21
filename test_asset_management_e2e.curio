@@ -1,0 +1,194 @@
+# CurioShelf Asset Management End-to-End Test
+# This script tests asset management workflows including sources, objects, and templates
+
+print("=== CurioShelf Asset Management E2E Test ===")
+print("Testing asset management workflows")
+
+# Test 1: Create Project for Asset Testing
+print("\n=== Test 1: Create Project for Asset Testing ===")
+print("Creating project for asset management testing...")
+
+# Trigger New Project menu
+trigger_menu("Project", "New Project")
+print("New Project menu triggered")
+
+# Wait for project creation
+print("Waiting for project creation...")
+
+# Verify project was created
+project_loaded := is_project_loaded()
+print("Project loaded:", project_loaded)
+assert(project_loaded, "Project should be loaded for asset testing")
+
+# Get project info
+project_info := get_project_info()
+print("Project info:", project_info)
+
+# Test 2: Initial Asset State
+print("\n=== Test 2: Initial Asset State ===")
+print("Checking initial asset state...")
+
+# Get initial asset counts
+initial_counts := get_asset_counts()
+print("Initial asset counts:", initial_counts)
+
+# Verify initial state
+assert(initial_counts.get("sources", 0) == 0, "Should start with 0 sources")
+assert(initial_counts.get("objects", 0) == 0, "Should start with 0 objects")
+assert(initial_counts.get("templates", 0) == 0, "Should start with 0 templates")
+assert(initial_counts.get("slices", 0) == 0, "Should start with 0 slices")
+
+print("Initial asset state verified")
+
+# Test 3: Source Management
+print("\n=== Test 3: Source Management ===")
+print("Testing source import and management...")
+
+# Test adding sources (these will be mock operations)
+print("Adding mock sources...")
+
+# Add some test sources
+add_source_result_1 := add_source("test_image_1.jpg")
+print("Add source 1 result:", add_source_result_1)
+
+add_source_result_2 := add_source("test_image_2.png")
+print("Add source 2 result:", add_source_result_2)
+
+add_source_result_3 := add_source("test_document.pdf")
+print("Add source 3 result:", add_source_result_3)
+
+# Check source counts after adding
+sources_after_add := get_asset_counts()
+print("Asset counts after adding sources:", sources_after_add)
+
+# Verify source count increased
+expected_sources := sources_after_add.get("sources", 0)
+print("Expected sources:", expected_sources)
+assert(expected_sources >= 3, "Should have at least 3 sources after adding")
+
+# Test 4: Object Management
+print("\n=== Test 4: Object Management ===")
+print("Testing object creation and management...")
+
+# Add some test objects
+print("Adding mock objects...")
+
+add_object_result_1 := add_object("test_object_1")
+print("Add object 1 result:", add_object_result_1)
+
+add_object_result_2 := add_object("test_object_2")
+print("Add object 2 result:", add_object_result_2)
+
+add_object_result_3 := add_object("complex_object")
+print("Add object 3 result:", add_object_result_3)
+
+# Check object counts after adding
+objects_after_add := get_asset_counts()
+print("Asset counts after adding objects:", objects_after_add)
+
+# Verify object count increased
+expected_objects := objects_after_add.get("objects", 0)
+print("Expected objects:", expected_objects)
+assert(expected_objects >= 3, "Should have at least 3 objects after adding")
+
+# Test 5: Template Management
+print("\n=== Test 5: Template Management ===")
+print("Testing template creation and management...")
+
+# Add some test templates
+print("Adding mock templates...")
+
+add_template_result_1 := add_template("test_template_1")
+print("Add template 1 result:", add_template_result_1)
+
+add_template_result_2 := add_template("test_template_2")
+print("Add template 2 result:", add_template_result_2)
+
+add_template_result_3 := add_template("advanced_template")
+print("Add template 3 result:", add_template_result_3)
+
+# Check template counts after adding
+templates_after_add := get_asset_counts()
+print("Asset counts after adding templates:", templates_after_add)
+
+# Verify template count increased
+expected_templates := templates_after_add.get("templates", 0)
+print("Expected templates:", expected_templates)
+assert(expected_templates >= 3, "Should have at least 3 templates after adding")
+
+# Test 6: Slice Management
+print("\n=== Test 6: Slice Management ===")
+print("Testing slice creation and management...")
+
+# Add some test slices
+print("Adding mock slices...")
+
+add_slice_result_1 := add_slice("test_slice_1")
+print("Add slice 1 result:", add_slice_result_1)
+
+add_slice_result_2 := add_slice("test_slice_2")
+print("Add slice 2 result:", add_slice_result_2)
+
+# Check slice counts after adding
+slices_after_add := get_asset_counts()
+print("Asset counts after adding slices:", slices_after_add)
+
+# Verify slice count increased
+expected_slices := slices_after_add.get("slices", 0)
+print("Expected slices:", expected_slices)
+assert(expected_slices >= 2, "Should have at least 2 slices after adding")
+
+# Test 7: Final Asset Verification
+print("\n=== Test 7: Final Asset Verification ===")
+print("Verifying final asset state...")
+
+# Get final asset counts
+final_counts := get_asset_counts()
+print("Final asset counts:", final_counts)
+
+# Verify all assets were added
+assert(final_counts.get("sources", 0) >= 3, "Should have at least 3 sources")
+assert(final_counts.get("objects", 0) >= 3, "Should have at least 3 objects")
+assert(final_counts.get("templates", 0) >= 3, "Should have at least 3 templates")
+assert(final_counts.get("slices", 0) >= 2, "Should have at least 2 slices")
+
+print("All asset counts verified")
+
+# Test 8: Project Save with Assets
+print("\n=== Test 8: Project Save with Assets ===")
+print("Saving project with all assets...")
+
+save_result := save_project()
+print("Save result:", save_result)
+assert(save_result, "Project save should succeed with assets")
+
+# Test 9: Project Structure Verification
+print("\n=== Test 9: Project Structure Verification ===")
+print("Verifying project structure...")
+
+# Get project structure
+project_structure := get_project_structure()
+print("Project structure:", project_structure)
+
+# Verify structure contains expected elements
+assert(project_structure is not None, "Project structure should not be None")
+
+# Test 10: Cleanup
+print("\n=== Test 10: Cleanup ===")
+print("Closing project and cleaning up...")
+
+# Close the project
+close_result := close_project()
+print("Close result:", close_result)
+assert(close_result, "Project close should succeed")
+
+# Verify final state
+final_project_loaded := is_project_loaded()
+print("Project loaded after cleanup:", final_project_loaded)
+assert(not final_project_loaded, "Project should not be loaded after cleanup")
+
+print("\n=== Asset Management E2E Test Complete ===")
+print("All asset management tests passed successfully!")
+
+# Exit gracefully
+exit(0)

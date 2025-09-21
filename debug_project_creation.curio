@@ -1,0 +1,19 @@
+# Debug Project Creation Script
+# This script will test the project creation and opening functionality
+
+print("=== Debug Project Creation Script ===")
+
+# Test 1: Check initial state
+print("1. Checking initial application state...")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 2: Try to call trigger_menu function
+print("\n2. Testing trigger_menu function...")
+print("   Calling trigger_menu('Project', 'New Project')...")
+trigger_menu("Project", "New Project")
+print("   trigger_menu call completed")
+
+print("\n=== Debug Script Completed ===")
+exit(0)

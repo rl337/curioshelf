@@ -1,0 +1,51 @@
+# Test Improved Auto-Responder Script
+# This script tests the improved auto-responder with better button detection
+
+print("=== Test Improved Auto-Responder Script ===")
+print("This script tests the improved auto-responder with enhanced button detection")
+
+# Test 1: Initial state
+print("\n1. Initial state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+
+# Test 2: Test New Project dialog with improved auto-responder
+print("\n2. Testing New Project dialog with improved auto-responder...")
+print("   The dialog should appear and be automatically filled")
+print("   The 'Create Project' button should be found and clicked")
+print("   The dialog should complete without hanging")
+
+trigger_menu("Project", "New Project")
+
+print("\n3. After auto-responded project creation:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful with improved auto-responder!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project creation failed with improved auto-responder!")
+
+# Test 4: Close project
+print("\n4. Closing project...")
+trigger_menu("Project", "Close Project")
+
+print("\n5. After closing project:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+
+print("\n=== Improved Auto-Responder Test Results ===")
+print("Expected results:")
+print("  ✅ New Project dialog auto-filled and completed successfully")
+print("  ✅ Create Project button was found and clicked")
+print("  ✅ No hanging or native dialog issues")
+print("  ✅ Project creation and closing worked correctly")
+
+print("\nIf all tests passed, the improved auto-responder is working correctly!")
+exit(0)
+

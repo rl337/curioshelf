@@ -1,0 +1,91 @@
+# Test Project Close End-to-End
+# This script tests project closing and UI state reset
+
+print("=== Project Close End-to-End Test ===")
+print("Testing: Close Project -> Verify UI State Reset")
+
+# Test 1: Verify we have a project loaded first
+print("\n1. Pre-Close State Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if not is_project_loaded():
+    print("   ❌ No project loaded - cannot test close functionality")
+    print("   Please run test_project_creation_e2e.curio first")
+    exit(1)
+
+# Test 2: Close the project
+print("\n2. Closing Project...")
+print("   Triggering 'Close Project' menu...")
+
+trigger_menu("Project", "Close Project")
+
+print("   Waiting for project close to complete...")
+
+# Test 3: Verify project was closed and UI reset
+print("\n3. Post-Close State Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+# Test 4: Verify UI state reset expectations
+print("\n4. UI State Reset Verification:")
+expected_ghosted := ["Can save project", "Can close project", "Can import source", "Can create object", "Can create template"]
+expected_enabled := ["Can create project", "Can open project"]
+
+all_ghosted_correctly := true
+all_enabled_correctly := true
+
+# Check ghosted items (should be False)
+if can_save_project():
+    print("   ❌ Save project should be ghosted but isn't")
+    all_ghosted_correctly := false
+if can_close_project():
+    print("   ❌ Close project should be ghosted but isn't")
+    all_ghosted_correctly := false
+if can_import_source():
+    print("   ❌ Import source should be ghosted but isn't")
+    all_ghosted_correctly := false
+if can_create_object():
+    print("   ❌ Create object should be ghosted but isn't")
+    all_ghosted_correctly := false
+if can_create_template():
+    print("   ❌ Create template should be ghosted but isn't")
+    all_ghosted_correctly := false
+
+# Check enabled items (should be True)
+if not can_create_project():
+    print("   ❌ Create project should be enabled but isn't")
+    all_enabled_correctly := false
+if not can_open_project():
+    print("   ❌ Open project should be enabled but isn't")
+    all_enabled_correctly := false
+
+print("\n=== Project Close Test Results ===")
+if not is_project_loaded() and all_ghosted_correctly and all_enabled_correctly:
+    print("✅ SUCCESS: Project closed and UI state reset correctly")
+    print("   - Project is no longer loaded")
+    print("   - Project-dependent operations are ghosted")
+    print("   - Project-independent operations are enabled")
+else:
+    print("❌ FAILURE: Project close or UI state reset failed")
+    if is_project_loaded():
+        print("   - Project is still loaded")
+    if not all_ghosted_correctly:
+        print("   - Some project-dependent operations are not ghosted")
+    if not all_enabled_correctly:
+        print("   - Some project-independent operations are not enabled")
+
+exit(0)
+

@@ -1,0 +1,87 @@
+# Test Full Project Lifecycle Script
+# This script tests the complete project workflow with UI verification
+
+print("=== Test Full Project Lifecycle Script ===")
+
+# Test 1: Initial state verification
+print("1. Initial state verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+# Test 2: Create new project
+print("\n2. Creating new project...")
+print("   Triggering New Project menu...")
+trigger_menu("Project", "New Project")
+print("   New Project menu triggered!")
+
+# Test 3: Verify project was created
+print("\n3. Verifying project creation:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+# Test 4: Check project info
+print("\n4. Checking project information:")
+if is_project_loaded():
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+    print("   Project description:", project_info.get("description", "Unknown"))
+else:
+    print("   ERROR: No project loaded after creation!")
+
+# Test 5: Test Sources menu (should be unghosted now)
+print("\n5. Testing Sources menu (should be unghosted):")
+print("   Can import source:", can_import_source())
+print("   Triggering Import Source menu...")
+trigger_menu("Sources", "Import Source")
+print("   Import Source menu triggered!")
+
+# Test 6: Test Objects menu (should be ghosted - no sources yet)
+print("\n6. Testing Objects menu (should be ghosted - no sources):")
+print("   Can create object:", can_create_object())
+print("   Has sources:", has_sources())
+
+# Test 7: Close project
+print("\n7. Closing project...")
+print("   Triggering Close Project menu...")
+trigger_menu("Project", "Close Project")
+print("   Close Project menu triggered!")
+
+# Test 8: Verify UI reset after close
+print("\n8. Verifying UI reset after close:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+# Test 9: Open project (this should fail since we don't have a real project file)
+print("\n9. Testing Open Project (should show dialog):")
+print("   Triggering Open Project menu...")
+trigger_menu("Project", "Open Project")
+print("   Open Project menu triggered!")
+
+# Test 10: Verify final state
+print("\n10. Final state verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+
+print("\n=== Test Script Completed ===")
+print("Expected behavior:")
+print("  - New Project should show a proper dialog with input fields")
+print("  - Dialog should allow user to enter project name and path")
+print("  - After creation, UI should be unghosted appropriately")
+print("  - Close Project should reset UI state")
+print("  - Open Project should show a file selection dialog")
+
+exit(0)
+

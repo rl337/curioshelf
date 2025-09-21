@@ -34,6 +34,7 @@ class EventType(Enum):
     HOTKEY_PRESSED = "hotkey_pressed"
     DIALOG_ACCEPTED = "dialog_accepted"
     DIALOG_REJECTED = "dialog_rejected"
+    SHOW_DIALOG = "show_dialog"
     SUCCESS = "success"
     ERROR = "error"
 

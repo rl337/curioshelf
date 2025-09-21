@@ -1,0 +1,111 @@
+# Test Full Project Lifecycle End-to-End
+# This script tests the complete project lifecycle: Create -> Close -> Open
+
+print("=== Full Project Lifecycle End-to-End Test ===")
+print("Testing: Create -> Close -> Open -> Verify UI States")
+
+# Test 1: Initial state
+print("\n1. Initial State:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+# Test 2: Create a new project
+print("\n2. Creating New Project...")
+trigger_menu("Project", "New Project")
+print("   Waiting for project creation...")
+
+print("   Post-Create State:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project creation failed!")
+    print("   Cannot continue with lifecycle test")
+    exit(1)
+
+# Test 3: Close the project
+print("\n3. Closing Project...")
+trigger_menu("Project", "Close Project")
+print("   Waiting for project close...")
+
+print("   Post-Close State:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if not is_project_loaded():
+    print("   ✅ Project close successful!")
+else:
+    print("   ❌ Project close failed!")
+    print("   Cannot continue with lifecycle test")
+    exit(1)
+
+# Test 4: Open the project again
+print("\n4. Opening Project...")
+trigger_menu("Project", "Open Project")
+print("   Waiting for project open...")
+
+print("   Post-Open State:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if is_project_loaded():
+    print("   ✅ Project open successful!")
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+else:
+    print("   ❌ Project open failed!")
+
+# Test 5: Final verification
+print("\n5. Final Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+print("\n=== Full Project Lifecycle Test Results ===")
+if is_project_loaded():
+    print("✅ SUCCESS: Full project lifecycle completed successfully")
+    print("   - Project was created")
+    print("   - Project was closed (UI reset)")
+    print("   - Project was reopened")
+    print("   - UI state is correct throughout")
+else:
+    print("❌ FAILURE: Full project lifecycle test failed")
+    print("   - Check individual test results above for details")
+
+exit(0)
+

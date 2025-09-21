@@ -1,0 +1,38 @@
+# Debug Project Dialog Script
+# This script will test the project dialog functionality in detail
+
+print("=== Debug Project Dialog Script ===")
+
+# Test 1: Check initial state
+print("1. Initial application state:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 2: Test New Project dialog
+print("\n2. Testing New Project dialog...")
+print("   Triggering New Project menu...")
+trigger_menu("Project", "New Project")
+print("   New Project menu triggered!")
+
+# Test 3: Wait and check state
+print("\n3. Checking state after New Project dialog...")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+# Test 4: Test Open Project dialog
+print("\n4. Testing Open Project dialog...")
+print("   Triggering Open Project menu...")
+trigger_menu("Project", "Open Project")
+print("   Open Project menu triggered!")
+
+# Test 5: Wait and check state
+print("\n5. Checking state after Open Project dialog...")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+
+print("\n=== Debug Script Completed ===")
+exit(0)
+

@@ -254,6 +254,55 @@ class Functions:
         # This is a placeholder - in a real implementation, this would
         # interact with the state machine's stack
         return "stack_value"  # Placeholder return value
+    
+    @staticmethod
+    @script_function("trigger_menu", "Trigger a menu item click event")
+    def trigger_menu(menu_name: str, item_name: str) -> None:
+        """Trigger a menu item click event.
+        
+        Args:
+            menu_name: Name of the menu (e.g., "Project", "Sources")
+            item_name: Name of the menu item (e.g., "New Project", "Import Source")
+        
+        Example:
+            trigger_menu("Project", "New Project")
+            trigger_menu("Sources", "Import Source")
+        """
+        # This function will be implemented to actually trigger UI events
+        # For now, it's a placeholder that will be handled by the script runtime
+        pass
+    
+    @staticmethod
+    @script_function("exit", "Gracefully exit the application")
+    def exit_app(exit_code: int = 0) -> None:
+        """Gracefully exit the application with the specified exit code.
+        
+        Args:
+            exit_code: Exit code to return (default: 0 for success)
+        
+        Example:
+            exit()           # Exit with code 0 (success)
+            exit(1)          # Exit with code 1 (error)
+        """
+        # This function will be implemented to actually exit the application
+        # For now, it's a placeholder that will be handled by the script runtime
+        pass
+    
+    @staticmethod
+    @script_function("get_project_structure", "Get the current project structure information")
+    def get_project_structure() -> dict:
+        """Get the current project structure information.
+        
+        Returns:
+            dict: Project structure containing sources, templates, objects, and metadata
+        
+        Example:
+            structure := get_project_structure()
+            print("Sources:", len(structure.get("sources", [])))
+        """
+        # This function will be implemented to actually get project structure
+        # For now, it's a placeholder that will be handled by the script runtime
+        return {}
 
 
 def get_functions() -> dict:

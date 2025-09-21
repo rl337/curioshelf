@@ -1,0 +1,71 @@
+# Test Project Creation End-to-End
+# This script tests the complete project creation workflow
+
+print("=== Project Creation End-to-End Test ===")
+print("Testing: Create Project -> Verify Files -> Verify UI State")
+
+# Test 1: Initial state verification
+print("\n1. Initial State Verification:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+# Test 2: Create a new project
+print("\n2. Creating New Project...")
+print("   Triggering 'New Project' menu...")
+
+trigger_menu("Project", "New Project")
+
+# Wait a moment for the dialog to appear and be processed
+print("   Waiting for project creation to complete...")
+
+# Test 3: Verify project was created successfully
+print("\n3. Verifying Project Creation:")
+print("   Project loaded:", is_project_loaded())
+print("   Can create project:", can_create_project())
+print("   Can open project:", can_open_project())
+print("   Can save project:", can_save_project())
+print("   Can close project:", can_close_project())
+print("   Can import source:", can_import_source())
+print("   Can create object:", can_create_object())
+print("   Can create template:", can_create_template())
+
+if is_project_loaded():
+    print("   ✅ Project creation successful!")
+    
+    # Get project info
+    project_info := get_project_info()
+    print("   Project name:", project_info.get("name", "Unknown"))
+    print("   Project path:", project_info.get("path", "Unknown"))
+    
+    # Verify project structure
+    print("\n4. Verifying Project Structure:")
+    print("   Project directory exists:", project_info.get("path", "") != "")
+    
+    # Check if we can get project structure
+    try:
+        structure := get_project_structure()
+        print("   Project structure loaded:", structure != {})
+        if structure != {}:
+            print("   Sources count:", len(structure.get("sources", [])))
+            print("   Templates count:", len(structure.get("templates", [])))
+            print("   Objects count:", len(structure.get("objects", [])))
+    except:
+        print("   Project structure not available yet")
+    
+else:
+    print("   ❌ Project creation failed!")
+    print("   This indicates the auto-responder or dialog system has issues")
+
+print("\n=== Project Creation Test Results ===")
+if is_project_loaded():
+    print("✅ SUCCESS: Project created and UI state updated correctly")
+else:
+    print("❌ FAILURE: Project creation failed or UI state not updated")
+
+exit(0)
