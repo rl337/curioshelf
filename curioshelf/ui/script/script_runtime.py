@@ -14,7 +14,7 @@ from .state_machine import StateMachine
 from .reflection import CommandReflector, create_command_reflector
 from .operators import get_operators, get_binary_operators, get_unary_operators
 from .functions import get_functions, get_function_help
-from .simple_parser import SimpleCurioParser
+from .recursive_descent_parser import RecursiveDescentParser
 
 
 class BudgetExceededError(Exception):
@@ -43,7 +43,7 @@ class ScriptRuntime:
         self.command_reflector = create_command_reflector(application_interface)
         self.operators = get_operators()
         self.functions = get_functions()
-        self.parser = SimpleCurioParser()
+        self.parser = RecursiveDescentParser(budget_checker=self._check_budget)
         
         # Execution budget system
         self.execution_budget = execution_budget
@@ -60,9 +60,14 @@ class ScriptRuntime:
             
             # Control structures
             'if_statement': 3,
-            'while_loop': 5,
             'foreach_loop': 5,
             'block': 1,
+            
+            # Parsing operations (reduced costs for complex scripts)
+            'parse_expression': 0,  # Free for basic expressions
+            'parse_dictionary': 2,  # Reduced cost
+            'parse_function_call': 1,  # Reduced cost
+            'parse_statement': 0,  # Free for basic statements
             
             # High-cost operations
             'project_operations': 20,
@@ -91,6 +96,11 @@ class ScriptRuntime:
                 operation
             )
         self.current_budget -= cost
+    
+    def _check_budget(self, operation: str) -> None:
+        """Check budget for a parsing operation"""
+        cost = self.command_costs.get(operation, 1)
+        self._consume_budget(cost, operation)
     
     def reset_budget(self) -> None:
         """Reset the execution budget to its initial value"""
@@ -221,6 +231,14 @@ class ScriptRuntime:
             # Handle variable references from the simple parser
             var_name = node['name']
             return self.state_machine.get_variable(var_name)
+        elif node_type == 'dictionary_access':
+            # Handle dictionary access like obj["key"]
+            obj = self._evaluate_expression(node['object'])
+            key = self._evaluate_expression(node['key'])
+            if isinstance(obj, dict):
+                return obj.get(key)
+            else:
+                raise TypeError(f"Cannot access key '{key}' on non-dictionary object: {type(obj)}")
         elif node_type == 'comparison':
             # Handle comparison expressions
             left = self._evaluate_expression(node['left'])
@@ -299,7 +317,18 @@ class ScriptRuntime:
             self._consume_budget(self.command_costs['command_call'], f'command_{statement["name"]}')
             cmd_name = statement['name']
             args = [self._evaluate_expression(arg) for arg in statement.get('args', [])]
-            return self.command_reflector.execute_command(cmd_name, *args)
+            
+            # First try to execute as a command
+            try:
+                return self.command_reflector.execute_command(cmd_name, *args)
+            except NameError:
+                # If not found as command, try as function
+                if cmd_name in self.functions:
+                    func_info = self.functions[cmd_name]
+                    func = func_info['function']
+                    return func(*args)
+                else:
+                    raise NameError(f"Command or function '{cmd_name}' not found")
         elif statement_type == 'if':
             self._consume_budget(self.command_costs['if_statement'], 'if_statement')
             condition = self._evaluate_expression(statement['condition'])
@@ -314,7 +343,12 @@ class ScriptRuntime:
                 # If no 'then' block, just return the condition result
                 return condition
             elif 'else' in statement:
-                return self.execute_statement(statement['else'])
+                # Execute each statement in the else block
+                results = []
+                for else_stmt in statement['else']:
+                    result = self.execute_statement(else_stmt)
+                    results.append(result)
+                return results[-1] if results else None
             else:
                 return False
         elif statement_type == 'foreach':
@@ -340,27 +374,7 @@ class ScriptRuntime:
                     results.append(item)
             
             return results
-        elif statement_type == 'while':
-            self._consume_budget(self.command_costs['while_loop'], 'while_loop')
-            condition = self._evaluate_expression(statement['condition'])
-            results = []
-            
-            while condition:
-                # Consume budget for each loop iteration
-                self._consume_budget(self.command_costs['while_loop'], 'while_loop_iteration')
-                if 'body' in statement:
-                    # Execute each statement in the body
-                    for body_stmt in statement['body']:
-                        result = self.execute_statement(body_stmt)
-                        results.append(result)
-                else:
-                    # If no body, just continue the loop
-                    pass
-                
-                # Re-evaluate the condition
-                condition = self._evaluate_expression(statement['condition'])
-            
-            return results
+        # While loops are not supported - use foreach with range instead
         elif statement_type == 'push':
             value = self._evaluate_expression(statement['value'])
             self.state_machine.push_value(value)
@@ -379,6 +393,9 @@ class ScriptRuntime:
                 result = self.execute_statement(stmt)
                 results.append(result)
             return results
+        elif statement_type == 'expression':
+            # Handle expression statements
+            return self._evaluate_expression(statement['value'])
         else:
             # Treat as expression
             return self._evaluate_expression(statement)

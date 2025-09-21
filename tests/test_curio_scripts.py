@@ -28,11 +28,12 @@ class CurioScriptTestRunner:
         # Create concrete test application for testing
         self.test_app = ConcreteTestApplicationImpl()
         
-        # Create script UI implementation
+        # Create script UI implementation with higher budget for complex tests
         self.script_ui = ScriptUIImplementation(
             verbose=False,  # Keep quiet during tests
             interactive=False,
-            application_interface=self.test_app
+            application_interface=self.test_app,
+            execution_budget=10000  # Higher budget for complex test scripts
         )
         
         # Initialize the UI
@@ -177,7 +178,7 @@ def test_curio_script(curio_script_runner, curio_script_path):
     elif "expect_normal_exit" in pragmas or not pragmas:
         # Script should succeed (default behavior)
         if not success:
-            pytest.fail(f"CurioScript test failed: {error_msg}")
+            pytest.fail(f"CurioScript test failed: {error_msg}") 
     
     else:
         # Unknown pragma

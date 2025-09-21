@@ -197,6 +197,21 @@ class Functions:
         print(f"[DEBUG] {value}")
     
     @staticmethod
+    @script_function("print", "Print a message to the console")
+    def print_func(*args) -> None:
+        """Print one or more values to the console.
+        
+        Args:
+            *args: Values to print (will be converted to strings and joined with spaces)
+        
+        Returns:
+            None
+        """
+        message = " ".join(str(arg) for arg in args)
+        print(f"[SCRIPT] {message}")
+        return None
+
+    @staticmethod
     @script_function("range", "Generate a range of numbers for iteration")
     def range_func(start: int, stop: int = None, step: int = 1) -> List[int]:
         """Generate a range of numbers for iteration, similar to Python's range().

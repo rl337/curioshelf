@@ -25,7 +25,7 @@ from .script_runtime import ScriptRuntime
 class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
     """Script implementation of the UI interface for programmatic control"""
     
-    def __init__(self, verbose: bool = True, interactive: bool = True, application_interface: Any = None):
+    def __init__(self, verbose: bool = True, interactive: bool = True, application_interface: Any = None, execution_budget: int = 1000):
         super().__init__(verbose)
         self._initialized = False
         self._running = False
@@ -34,7 +34,7 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
         self._grammar = ScriptGrammar()
         self._command_history: List[str] = []
         self._output_buffer: List[str] = []
-        self._script_runtime = ScriptRuntime(application_interface, verbose)
+        self._script_runtime = ScriptRuntime(application_interface, verbose, execution_budget)
         
     def initialize(self) -> bool:
         """Initialize the script UI implementation"""

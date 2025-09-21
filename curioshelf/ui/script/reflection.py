@@ -157,21 +157,69 @@ class CommandReflector:
         """Get all categories"""
         return list(self._categories.keys())
     
+    def _convert_arguments(self, func: Callable, args: tuple) -> tuple:
+        """Convert arguments based on function signature"""
+        try:
+            # Get function signature
+            sig = inspect.signature(func)
+            param_types = {}
+            
+            # Get type hints for parameters
+            type_hints = get_type_hints(func)
+            
+            converted_args = []
+            for i, (param_name, param) in enumerate(sig.parameters.items()):
+                if i >= len(args):
+                    break
+                    
+                arg_value = args[i]
+                param_type = type_hints.get(param_name)
+                
+                # Convert string to Path if parameter expects Path
+                if param_type and hasattr(param_type, '__origin__'):
+                    # Handle typing types like Path
+                    if param_type.__origin__ is type and issubclass(param_type.__args__[0], type):
+                        actual_type = param_type.__args__[0]
+                        if actual_type.__name__ == 'Path' and isinstance(arg_value, str):
+                            from pathlib import Path
+                            converted_args.append(Path(arg_value))
+                            continue
+                elif param_type and hasattr(param_type, '__name__'):
+                    # Handle direct type annotations
+                    if param_type.__name__ == 'Path' and isinstance(arg_value, str):
+                        from pathlib import Path
+                        converted_args.append(Path(arg_value))
+                        continue
+                
+                # No conversion needed
+                converted_args.append(arg_value)
+            
+            # Add any remaining unconverted args
+            converted_args.extend(args[len(converted_args):])
+            return tuple(converted_args)
+            
+        except Exception:
+            # If conversion fails, return original args
+            return args
+    
     def execute_command(self, name: str, *args, **kwargs) -> Any:
         """Execute a command by name with timeout-based budget consumption"""
         command_info = self.get_command(name)
         if not command_info:
             raise NameError(f"Command '{name}' not found")
         
+        # Convert arguments based on function signature
+        converted_args = self._convert_arguments(command_info['function'], args)
+        
         # Check if we have a budget system available
         budget_system = getattr(self, '_budget_system', None)
         
         if budget_system:
-            return self._execute_with_timeout_budget(command_info['function'], name, args, kwargs, budget_system)
+            return self._execute_with_timeout_budget(command_info['function'], name, converted_args, kwargs, budget_system)
         else:
             # Fallback to direct execution if no budget system
             try:
-                return command_info['function'](*args, **kwargs)
+                return command_info['function'](*converted_args, **kwargs)
             except Exception as e:
                 raise RuntimeError(f"Error executing command '{name}': {e}")
     

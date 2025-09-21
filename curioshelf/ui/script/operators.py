@@ -36,7 +36,15 @@ class Operators:
         """Add two values"""
         try:
             # Try numeric addition first
-            return float(left) + float(right)
+            left_val = float(left)
+            right_val = float(right)
+            result = left_val + right_val
+            
+            # Return integer if both operands were integers and result is whole
+            if (isinstance(left, int) and isinstance(right, int) and 
+                result.is_integer()):
+                return int(result)
+            return result
         except (ValueError, TypeError):
             # Fall back to string concatenation
             return str(left) + str(right)
@@ -45,13 +53,29 @@ class Operators:
     @binary_operator('-')
     def subtraction(left: Any, right: Any) -> Any:
         """Subtract two values"""
-        return float(left) - float(right)
+        left_val = float(left)
+        right_val = float(right)
+        result = left_val - right_val
+        
+        # Return integer if both operands were integers and result is whole
+        if (isinstance(left, int) and isinstance(right, int) and 
+            result.is_integer()):
+            return int(result)
+        return result
     
     @staticmethod
     @binary_operator('*')
     def multiplication(left: Any, right: Any) -> Any:
         """Multiply two values"""
-        return float(left) * float(right)
+        left_val = float(left)
+        right_val = float(right)
+        result = left_val * right_val
+        
+        # Return integer if both operands were integers and result is whole
+        if (isinstance(left, int) and isinstance(right, int) and 
+            result.is_integer()):
+            return int(result)
+        return result
     
     @staticmethod
     @binary_operator('/')
@@ -66,7 +90,15 @@ class Operators:
     @binary_operator('%')
     def modulo(left: Any, right: Any) -> Any:
         """Modulo operation"""
-        return float(left) % float(right)
+        left_val = float(left)
+        right_val = float(right)
+        result = left_val % right_val
+        
+        # Return integer if both operands were integers and result is whole
+        if (isinstance(left, int) and isinstance(right, int) and 
+            result.is_integer()):
+            return int(result)
+        return result
     
     @staticmethod
     @binary_operator('==')
