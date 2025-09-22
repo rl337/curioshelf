@@ -21,10 +21,10 @@ from curioshelf.ui.ui_factory import create_ui_factory
 class TestEventExecutionIntegration:
     """Test complete event execution flow with real project operations"""
     
-    def test_project_creation_flow(self, temp_project_dir):
+    def test_project_creation_flow(self, tmp_path):
         """Test complete project creation flow from UI event to file system"""
         # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
@@ -42,7 +42,7 @@ class TestEventExecutionIntegration:
             data={
                 "dialog_type": "project_dialog",
                 "is_new_project": True,
-                "project_path": str(temp_project_dir),
+                "project_path": str(tmp_path),
                 "project_info": metadata
             }
         )
@@ -51,27 +51,42 @@ class TestEventExecutionIntegration:
         event_bus.emit(event)
         
         # Verify project was created
-        assert (temp_project_dir / "curioshelf.json").exists()
+        assert (tmp_path / "curioshelf.json").exists()
         
         # Load and verify project structure
         project_manager = ProjectStructureManager()
-        structure = project_manager.load_project(temp_project_dir)
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         assert structure.metadata.name == "Test Project"
         assert structure.metadata.author == "Test User"
         
         # Verify directory structure was created
-        assert (temp_project_dir / "sources").exists()
-        assert (temp_project_dir / "templates").exists()
-        assert (temp_project_dir / "objects").exists()
-        assert (temp_project_dir / "build").exists()
-        assert (temp_project_dir / "config").exists()
-        assert (temp_project_dir / ".gitignore").exists()
+        assert (tmp_path / "sources").exists()
+        assert (tmp_path / "templates").exists()
+        assert (tmp_path / "objects").exists()
+        assert (tmp_path / "build").exists()
+        assert (tmp_path / "config").exists()
+        assert (tmp_path / ".gitignore").exists()
     
-    def test_project_loading_flow(self, temp_project_with_files):
+    def test_project_loading_flow(self, tmp_path):
         """Test project loading flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project to load
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for loading",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test loading the project
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
@@ -82,7 +97,7 @@ class TestEventExecutionIntegration:
             data={
                 "dialog_type": "project_dialog",
                 "is_new_project": False,
-                "project_path": str(temp_project_with_files)
+                "project_path": str(tmp_path)
             }
         )
         
@@ -95,15 +110,30 @@ class TestEventExecutionIntegration:
         assert project_info is not None
         assert project_info.name == "Test Project"
     
-    def test_save_project_flow(self, temp_project_with_files):
+    def test_save_project_flow(self, tmp_path):
         """Test project saving flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project to save
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for saving",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test saving the project
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit save project event
@@ -118,20 +148,35 @@ class TestEventExecutionIntegration:
         
         # Verify project was saved (check modified timestamp)
         project_manager = ProjectStructureManager()
-        structure = project_manager.load_project(temp_project_with_files)
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         # The modified timestamp should be recent
         assert structure.metadata.modified > structure.metadata.created
     
-    def test_close_project_flow(self, temp_project_with_files):
+    def test_close_project_flow(self, tmp_path):
         """Test project closing flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project to close
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for closing",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test closing the project
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit close project event
@@ -147,15 +192,30 @@ class TestEventExecutionIntegration:
         # Verify project was closed
         assert not app.is_project_loaded()
     
-    def test_create_object_flow(self, temp_project_with_files):
+    def test_create_object_flow(self, tmp_path):
         """Test object creation flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for object creation",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test object creation
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit create object event
@@ -178,15 +238,30 @@ class TestEventExecutionIntegration:
         object_names = [obj.name for obj in objects]
         assert "Test Object" in object_names
     
-    def test_create_template_flow(self, temp_project_with_files):
+    def test_create_template_flow(self, tmp_path):
         """Test template creation flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for template creation",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test template creation
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit create template event
@@ -209,15 +284,34 @@ class TestEventExecutionIntegration:
         template_names = [template.name for template in templates]
         assert "Test Template" in template_names
     
-    def test_import_source_flow(self, temp_project_with_files, sample_image_path):
+    def test_import_source_flow(self, tmp_path):
         """Test source import flow from UI event"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for source import",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Create a sample file to import
+        sample_file = tmp_path / "sample.txt"
+        sample_file.write_text("Sample content")
+        
+        # Now test source import
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit import source event
@@ -226,7 +320,7 @@ class TestEventExecutionIntegration:
             source="main_window",
             data={
                 "menu_item": "import_source",
-                "file_path": str(sample_image_path)
+                "file_path": str(sample_file)
             }
         )
         
@@ -238,12 +332,12 @@ class TestEventExecutionIntegration:
         assert len(sources) > 0
         # Check that the source file path is correct (should be relative to project)
         source_paths = [str(source.file_path) for source in sources]
-        assert any('sample.png' in path for path in source_paths)
+        assert any('sample.txt' in path for path in source_paths)
     
-    def test_error_handling_flow(self, temp_project_dir):
+    def test_error_handling_flow(self, tmp_path):
         """Test error handling in event execution flow"""
         # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
@@ -260,15 +354,30 @@ class TestEventExecutionIntegration:
         # Verify no project is loaded (error case)
         assert not app.is_project_loaded()
     
-    def test_hotkey_flow(self, temp_project_with_files):
+    def test_hotkey_flow(self, tmp_path):
         """Test hotkey event flow"""
-        # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        # First create a project
+        from curioshelf.projects.structure import ProjectStructureManager, ProjectMetadata
+        
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for hotkey flow",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test hotkey flow
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
         # Load project first
-        app.load_project(temp_project_with_files)
+        app.load_project(tmp_path)
         assert app.is_project_loaded()
         
         # Emit hotkey event
@@ -283,14 +392,14 @@ class TestEventExecutionIntegration:
         
         # Verify project was saved (check modified timestamp)
         project_manager = ProjectStructureManager()
-        structure = project_manager.load_project(temp_project_with_files)
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         assert structure.metadata.modified > structure.metadata.created
     
-    def test_multiple_events_flow(self, temp_project_dir):
+    def test_multiple_events_flow(self, tmp_path):
         """Test multiple events in sequence"""
         # Create UI factory and application
-        ui_factory = create_ui_factory("headless", verbose=False)
+        ui_factory = create_ui_factory("qt", verbose=False)
         app = CurioShelfApplicationImpl(ui_factory)
         event_layer = EventExecutionLayer(app)
         
@@ -308,7 +417,7 @@ class TestEventExecutionIntegration:
             data={
                 "dialog_type": "project_dialog",
                 "is_new_project": True,
-                "project_path": str(temp_project_dir),
+                "project_path": str(tmp_path),
                 "project_info": metadata
             }
         )
@@ -351,7 +460,7 @@ class TestEventExecutionIntegration:
         
         # Verify project structure
         project_manager = ProjectStructureManager()
-        structure = project_manager.load_project(temp_project_dir)
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         assert structure.metadata.name == "Multi Event Test Project"
 
@@ -412,7 +521,7 @@ class TestProjectStructure:
         assert restored.metadata.name == structure.metadata.name
         assert restored.sources_dir == structure.sources_dir
     
-    def test_project_manager_creation(self, temp_project_dir):
+    def test_project_manager_creation(self, tmp_path):
         """Test project creation with ProjectStructureManager"""
         project_manager = ProjectStructureManager()
         
@@ -423,53 +532,79 @@ class TestProjectStructure:
         )
         
         # Create project
-        success = project_manager.create_project(temp_project_dir, metadata)
+        success = project_manager.create_project(tmp_path, metadata)
         assert success
         
         # Verify project structure
-        assert (temp_project_dir / "curioshelf.json").exists()
-        assert (temp_project_dir / "sources").exists()
-        assert (temp_project_dir / "templates").exists()
-        assert (temp_project_dir / "objects").exists()
-        assert (temp_project_dir / "build").exists()
-        assert (temp_project_dir / "config").exists()
-        assert (temp_project_dir / ".gitignore").exists()
+        assert (tmp_path / "curioshelf.json").exists()
+        assert (tmp_path / "sources").exists()
+        assert (tmp_path / "templates").exists()
+        assert (tmp_path / "objects").exists()
+        assert (tmp_path / "build").exists()
+        assert (tmp_path / "config").exists()
+        assert (tmp_path / ".gitignore").exists()
         
         # Verify project can be loaded
-        structure = project_manager.load_project(temp_project_dir)
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         assert structure.metadata.name == "Manager Test Project"
     
-    def test_project_manager_loading(self, temp_project_with_files):
+    def test_project_manager_loading(self, tmp_path):
         """Test project loading with ProjectStructureManager"""
-        project_manager = ProjectStructureManager()
+        # First create a project
+        from curioshelf.projects.structure import ProjectMetadata
         
-        # Load project
-        structure = project_manager.load_project(temp_project_with_files)
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for loading",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test loading
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         assert structure.metadata.name == "Test Project"
         
         # Verify is_project check
-        assert project_manager.is_project(temp_project_with_files)
-        assert not project_manager.is_project(temp_project_with_files.parent)
+        assert project_manager.is_project(tmp_path)
+        assert not project_manager.is_project(tmp_path.parent)
     
-    def test_project_manager_saving(self, temp_project_with_files):
+    def test_project_manager_saving(self, tmp_path):
         """Test project saving with ProjectStructureManager"""
-        project_manager = ProjectStructureManager()
+        # First create a project
+        from curioshelf.projects.structure import ProjectMetadata
         
-        # Load project
-        structure = project_manager.load_project(temp_project_with_files)
+        # Create project metadata
+        metadata = ProjectMetadata(
+            name="Test Project",
+            description="Test project for saving",
+            author="Test User"
+        )
+        
+        # Create project structure
+        project_manager = ProjectStructureManager()
+        success = project_manager.create_project(tmp_path, metadata)
+        assert success, "Failed to create test project"
+        
+        # Now test loading and saving
+        structure = project_manager.load_project(tmp_path)
         assert structure is not None
         
         # Modify metadata
         structure.metadata.description = "Modified description"
         
         # Save project
-        success = project_manager.save_project(temp_project_with_files, structure)
+        success = project_manager.save_project(tmp_path, structure)
         assert success
         
         # Reload and verify changes
-        reloaded = project_manager.load_project(temp_project_with_files)
+        reloaded = project_manager.load_project(tmp_path)
         assert reloaded is not None
         assert reloaded.metadata.description == "Modified description"
         assert reloaded.metadata.modified > reloaded.metadata.created

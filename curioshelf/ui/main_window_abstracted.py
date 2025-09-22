@@ -10,7 +10,7 @@ from pathlib import Path
 
 from curioshelf.application_interface import ApplicationInterface
 from curioshelf.application import CurioShelfApplication
-from curioshelf.mock_application import MockCurioShelfApplication
+from tests.mock_application import MockCurioShelfApplication
 from curioshelf.app_impl.application_impl import CurioShelfApplicationImpl
 from curioshelf.projects import ProjectInfo
 from curioshelf.event_system import (

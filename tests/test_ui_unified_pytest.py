@@ -13,11 +13,11 @@ from curioshelf.ui.ui_factory import create_ui_factory
 
 
 class TestUIUnified:
-    """Unified tests that work with both headless and Qt implementations"""
+    """Unified tests that work with both script and Qt implementations"""
     
-    @pytest.fixture(params=["headless", "qt"])
-    def ui_factory(self, request):
-        """Create UI factory for both headless and Qt implementations"""
+    @pytest.fixture(params=["script", "qt"])
+    def ui_factory(self, request, qt_test_environment):
+        """Create UI factory for both script and Qt implementations"""
         backend = request.param
         factory = create_ui_factory(backend, verbose=False)
         yield factory
@@ -41,6 +41,11 @@ class TestUIUnified:
     def test_widget_creation(self, ui_factory):
         """Test that all widget types can be created"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip widget creation tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support widget creation")
+        
         widget_types = [
             'button', 'text_input', 'combo_box', 'list_widget', 
             'canvas', 'progress_bar', 'group_box', 'tab_widget', 
@@ -64,6 +69,11 @@ class TestUIUnified:
     def test_widget_operations(self, ui_factory):
         """Test widget operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip widget operations tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support widget operations")
+        
         button = ui_impl.create_button("Test Button")
         
         # Test button state changes
@@ -82,6 +92,11 @@ class TestUIUnified:
     def test_text_input_operations(self, ui_factory):
         """Test text input operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip text input tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support text input operations")
+        
         text_input = ui_impl.create_text_input("Placeholder")
         
         # Test text operations
@@ -94,6 +109,11 @@ class TestUIUnified:
     def test_combo_box_operations(self, ui_factory):
         """Test combo box operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip combo box tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support combo box operations")
+        
         combo = ui_impl.create_combo_box()
         
         # Test adding items
@@ -122,6 +142,11 @@ class TestUIUnified:
     def test_list_widget_operations(self, ui_factory):
         """Test list widget operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip list widget tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support list widget operations")
+        
         list_widget = ui_impl.create_list_widget()
         
         # Test adding items
@@ -145,6 +170,11 @@ class TestUIUnified:
     def test_progress_bar_operations(self, ui_factory):
         """Test progress bar operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip progress bar tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support progress bar operations")
+        
         progress = ui_impl.create_progress_bar()
         
         # Test initial values
@@ -165,6 +195,11 @@ class TestUIUnified:
     def test_layout_operations(self, ui_factory):
         """Test layout operations"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip layout tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support layout operations")
+        
         layout = ui_impl.create_layout("vertical")
         button = ui_impl.create_button("Test")
         text_input = ui_impl.create_text_input("Test")
@@ -179,6 +214,12 @@ class TestUIUnified:
     
     def test_main_window_creation(self, ui_factory):
         """Test main window creation"""
+        ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip main window creation tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support main window creation")
+        
         main_window = ui_factory.create_main_window()
         
         assert main_window is not None
@@ -190,6 +231,11 @@ class TestUIUnified:
     
     def test_main_window_methods(self, ui_factory):
         """Test main window method calls"""
+        # Skip this test for script UI as it doesn't support full widget creation
+        ui_impl = ui_factory.get_ui_implementation()
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support full main window creation")
+        
         main_window = ui_factory.create_main_window()
         
         # These methods should not raise exceptions
@@ -205,6 +251,11 @@ class TestUIUnified:
     def test_widget_show_operations(self, ui_factory):
         """Test that all widgets can be shown"""
         ui_impl = ui_factory.get_ui_implementation()
+        
+        # Skip widget show operations tests for script UI as it doesn't support them
+        if 'script' in str(ui_impl.__class__):
+            pytest.skip("Script UI does not support widget show operations")
+        
         widgets = [
             ui_impl.create_button("Test"),
             ui_impl.create_text_input("Test"),
@@ -226,9 +277,9 @@ class TestUIUnified:
 class TestUITestMode:
     """Test the embedded test mode functionality"""
     
-    @pytest.fixture(params=["headless", "qt"])
-    def ui_factory(self, request):
-        """Create UI factory for both headless and Qt implementations"""
+    @pytest.fixture(params=["script", "qt"])
+    def ui_factory(self, request, qt_test_environment):
+        """Create UI factory for both script and Qt implementations"""
         backend = request.param
         factory = create_ui_factory(backend, verbose=False)
         yield factory

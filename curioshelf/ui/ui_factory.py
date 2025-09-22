@@ -13,7 +13,7 @@ from typing import Optional
 from .ui_interface import create_ui_implementation, UIImplementationError
 
 # Import implementations to register them
-from . import debug
+# Debug UI moved to tests/support/debug
 from . import script
 
 # Try to import Qt implementation (may fail if PySide6 not available)

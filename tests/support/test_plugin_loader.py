@@ -14,8 +14,8 @@ if str(test_support_path) not in sys.path:
     sys.path.insert(0, str(test_support_path))
 
 from curioshelf.plugin_system import plugin_manager
-from test_support.plugins.qt_heartbeat_plugin import QtHeartbeatPlugin
-from test_support.plugins.qt_dialog_responder_plugin import QtDialogResponderPlugin
+from tests.support.plugins.qt_heartbeat_plugin import QtHeartbeatPlugin
+from tests.support.plugins.qt_dialog_responder_plugin import QtDialogResponderPlugin
 
 
 def load_test_plugins():

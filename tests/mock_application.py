@@ -9,11 +9,11 @@ from typing import Any, Dict, List, Optional, Callable
 from pathlib import Path
 import logging
 
-from .application_interface import ApplicationInterface
-from .models import AssetSource, Template, CurioObject
-from .projects import ProjectInfo
-from .event_system import event_bus, UIEvent, EventType
-from .status_bar_handler import (
+from curioshelf.application_interface import ApplicationInterface
+from curioshelf.models import AssetSource, Template, CurioObject
+from curioshelf.projects import ProjectInfo
+from curioshelf.event_system import event_bus, UIEvent, EventType
+from curioshelf.status_bar_handler import (
     emit_project_status, emit_asset_status, emit_info_message, 
     emit_error_message, emit_progress_update
 )

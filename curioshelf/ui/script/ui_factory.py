@@ -160,12 +160,19 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
             result = self._script_runtime.execute_statement(statement)
             
             # Check if the script requested an exit
-            if self._script_runtime.state_machine.get_variable("_script_exit_requested"):
-                exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code", 0)
-                if self.verbose:
-                    print(f"[SCRIPT] Exit requested with code: {exit_code}")
-                self._running = False
-                return
+            try:
+                if self._script_runtime.state_machine.get_variable("_script_exit_requested"):
+                    try:
+                        exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code")
+                    except NameError:
+                        exit_code = 0
+                    if self.verbose:
+                        print(f"[SCRIPT] Exit requested with code: {exit_code}")
+                    self._running = False
+                    return
+            except NameError:
+                # _script_exit_requested not set, continue normally
+                pass
             
             if result is not None:
                 self._output_buffer.append(f"Result: {result}")
@@ -296,6 +303,12 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a status bar (not applicable for script UI)"""
         raise NotImplementedError("Script UI does not support widget creation")
     
+    def create_main_widget(self, parent: Optional['UIWidget'] = None) -> 'UIWidget':
+        """Create a main widget for the main window"""
+        # For script UI, we'll create a simple widget that can be used as main widget
+        from curioshelf.ui.abstraction import UIWidget
+        return UIWidget()
+    
     # Required abstract methods from UIImplementationInterface
     def create_pixmap(self, width: int, height: int) -> Any:
         """Create a pixmap (not applicable for script UI)"""
@@ -334,7 +347,10 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
             # Check if script requested exit
             try:
                 if self._script_runtime.state_machine.get_variable("_script_exit_requested"):
-                    exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code", 0)
+                    try:
+                        exit_code = self._script_runtime.state_machine.get_variable("_script_exit_code")
+                    except NameError:
+                        exit_code = 0
                     if self.verbose:
                         print(f"[SCRIPT] Exit requested with code: {exit_code}")
                     self._running = False

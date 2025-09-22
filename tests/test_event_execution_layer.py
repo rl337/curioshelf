@@ -11,7 +11,7 @@ from unittest.mock import Mock, MagicMock
 
 from curioshelf.event_execution_layer import EventExecutionLayer, EventExecutor
 from curioshelf.event_system import UIEvent, EventType, EventBus, event_bus
-from curioshelf.mock_application import MockCurioShelfApplication
+from tests.mock_application import MockCurioShelfApplication
 
 
 class TestEventExecutionLayer:

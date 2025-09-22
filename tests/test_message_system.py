@@ -14,7 +14,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from curioshelf.ui.ui_factory import create_ui_factory
-from curioshelf.ui.debug.message_system import MessageCollector, MessageType
+from tests.support.debug.message_system import MessageCollector, MessageType
 
 
 class TestMessageCollection:

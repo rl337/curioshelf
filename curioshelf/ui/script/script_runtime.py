@@ -82,7 +82,7 @@ class ScriptRuntime:
     def _setup_auto_responder(self, application_interface: Any):
         """Setup auto-responder for dialogs during scripted testing"""
         try:
-            from test_support.test_plugin_loader import get_dialog_responder, get_heartbeat_monitor
+            from tests.support.test_plugin_loader import get_dialog_responder, get_heartbeat_monitor
             import tempfile
             
             # Get auto-responder from plugin system

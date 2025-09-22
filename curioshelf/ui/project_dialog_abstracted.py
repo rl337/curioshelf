@@ -247,7 +247,7 @@ class ProjectDialogAbstracted(UIWidget):
         # Import here to avoid circular imports
         from .qtimpl.project_dialog import QtProjectDialog
         from PySide6.QtWidgets import QDialog
-        from .dialog_auto_responder import get_auto_responder
+        from tests.support.dialog_auto_responder import get_auto_responder
         
         # Create and show the Qt dialog
         dialog = QtProjectDialog(mode=self.mode)
@@ -258,7 +258,7 @@ class ProjectDialogAbstracted(UIWidget):
         
         # Setup auto-responder for scripted testing (only if test plugins are loaded)
         try:
-            from test_support.test_plugin_loader import get_dialog_responder
+            from tests.support.test_plugin_loader import get_dialog_responder
             auto_responder = get_dialog_responder()
             if auto_responder and auto_responder.enabled:
                 print(f"[PROJECT DIALOG] Auto-responder enabled, will auto-respond to dialog")

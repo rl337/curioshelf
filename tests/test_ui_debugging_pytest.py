@@ -15,7 +15,7 @@ from tests.ui_debug import (
     create_debugger, UIDebugger, DebugMessage, DebugMessageType,
     UIDebugMixin, UIRemoteController
 )
-from curioshelf.ui.debug.message_system import MessageType
+from tests.support.debug.message_system import MessageType
 from curioshelf.ui.ui_factory import create_ui_factory
 
 

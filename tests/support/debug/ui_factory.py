@@ -9,12 +9,12 @@ and debugging purposes.
 from typing import Any, Optional, Dict, List
 from pathlib import Path
 
-from ..abstraction import (
+from curioshelf.ui.abstraction import (
     UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
-from ..factory_interface import UIFactoryInterface
+from curioshelf.ui.factory_interface import UIFactoryInterface
 from .ui_widgets import (
     DebugUIWidget, DebugUIButton, DebugUITextInput, DebugUIComboBox, 
     DebugUIListWidget, DebugUICanvas, DebugUIMessageBox, DebugUIFileDialog, 
@@ -22,7 +22,7 @@ from .ui_widgets import (
     DebugUILayout, DebugUIMenuBar, DebugUIMenu, DebugUIMenuItem, DebugUIStatusBar
 )
 from .message_system import MessageLogger, MessageType
-from ..ui_interface import UIImplementationInterface, UIImplementationError
+from curioshelf.ui.ui_interface import UIImplementationInterface, UIImplementationError
 
 
 class DebugUIImplementation(UIImplementationInterface, UIFactoryInterface):
@@ -299,7 +299,7 @@ DebugUIFactory = DebugUIImplementation
 
 
 # Register the implementation
-from ..ui_interface import UIImplementationRegistry
+from curioshelf.ui.ui_interface import UIImplementationRegistry
 UIImplementationRegistry.register("debug", DebugUIImplementation)
 
 

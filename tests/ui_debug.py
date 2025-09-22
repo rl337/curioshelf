@@ -60,25 +60,56 @@ class UIDebugger:
         self.message_queue = queue.Queue()
         self.subscribers: List[Callable[[DebugMessage], None]] = []
         self.thread_id = threading.get_ident()
+        self._stop_event = threading.Event()
+        self._processor_thread = None
         
         # Start message processing thread
         if self.enabled:
             self._start_message_processor()
     
+    def __del__(self):
+        """Destructor to ensure cleanup"""
+        try:
+            self.cleanup()
+        except:
+            pass  # Ignore errors during destruction
+    
     def _start_message_processor(self):
         """Start the message processing thread"""
         def process_messages():
-            while True:
-                try:
-                    message = self.message_queue.get(timeout=1.0)
-                    self._process_message(message)
-                except queue.Empty:
-                    continue
-                except Exception as e:
-                    print(f"Error processing debug message: {e}")
+            try:
+                while not self._stop_event.is_set():
+                    try:
+                        message = self.message_queue.get(timeout=1.0)
+                        self._process_message(message)
+                    except queue.Empty:
+                        continue
+                    except Exception as e:
+                        print(f"Error processing debug message: {e}")
+            except Exception as e:
+                print(f"Fatal error in message processor: {e}")
+            finally:
+                print("[UI DEBUG] Message processor thread exiting")
         
-        thread = threading.Thread(target=process_messages, daemon=True)
-        thread.start()
+        self._processor_thread = threading.Thread(target=process_messages, daemon=True, name="UIDebugProcessor")
+        self._processor_thread.start()
+        print(f"[UI DEBUG] Started message processor thread: {self._processor_thread.name}")
+    
+    def cleanup(self):
+        """Cleanup the debug system and stop threads"""
+        print("[UI DEBUG] Starting cleanup...")
+        if self._processor_thread and self._processor_thread.is_alive():
+            print("[UI DEBUG] Stopping message processor thread...")
+            self._stop_event.set()
+            self._processor_thread.join(timeout=2.0)
+            if self._processor_thread.is_alive():
+                print("[UI DEBUG] Warning: Thread did not stop gracefully")
+            else:
+                print("[UI DEBUG] Thread stopped successfully")
+        else:
+            print("[UI DEBUG] No active thread to cleanup")
+        self._processor_thread = None
+        print("[UI DEBUG] Cleanup completed")
     
     def _process_message(self, message: DebugMessage):
         """Process a debug message"""
@@ -279,3 +310,13 @@ def set_global_debugger(debugger: UIDebugger):
 def create_debugger(enabled: bool = True, log_file: Optional[Path] = None) -> UIDebugger:
     """Create a new debugger instance"""
     return UIDebugger(enabled=enabled, log_file=log_file)
+
+
+def cleanup_global_debugger():
+    """Cleanup the global debugger instance"""
+    global _global_debugger
+    if _global_debugger:
+        print("[UI DEBUG] Cleaning up global debugger...")
+        _global_debugger.cleanup()
+        _global_debugger = None
+        print("[UI DEBUG] Global debugger cleaned up")

@@ -146,7 +146,7 @@ def main():
             app_instance = main_window.app
             
             # Load test plugins for scripted execution
-            from test_support.test_plugin_loader import load_test_plugins, initialize_test_plugins, get_heartbeat_monitor
+            from tests.support.test_plugin_loader import load_test_plugins, initialize_test_plugins, get_heartbeat_monitor
             
             # Load and initialize test plugins
             load_test_plugins()

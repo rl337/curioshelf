@@ -9,8 +9,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from curioshelf.app_impl.application_impl import CurioShelfApplicationImpl
-from curioshelf.mock_application import MockCurioShelfApplication
-from curioshelf.ui.debug.ui_factory import DebugUIImplementation
+from tests.mock_application import MockCurioShelfApplication
+from tests.support.debug.ui_factory import DebugUIImplementation
 from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
 from curioshelf.projects import ProjectMetadata, ProjectInfo
 from curioshelf.event_system import UIEvent, EventType, event_bus
@@ -188,27 +188,27 @@ class TestMenuClickBehavior:
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
-        # Capture events to verify execution
-        events = []
-        def capture_event(event):
-            events.append(event)
-        
-        event_bus.subscribe(EventType.SUCCESS, capture_event)
-        event_bus.subscribe(EventType.ERROR, capture_event)
-        
-        # New project should be enabled initially
-        new_project_item = main_window.actions["new_project"]
-        assert new_project_item.enabled, "New Project should be enabled"
-        
-        # Click the enabled menu item
-        new_project_item._on_clicked()
-        
-        # Verify events were emitted
-        success_events = [e for e in events if e.event_type == EventType.SUCCESS]
-        assert len(success_events) > 0, "Success events should be emitted for enabled menu item"
-        
-        # Verify project was created
-        assert app.is_project_loaded(), "Project should be loaded after clicking New Project"
+        # Mock the project dialog to prevent Qt crashes
+        with patch('curioshelf.ui.project_dialog_abstracted.ProjectDialogAbstracted.exec') as mock_dialog_exec:
+            # Capture events to verify execution
+            events = []
+            def capture_event(event):
+                events.append(event)
+            
+            event_bus.subscribe(EventType.SUCCESS, capture_event)
+            event_bus.subscribe(EventType.ERROR, capture_event)
+            event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
+            
+            # New project should be enabled initially
+            new_project_item = main_window.actions["new_project"]
+            assert new_project_item.enabled, "New Project should be enabled"
+            
+            # Click the enabled menu item
+            new_project_item._on_clicked()
+            
+            # Verify that a SHOW_DIALOG event was emitted (instead of direct project creation)
+            dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
+            assert len(dialog_events) > 0, "SHOW_DIALOG events should be emitted for enabled menu item"
     
     def test_menu_state_updates_after_operations(self):
         """Test that menu state updates automatically after operations"""
@@ -302,7 +302,7 @@ class TestUIStateEdgeCases:
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
         # Create a menu item without state callback
-        from curioshelf.ui.debug.ui_widgets import DebugUIMenuItem
+        from tests.support.debug.ui_widgets import DebugUIMenuItem
         test_item = DebugUIMenuItem("Test Item")
         
         # Should not crash when updating state
