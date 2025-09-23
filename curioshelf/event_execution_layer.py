@@ -256,8 +256,9 @@ class EventExecutor:
                     data={"action": "import_source", "error": f"Failed to import source: {file_path}"}
                 ))
         else:
-            # This will typically trigger a file dialog
-            self.logger.info("Import source command - should show file dialog")
+            # Show file dialog for source import
+            self.logger.info("Import source command - showing file dialog")
+            self._show_import_source_dialog()
     
     def _execute_create_object(self, data: Dict[str, Any]) -> None:
         """Execute object creation"""
@@ -382,6 +383,21 @@ class EventExecutor:
     def _execute_project_dialog_rejected(self, data: Dict[str, Any]) -> None:
         """Handle project dialog rejection"""
         self.logger.info("Project dialog rejected - no action taken")
+    
+    def _show_import_source_dialog(self) -> None:
+        """Show file dialog for importing source"""
+        # Emit event to show file dialog
+        event_bus.emit(UIEvent(
+            event_type=EventType.SHOW_DIALOG,
+            source="event_executor",
+            data={
+                "dialog_type": "file_dialog",
+                "mode": "import_source",
+                "action": "import_source",
+                "title": "Import Source Image",
+                "filter": "Image Files (*.png *.jpg *.jpeg *.svg *.bmp *.gif);;All Files (*)"
+            }
+        ))
     
     def execute_file_dialog_result(self, dialog_type: str, file_path: Optional[Path], data: Dict[str, Any] = None) -> None:
         """Execute a file dialog result"""

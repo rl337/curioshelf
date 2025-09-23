@@ -65,6 +65,14 @@ class StatusBarEventHandler:
         
         if self.status_bar and hasattr(self.status_bar, 'set_message'):
             self.status_bar.set_message(f"Info: {info_message}")
+    
+    def cleanup(self) -> None:
+        """Clean up the status bar event handler"""
+        # Unsubscribe from events
+        event_bus.unsubscribe(EventType.STATUS_MESSAGE, self._handle_status_message)
+        event_bus.unsubscribe(EventType.PROGRESS_UPDATE, self._handle_progress_update)
+        event_bus.unsubscribe(EventType.ERROR_MESSAGE, self._handle_error_message)
+        event_bus.unsubscribe(EventType.INFO_MESSAGE, self._handle_info_message)
 
 
 def emit_status_message(message: str, source: str = "system") -> None:

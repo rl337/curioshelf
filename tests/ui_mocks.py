@@ -10,7 +10,7 @@ from pathlib import Path
 from dataclasses import dataclass
 
 from curioshelf.ui.abstraction import (
-    UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
+    UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UIListItem, UICanvas,
     UIDialog, UIMessageBox, UIFileDialog, UIProgressBar, UILayout,
     UIGroupBox, UITabWidget, UISplitter
 )
@@ -69,6 +69,11 @@ class MockTextInput(UITextInput):
 
 class MockComboBox(UIComboBox):
     """Mock combo box implementation"""
+    pass
+
+
+class MockUIListItem(UIListItem):
+    """Mock list item implementation"""
     pass
 
 
@@ -179,6 +184,14 @@ class MockFileDialog(UIFileDialog):
             return result
         return None
     
+    def get_existing_directory(self, title: str, directory: str = "") -> Optional[str]:
+        """Get an existing directory path"""
+        if self._open_index < len(self._open_responses):
+            result = self._open_responses[self._open_index]
+            self._open_index += 1
+            return result
+        return None
+    
     def set_open_responses(self, responses: List[Optional[str]]):
         """Set the responses for open file dialogs"""
         self._open_responses = responses
@@ -210,6 +223,10 @@ class MockLayout(UILayout):
     def remove_widget(self, widget: UIWidget):
         if widget in self._widgets:
             self._widgets.remove(widget)
+    
+    def insert_widget(self, index: int, widget: UIWidget, *args, **kwargs):
+        """Insert a widget at a specific index in the layout"""
+        self._widgets.insert(index, widget)
     
     def get_widgets(self) -> List[UIWidget]:
         return self._widgets.copy()

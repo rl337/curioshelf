@@ -73,6 +73,7 @@ class MainWindowAbstracted:
     def _register_event_handlers(self) -> None:
         """Register event handlers for dialog events"""
         event_bus.subscribe(EventType.SHOW_DIALOG, self._handle_show_dialog)
+        event_bus.subscribe(EventType.UI_STATE_CHANGED, self._handle_ui_state_changed)
     
     def _handle_show_dialog(self, event: UIEvent) -> None:
         """Handle show dialog events"""
@@ -88,8 +89,53 @@ class MainWindowAbstracted:
                 self.show_project_dialog(create_mode=True)
             elif mode == 'open':
                 self.show_project_dialog(create_mode=False)
+        elif dialog_type == 'file_dialog':
+            print(f"[DEBUG] Showing file dialog for {mode}")
+            self._show_file_dialog(event.data)
         else:
             print(f"[DEBUG] Unknown dialog type: {dialog_type}")
+    
+    def _show_file_dialog(self, data: Dict[str, Any]) -> None:
+        """Show file dialog based on event data"""
+        mode = data.get('mode')
+        title = data.get('title', 'Select File')
+        file_filter = data.get('filter', 'All Files (*)')
+        
+        print(f"[DEBUG] Showing file dialog: {title}")
+        
+        file_dialog = self.ui.create_file_dialog()
+        
+        # Set default directory based on mode
+        if mode == 'import_source':
+            # For import source, start from the default project directory
+            from curioshelf.config import config
+            default_dir = str(config.get_default_project_directory())
+            file_path = file_dialog.get_open_file_name(title, file_filter, default_dir)
+        else:
+            file_path = file_dialog.get_open_file_name(title, file_filter)
+        
+        if file_path:
+            print(f"[DEBUG] File selected: {file_path}")
+            # Execute the file dialog result through the existing event execution layer
+            self.event_layer.execute_file_dialog_result(mode, Path(file_path))
+        else:
+            print(f"[DEBUG] File dialog cancelled")
+    
+    def _handle_ui_state_changed(self, event: UIEvent) -> None:
+        """Handle UI state change events"""
+        print(f"[DEBUG] Received UI_STATE_CHANGED event: {event.data}")
+        
+        # Prevent recursive updates
+        if hasattr(self, '_updating_menu_state') and self._updating_menu_state:
+            print(f"[DEBUG] Already updating menu state, skipping to prevent recursion")
+            return
+        
+        self._updating_menu_state = True
+        try:
+            self._update_menu_state()
+            print(f"[DEBUG] Menu state updated")
+        finally:
+            self._updating_menu_state = False
     
     def setup_ui(self):
         """Setup the user interface using abstraction layer"""
@@ -123,31 +169,30 @@ class MainWindowAbstracted:
         
         # Add placeholder tabs with some content
         placeholder1 = self.ui.create_widget(parent=self.main_widget)
+        placeholder1_layout = self.ui.create_layout("vertical", parent=placeholder1)
+        placeholder1.set_layout(placeholder1_layout)
+        
         placeholder1_label = self.ui.create_text_input(parent=placeholder1)
         placeholder1_label.set_text("Sources tab - Load a project to see sources")
         placeholder1_label.set_enabled(False)  # Make it read-only
+        placeholder1_layout.add_widget(placeholder1_label)
         
         placeholder2 = self.ui.create_widget(parent=self.main_widget)
+        placeholder2_layout = self.ui.create_layout("vertical", parent=placeholder2)
+        placeholder2.set_layout(placeholder2_layout)
+        
         placeholder2_label = self.ui.create_text_input(parent=placeholder2)
         placeholder2_label.set_text("Templates tab - Load a project to see templates")
         placeholder2_label.set_enabled(False)  # Make it read-only
+        placeholder2_layout.add_widget(placeholder2_label)
         
         placeholder3 = self.ui.create_widget(parent=self.main_widget)
+        placeholder3_layout = self.ui.create_layout("vertical", parent=placeholder3)
+        placeholder3.set_layout(placeholder3_layout)
+        
         placeholder3_label = self.ui.create_text_input(parent=placeholder3)
         placeholder3_label.set_text("Objects tab - Load a project to see objects")
         placeholder3_label.set_enabled(False)  # Make it read-only
-        
-        # Create layouts for placeholder tabs
-        placeholder1_layout = self.ui.create_layout("vertical", parent=placeholder1)
-        placeholder1.set_layout(placeholder1_layout)
-        placeholder1_layout.add_widget(placeholder1_label)
-        
-        placeholder2_layout = self.ui.create_layout("vertical", parent=placeholder2)
-        placeholder2.set_layout(placeholder2_layout)
-        placeholder2_layout.add_widget(placeholder2_label)
-        
-        placeholder3_layout = self.ui.create_layout("vertical", parent=placeholder3)
-        placeholder3.set_layout(placeholder3_layout)
         placeholder3_layout.add_widget(placeholder3_label)
         
         self.tab_widget.add_tab(placeholder1, "Sources")
@@ -269,6 +314,10 @@ class MainWindowAbstracted:
         for action_name, action in self.actions.items():
             if hasattr(action, 'update_all_states'):
                 action.update_all_states()
+            
+            # Explicitly update the enabled state if the callback exists
+            if hasattr(action, 'update_state') and action.has_state_callback('enabled'):
+                action.update_state('enabled')
     
     def _handle_menu_click(self, menu_name: str, command) -> None:
         """Handle menu item click by emitting events to the event execution layer"""

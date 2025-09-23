@@ -120,6 +120,32 @@ class UIWidget(ABC):
         """Update all widget states based on their callbacks"""
         for state_name in self._state_callbacks:
             self.update_state(state_name)
+    
+    def cleanup(self) -> None:
+        """Clean up the widget and its resources"""
+        # This would be implemented by concrete classes
+        pass
+
+
+class UILabel(UIWidget):
+    """Abstract label interface"""
+    
+    def __init__(self) -> None:
+        super().__init__()
+        self._text = ""
+    
+    def set_text(self, text: str) -> None:
+        """Set the text content of the label"""
+        self._text = text
+    
+    def get_text(self) -> str:
+        """Get the text content of the label"""
+        return self._text
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the label"""
+        # This would be implemented by concrete classes
+        pass
 
 
 class UIButton(UIWidget):
@@ -155,6 +181,11 @@ class UIButton(UIWidget):
     def set_visible_callback(self, callback: Callable[[], bool]) -> None:
         """Set a callback that determines if the button should be visible"""
         self.set_state_callback("visible", callback)
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the button"""
+        # This would be implemented by concrete classes
+        pass
 
 
 class UITextInput(UIWidget):
@@ -191,6 +222,15 @@ class UITextInput(UIWidget):
         self._text = text
         if old_text != text:
             self.emit_signal("text_changed", text)
+    
+    def get_text(self) -> str:
+        """Get the current text"""
+        return self._text
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the text input"""
+        # This would be implemented by concrete classes
+        pass
 
 
 class UIComboBox(UIWidget):
@@ -201,9 +241,15 @@ class UIComboBox(UIWidget):
         self._items: List[tuple[str, Any]] = []  # (text, data) pairs
         self._current_index = -1
     
-    def add_item(self, text: str, data: Any = None) -> None:
-        """Add an item to the combo box"""
-        self._items.append((text, data))
+    def add_item(self, text_or_item, data: Any = None) -> None:
+        """Add an item to the combo box. Can accept either text+data or a UIListItem."""
+        if isinstance(text_or_item, str):
+            # Old calling pattern: add_item(text, data)
+            self._items.append((text_or_item, data))
+        else:
+            # New calling pattern: add_item(UIListItem)
+            item = text_or_item
+            self._items.append((item.get_text(), item.get_data()))
     
     def clear(self) -> None:
         """Clear all items"""
@@ -241,9 +287,15 @@ class UIListWidget(UIWidget):
         self._items: List[tuple[str, Any]] = []  # (text, data) pairs
         self._current_index = -1
     
-    def add_item(self, text: str, data: Any = None) -> None:
-        """Add an item to the list"""
-        self._items.append((text, data))
+    def add_item(self, text_or_item, data: Any = None) -> None:
+        """Add an item to the list. Can accept either text+data or a UIListItem."""
+        if isinstance(text_or_item, str):
+            # Old calling pattern: add_item(text, data)
+            self._items.append((text_or_item, data))
+        else:
+            # New calling pattern: add_item(UIListItem)
+            item = text_or_item
+            self._items.append((item.get_text(), item.get_data()))
     
     def clear(self) -> None:
         """Clear all items"""
@@ -271,6 +323,82 @@ class UIListWidget(UIWidget):
     def set_current_changed_callback(self, callback: Callable[[Any], None]) -> None:
         """Set callback for selection changes"""
         self.connect_signal("current_changed", callback)
+    
+    def create_item(self, text: str) -> 'UIListItem':
+        """Create a new list item"""
+        return UIListItem(text)
+    
+    def add_item(self, item: 'UIListItem') -> None:
+        """Add an item to the list"""
+        self._items.append((item.get_text(), item.get_data()))
+    
+    def remove_item(self, item: 'UIListItem') -> None:
+        """Remove an item from the list"""
+        # Find and remove the item
+        for i, (text, data) in enumerate(self._items):
+            if text == item.get_text() and data == item.get_data():
+                del self._items[i]
+                if self._current_index >= i:
+                    self._current_index -= 1
+                break
+    
+    def get_item_count(self) -> int:
+        """Get the number of items in the list"""
+        return len(self._items)
+    
+    def get_item(self, index: int) -> Optional['UIListItem']:
+        """Get an item by index"""
+        if 0 <= index < len(self._items):
+            text, data = self._items[index]
+            item = UIListItem(text)
+            item.set_data(data)
+            return item
+        return None
+    
+    def get_selected_item(self) -> Optional['UIListItem']:
+        """Get the currently selected item"""
+        if 0 <= self._current_index < len(self._items):
+            text, data = self._items[self._current_index]
+            item = UIListItem(text)
+            item.set_data(data)
+            return item
+        return None
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the list widget"""
+        # This would be implemented by concrete classes
+        pass
+
+
+class UIListItem:
+    """Represents a single item in a list widget"""
+    
+    def __init__(self, text: str) -> None:
+        self._text = text
+        self._data = None
+    
+    def get_text(self) -> str:
+        """Get the text of the item"""
+        return self._text
+    
+    def set_text(self, text: str) -> None:
+        """Set the text of the item"""
+        self._text = text
+    
+    def get_data(self) -> Any:
+        """Get the data of the item"""
+        return self._data
+    
+    def set_data(self, *args) -> None:
+        """Set the data of the item. Can accept multiple arguments."""
+        if len(args) == 1:
+            self._data = args[0]
+        elif len(args) == 2:
+            # Store as a tuple for backward compatibility
+            self._data = (args[0], args[1])
+        else:
+            # Store as a tuple for multiple values
+            self._data = args
 
 
 class UICanvas(UIWidget):
@@ -357,13 +485,18 @@ class UIFileDialog(ABC):
     """Abstract file dialog interface"""
     
     @abstractmethod
-    def get_open_file_name(self, title: str, filter: str = "") -> Optional[str]:
+    def get_open_file_name(self, title: str, filter: str = "", directory: str = "") -> Optional[str]:
         """Get a file name for opening"""
         pass
     
     @abstractmethod
     def get_save_file_name(self, title: str, filter: str = "") -> Optional[str]:
         """Get a file name for saving"""
+        pass
+    
+    @abstractmethod
+    def get_existing_directory(self, title: str, directory: str = "") -> Optional[str]:
+        """Get an existing directory path"""
         pass
 
 
@@ -412,6 +545,11 @@ class UILayout(ABC):
     @abstractmethod
     def remove_widget(self, widget: UIWidget) -> None:
         """Remove a widget from the layout"""
+        pass
+    
+    @abstractmethod
+    def insert_widget(self, index: int, widget: UIWidget, *args: Any, **kwargs: Any) -> None:
+        """Insert a widget at a specific index in the layout"""
         pass
 
 
@@ -520,6 +658,11 @@ class UIMenu(UIWidget):
         """Add a menu item to the menu"""
         self._items.append(item)
     
+    def add_separator(self) -> None:
+        """Add a separator to the menu"""
+        # This is a placeholder - concrete implementations should override this
+        pass
+    
     def get_items(self) -> List['UIMenuItem']:
         """Get all menu items in the menu"""
         return self._items.copy()
@@ -581,3 +724,8 @@ class UIStatusBar(UIWidget):
     def get_message(self) -> str:
         """Get the current status bar message"""
         return self._message
+    
+    def add_widget(self, widget: 'UIWidget') -> None:
+        """Add a widget to the status bar"""
+        # This is a placeholder - concrete implementations should override this
+        pass

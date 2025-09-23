@@ -16,7 +16,7 @@ from curioshelf.ui.abstraction import (
 )
 from curioshelf.ui.factory_interface import UIFactoryInterface
 from .ui_widgets import (
-    DebugUIWidget, DebugUIButton, DebugUITextInput, DebugUIComboBox, 
+    DebugUIWidget, DebugUIButton, DebugUILabel, DebugUITextInput, DebugUIComboBox, 
     DebugUIListWidget, DebugUICanvas, DebugUIMessageBox, DebugUIFileDialog, 
     DebugUIProgressBar, DebugUIGroupBox, DebugUITabWidget, DebugUISplitter,
     DebugUILayout, DebugUIMenuBar, DebugUIMenu, DebugUIMenuItem, DebugUIStatusBar
@@ -210,6 +210,15 @@ class DebugUIImplementation(UIImplementationInterface, UIFactoryInterface):
     def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'DebugUITextInput':
         """Create a text input"""
         return DebugUITextInput(placeholder, self.verbose, self._message_logger)
+    
+    def create_line_edit(self, parent: Optional['UIWidget'] = None) -> 'DebugUITextInput':
+        """Create a line edit widget (alias for create_text_input)"""
+        return DebugUITextInput("", self.verbose, self._message_logger)
+    
+    def create_label(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'DebugUILabel':
+        """Create a label widget"""
+        from .ui_widgets import DebugUILabel
+        return DebugUILabel(text, self.verbose, self._message_logger)
     
     def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'DebugUIComboBox':
         """Create a combo box"""

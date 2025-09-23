@@ -24,7 +24,7 @@ from ..abstraction import (
 from ..factory_interface import UIFactoryInterface
 from ..ui_interface import UIImplementationInterface, UIImplementationError
 from .ui_widgets import (
-    QtUIMainWidget, QtUIWidget, QtUIButton, QtUITextInput, QtUIComboBox, QtUIListWidget,
+    QtUIMainWidget, QtUIWidget, QtUIButton, QtUILabel, QtUITextInput, QtUIComboBox, QtUIListWidget,
     QtUICanvas, QtUIMessageBox, QtUIFileDialog, QtUIProgressBar, QtUIGroupBox,
     QtUITabWidget, QtUISplitter, QtUILayout, QtUIMenuBar, QtUIMenu, QtUIMenuItem, QtUIStatusBar
 )
@@ -292,6 +292,16 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
         qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
         return QtUITextInput(placeholder, parent=qt_parent)
     
+    def create_line_edit(self, parent: Optional['UIWidget'] = None) -> 'QtUITextInput':
+        """Create a line edit widget (alias for create_text_input)"""
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUITextInput("", parent=qt_parent)
+    
+    def create_label(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'QtUILabel':
+        """Create a label widget"""
+        qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
+        return QtUILabel(text, parent=qt_parent)
+    
     def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'QtUIComboBox':
         """Create a combo box"""
         qt_parent = parent._qt_widget if parent and hasattr(parent, '_qt_widget') else None
@@ -344,7 +354,7 @@ class QtUIImplementation(UIImplementationInterface, UIFactoryInterface):
         # Draw a simple pattern for testing
         painter = QPainter(pixmap)
         painter.setPen(QPen(Qt.blue, 2))
-        painter.setBrush(QBrush(Qt.lightBlue))
+        painter.setBrush(QBrush(Qt.blue))
         painter.drawRect(10, 10, width - 20, height - 20)
         painter.drawText(20, 30, f"Test Image {self._pixmap_counter}")
         painter.end()

@@ -113,7 +113,7 @@ class EventBus:
         if event_type in self._event_handlers:
             try:
                 self._event_handlers[event_type].remove(handler)
-                self._logger.debug(f"Unsubscribed handler from {eventType}")
+                self._logger.debug(f"Unsubscribed handler from {event_type}")
             except ValueError:
                 pass
     

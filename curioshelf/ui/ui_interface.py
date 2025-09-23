@@ -17,7 +17,7 @@ from typing import Any, Optional, List, Dict, Callable
 from pathlib import Path
 
 from .abstraction import (
-    UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
+    UIWidget, UIButton, UILabel, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
@@ -140,6 +140,36 @@ class UIImplementationInterface(ABC):
         pass
     
     @abstractmethod
+    def create_line_edit(self, parent: Optional[UIWidget] = None) -> UITextInput:
+        """
+        Create a line edit widget (alias for create_text_input)
+        
+        Args:
+            parent: Optional parent widget for proper hierarchy
+            
+        Returns:
+            UITextInput: A line edit widget
+        """
+        pass
+    
+    @abstractmethod
+    def create_label(self, text: str = "", parent: Optional[UIWidget] = None) -> 'UILabel':
+        """
+        Create a label widget
+        
+        Args:
+            text: Text to display in the label
+            parent: Optional parent widget for proper hierarchy
+            
+        Returns:
+            UILabel: A label widget that supports:
+                - Text display
+                - Text styling
+                - Text updates
+        """
+        pass
+    
+    @abstractmethod
     def create_combo_box(self, parent: Optional[UIWidget] = None) -> UIComboBox:
         """
         Create a dropdown combo box widget
@@ -196,6 +226,7 @@ class UIImplementationInterface(ABC):
             UIFileDialog: A file dialog that supports:
                 - Open file selection (get_open_file_name)
                 - Save file selection (get_save_file_name)
+                - Directory selection (get_existing_directory)
                 - File type filtering
         """
         pass

@@ -17,7 +17,7 @@ from PySide6.QtCore import Qt, QRect, QTimer, Signal, QObject
 from PySide6.QtGui import QPixmap, QFont, QPainter, QPen, QBrush, QWheelEvent, QAction
 
 from ..abstraction import (
-    UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
+    UIWidget, UIButton, UILabel, UITextInput, UIComboBox, UIListWidget, UIListItem, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
@@ -124,6 +124,27 @@ class QtUIWidget(UIWidget, UIDebugMixin):
         self._qt_widget.show()
         self.debug_ui_event("shown", {"widget_id": id(self)})
     
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the widget"""
+        self._qt_widget.setStyleSheet(style)
+    
+    def add_widget(self, widget: UIWidget) -> None:
+        """Add a widget to this widget"""
+        if hasattr(widget, 'qt_widget'):
+            widget.qt_widget.setParent(self._qt_widget)
+            # If this widget has a layout, add to the layout
+            if hasattr(self, '_layout') and self._layout:
+                self._layout.add_widget(widget)
+            else:
+                # Otherwise, just set as child
+                widget.qt_widget.setParent(self._qt_widget)
+    
+    def cleanup(self) -> None:
+        """Clean up the widget and its resources"""
+        super().cleanup()
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.deleteLater()
+    
     def set_layout(self, layout: 'UILayout') -> None:
         """Set the layout for the widget"""
         super().set_layout(layout)
@@ -140,6 +161,37 @@ class QtUIWidget(UIWidget, UIDebugMixin):
     
     @property
     def qt_widget(self) -> QWidget:
+        """Get the underlying Qt widget"""
+        return self._qt_widget
+
+
+class QtUILabel(UILabel):
+    """Qt implementation of UILabel"""
+    
+    def __init__(self, text: str = "", parent: Optional[QWidget] = None):
+        super().__init__()
+        self._qt_widget = QLabel(text, parent)
+        self._qt_widget.setObjectName("ui_label")
+    
+    def set_text(self, text: str) -> None:
+        """Set the text content of the label"""
+        super().set_text(text)
+        if self._qt_widget:
+            self._qt_widget.setText(text)
+    
+    def get_text(self) -> str:
+        """Get the text content of the label"""
+        if self._qt_widget:
+            return self._qt_widget.text()
+        return super().get_text()
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the label"""
+        if self._qt_widget:
+            self._qt_widget.setStyleSheet(style)
+    
+    @property
+    def qt_widget(self) -> QLabel:
         """Get the underlying Qt widget"""
         return self._qt_widget
 
@@ -176,6 +228,15 @@ class QtUIButton(UIButton):
         """Show or hide the button"""
         super().set_visible(visible)
         self._qt_button.setVisible(visible)
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the button"""
+        self._qt_button.setStyleSheet(style)
+    
+    @property
+    def clicked(self):
+        """Get the clicked signal for connecting callbacks"""
+        return self._qt_button.clicked
     
     def show(self) -> None:
         """Show the button"""
@@ -224,6 +285,23 @@ class QtUITextInput(UITextInput):
         """Set text and emit signal"""
         self._qt_input.setText(text)
     
+    def get_text(self) -> str:
+        """Get the current text"""
+        return self._qt_input.text()
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the text input"""
+        self._qt_input.setStyleSheet(style)
+    
+    @property
+    def text_changed(self):
+        """Get the text_changed signal for connecting callbacks"""
+        return self._qt_input.textChanged
+    
+    def set_placeholder(self, placeholder: str) -> None:
+        """Set the placeholder text"""
+        self._qt_input.setPlaceholderText(placeholder)
+    
     def set_enabled(self, enabled: bool) -> None:
         """Enable or disable the input"""
         super().set_enabled(enabled)
@@ -258,10 +336,16 @@ class QtUIComboBox(UIComboBox):
         self._current_index = index
         self.emit_signal("current_changed", self.current_data())
     
-    def add_item(self, text: str, data: Any = None) -> None:
-        """Add an item to the combo box"""
-        super().add_item(text, data)
-        self._qt_combo.addItem(text)
+    def add_item(self, text_or_item, data: Any = None) -> None:
+        """Add an item to the combo box. Can accept either text+data or a UIListItem."""
+        super().add_item(text_or_item, data)
+        if isinstance(text_or_item, str):
+            # Old calling pattern: add_item(text, data)
+            self._qt_combo.addItem(text_or_item)
+        else:
+            # New calling pattern: add_item(UIListItem)
+            item = text_or_item
+            self._qt_combo.addItem(item.get_text())
     
     def clear(self) -> None:
         """Clear all items"""
@@ -339,10 +423,83 @@ class QtUIListWidget(UIListWidget):
         super().show()
         self._qt_list.show()
     
+    def create_item(self, text: str) -> 'QtUIListItem':
+        """Create a new list item"""
+        return QtUIListItem(text)
+    
+    def add_item(self, item: 'UIListItem') -> None:
+        """Add an item to the list"""
+        data = item.get_data()
+        # If data is a tuple, use the first element for backward compatibility
+        if isinstance(data, tuple) and len(data) > 0:
+            data_for_storage = data[0]
+        else:
+            data_for_storage = data
+        
+        super().add_item(item)
+        qt_item = QListWidgetItem(item.get_text())
+        qt_item.setData(Qt.UserRole, data_for_storage)
+        self._qt_list.addItem(qt_item)
+    
+    def remove_item(self, item: 'UIListItem') -> None:
+        """Remove an item from the list"""
+        # Find and remove the Qt item
+        for i in range(self._qt_list.count()):
+            qt_item = self._qt_list.item(i)
+            if qt_item and qt_item.text() == item.get_text() and qt_item.data(Qt.UserRole) == item.get_data():
+                self._qt_list.takeItem(i)
+                break
+        super().remove_item(item)
+    
+    def get_item_count(self) -> int:
+        """Get the number of items in the list"""
+        return self._qt_list.count()
+    
+    def get_item(self, index: int) -> Optional['QtUIListItem']:
+        """Get an item by index"""
+        if 0 <= index < self._qt_list.count():
+            qt_item = self._qt_list.item(index)
+            if qt_item:
+                item = QtUIListItem(qt_item.text())
+                data = qt_item.data(Qt.UserRole)
+                print(f"DEBUG: qt_item.data(Qt.UserRole) returned: {data} (type: {type(data)})")
+                item.set_data(data)
+                return item
+        return None
+    
+    def get_selected_item(self) -> Optional['QtUIListItem']:
+        """Get the currently selected item"""
+        current_row = self._qt_list.currentRow()
+        if current_row >= 0:
+            qt_item = self._qt_list.item(current_row)
+            if qt_item:
+                item = QtUIListItem(qt_item.text())
+                data = qt_item.data(Qt.UserRole)
+                print(f"DEBUG: qt_item.data(Qt.UserRole) returned: {data} (type: {type(data)})")
+                item.set_data(data)
+                return item
+        return None
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the list widget"""
+        self._qt_list.setStyleSheet(style)
+    
+    @property
+    def item_selected(self):
+        """Get the item_selected signal for connecting callbacks"""
+        return self._qt_list.currentRowChanged
+    
     @property
     def qt_widget(self) -> QListWidget:
         """Get the underlying Qt list widget"""
         return self._qt_list
+
+
+class QtUIListItem(UIListItem):
+    """Qt implementation of UIListItem"""
+    
+    def __init__(self, text: str) -> None:
+        super().__init__(text)
 
 
 class QtUICanvas(UICanvas):
@@ -448,15 +605,20 @@ class QtUIMessageBox(UIMessageBox):
 class QtUIFileDialog(UIFileDialog):
     """Qt implementation of UIFileDialog"""
     
-    def get_open_file_name(self, title: str, filter: str = "") -> Optional[str]:
+    def get_open_file_name(self, title: str, filter: str = "", directory: str = "") -> Optional[str]:
         """Get a file name for opening"""
-        file_path, _ = QFileDialog.getOpenFileName(None, title, "", filter)
+        file_path, _ = QFileDialog.getOpenFileName(None, title, directory, filter)
         return file_path if file_path else None
     
     def get_save_file_name(self, title: str, filter: str = "") -> Optional[str]:
         """Get a file name for saving"""
         file_path, _ = QFileDialog.getSaveFileName(None, title, "", filter)
         return file_path if file_path else None
+    
+    def get_existing_directory(self, title: str, directory: str = "") -> Optional[str]:
+        """Get an existing directory path"""
+        directory_path = QFileDialog.getExistingDirectory(None, title, directory)
+        return directory_path if directory_path else None
 
 
 class QtUIProgressBar(UIProgressBar):
@@ -523,6 +685,7 @@ class QtUIGroupBox(UIGroupBox):
     
     def __init__(self, title: str = "") -> None:
         super().__init__(title)
+        self._title = title
         self._qt_group = QGroupBox(title)
     
     @property
@@ -531,7 +694,7 @@ class QtUIGroupBox(UIGroupBox):
     
     @title.setter
     def title(self, value: str) -> None:
-        super().title = value
+        self._title = value
         self._qt_group.setTitle(value)
     
     def set_enabled(self, enabled: bool) -> None:
@@ -548,6 +711,10 @@ class QtUIGroupBox(UIGroupBox):
         """Show the group box"""
         super().show()
         self._qt_group.show()
+    
+    def set_title(self, title: str) -> None:
+        """Set the title of the group box"""
+        self.title = title
     
     @property
     def qt_widget(self) -> QGroupBox:
@@ -673,6 +840,28 @@ class QtUILayout(UILayout):
         elif hasattr(widget, '_qt_tabs'):  # Special case for QtUITabWidget
             self._qt_layout.removeWidget(widget._qt_tabs)
     
+    def insert_widget(self, index: int, widget: UIWidget, *args, **kwargs) -> None:
+        """Insert a widget at a specific index in the layout"""
+        # Check if widget has a qt_widget property (all Qt implementations should have this)
+        if hasattr(widget, 'qt_widget'):
+            # Ensure the widget is properly parented
+            if hasattr(self, '_parent_widget') and self._parent_widget:
+                widget.qt_widget.setParent(self._parent_widget)
+            self._qt_layout.insertWidget(index, widget.qt_widget, *args, **kwargs)
+        elif hasattr(widget, '_qt_tabs'):  # Special case for QtUITabWidget
+            # Ensure the widget is properly parented
+            if hasattr(self, '_parent_widget') and self._parent_widget:
+                widget._qt_tabs.setParent(self._parent_widget)
+            self._qt_layout.insertWidget(index, widget._qt_tabs, *args, **kwargs)
+        else:
+            print(f"Warning: Cannot insert widget {widget} to layout - no Qt widget found")
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the layout"""
+        # Layouts don't have styles in Qt, but we can apply to the parent widget
+        if hasattr(self, '_parent_widget') and self._parent_widget:
+            self._parent_widget.setStyleSheet(style)
+    
     @property
     def qt_layout(self) -> None:
         """Get the underlying Qt layout"""
@@ -736,6 +925,11 @@ class QtUIMenu(UIMenu, UIDebugMixin):
         if isinstance(item, QtUIMenuItem):
             self._qt_menu.addAction(item.qt_action)
     
+    def add_separator(self) -> None:
+        """Add a separator to the menu"""
+        super().add_separator()
+        self._qt_menu.addSeparator()
+    
     def show(self) -> None:
         """Show the menu"""
         super().show()
@@ -766,6 +960,16 @@ class QtUIMenuItem(UIMenuItem, UIDebugMixin):
     def _on_qt_clicked(self) -> None:
         """Handle Qt menu item click"""
         self._on_clicked()
+    
+    def set_text(self, text: str) -> None:
+        """Set the text of the menu item"""
+        self.text = text
+        self._qt_action.setText(text)
+    
+    @property
+    def clicked(self):
+        """Get the clicked signal for connecting callbacks"""
+        return self._qt_action.triggered
     
     def show(self) -> None:
         """Show the menu item"""
@@ -815,6 +1019,12 @@ class QtUIStatusBar(UIStatusBar, UIDebugMixin):
         """Set the status bar message"""
         super().set_message(message)
         self._qt_status_bar.showMessage(message)
+    
+    def add_widget(self, widget: 'UIWidget') -> None:
+        """Add a widget to the status bar"""
+        super().add_widget(widget)
+        if hasattr(widget, 'qt_widget'):
+            self._qt_status_bar.addWidget(widget.qt_widget)
     
     def show(self) -> None:
         """Show the status bar"""

@@ -70,15 +70,23 @@ class UIFactory:
         
         return self._ui_implementation
     
-    def create_main_window(self):
+    def create_main_window(self, application=None, use_views=True):
         """Create the main application window"""
         if self._main_window is None:
-            from .main_window_abstracted import MainWindowAbstracted
-            
-            ui_impl = self.get_ui_implementation()
-            self._main_window = MainWindowAbstracted(
-                ui_impl, verbose=self.verbose
-            )
+            if use_views:
+                from .main_window_with_views import MainWindowWithViews
+                
+                ui_impl = self.get_ui_implementation()
+                self._main_window = MainWindowWithViews(
+                    ui_impl, application=application, verbose=self.verbose
+                )
+            else:
+                from .main_window_abstracted import MainWindowAbstracted
+                
+                ui_impl = self.get_ui_implementation()
+                self._main_window = MainWindowAbstracted(
+                    ui_impl, application=application, verbose=self.verbose
+                )
         
         return self._main_window
     

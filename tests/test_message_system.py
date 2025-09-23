@@ -37,8 +37,14 @@ class TestMessageCollection:
         # Perform some actions
         button.click()
         text_input.set_text("Hello World")
-        combo.add_item("Option 1", "opt1")
-        combo.add_item("Option 2", "opt2")
+        from tests.ui_mocks import MockUIListItem
+        item1 = MockUIListItem("Option 1")
+        item1.set_data("opt1")
+        combo.add_item(item1)
+        
+        item2 = MockUIListItem("Option 2")
+        item2.set_data("opt2")
+        combo.add_item(item2)
         combo.set_current_index(0)
         
         # Get collected messages

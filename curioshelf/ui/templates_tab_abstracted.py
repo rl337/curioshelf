@@ -136,7 +136,10 @@ class TemplatesTabAbstracted:
         
         self.templates_list.clear()
         for template in self.asset_manager.templates.values():
-            self.templates_list.add_item(template.name, template.name)
+            from curioshelf.ui.abstraction import UIListItem
+            template_item = UIListItem(template.name)
+            template_item.set_data(template.name)
+            self.templates_list.add_item(template_item)
     
     def on_template_selected(self, template_name: str):
         """Handle template selection"""

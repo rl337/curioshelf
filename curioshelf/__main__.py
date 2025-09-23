@@ -14,6 +14,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from .ui.ui_factory import create_ui_factory, get_available_ui_backends
+from .app_impl.application_impl import CurioShelfApplicationImpl
 from tests.ui_debug import get_global_debugger, create_debugger
 from tests.ui_instrumentation_server import UIInstrumentationServer
 
@@ -176,7 +177,10 @@ def main():
         
         # Create main window (not needed for script UI)
         if ui_backend != "script":
-            main_window = factory.create_main_window()
+            # Create application instance for GUI mode
+            app_instance = CurioShelfApplicationImpl(factory)
+            # Use the new view-based main window
+            main_window = factory.create_main_window(application=app_instance, use_views=True)
             
             # Register main window with instrumentation server if debugging is enabled
             if instrumentation_server:

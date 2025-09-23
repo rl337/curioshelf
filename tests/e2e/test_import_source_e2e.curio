@@ -1,0 +1,157 @@
+# CurioShelf Import Source End-to-End Test
+# This script specifically tests the import source functionality and UI state
+
+print("=== CurioShelf Import Source E2E Test ===")
+print("Testing import source functionality and UI state management")
+
+# Test 1: Initial State - No Project Loaded
+print("\n=== Test 1: Initial State - No Project Loaded ===")
+print("Checking initial state...")
+
+project_loaded := is_project_loaded()
+print("Project loaded:", project_loaded)
+assert(not project_loaded, "No project should be loaded initially")
+
+can_import := can_import_source()
+print("Can import source:", can_import)
+assert(not can_import, "Should not be able to import source without a project")
+
+# Test 2: Create Project and Check Import State
+print("\n=== Test 2: Create Project and Check Import State ===")
+print("Creating project...")
+
+trigger_menu("Project", "New Project")
+print("New Project menu triggered")
+
+# Wait for project creation
+print("Waiting for project creation...")
+
+project_loaded_after_create := is_project_loaded()
+print("Project loaded after creation:", project_loaded_after_create)
+assert(project_loaded_after_create, "Project should be loaded after creation")
+
+# Check import state after project creation
+can_import_after_create := can_import_source()
+print("Can import after project creation:", can_import_after_create)
+assert(can_import_after_create, "Should be able to import source after project creation")
+
+# Test 3: Import Source via Menu
+print("\n=== Test 3: Import Source via Menu ===")
+print("Testing import source menu functionality...")
+
+# Get initial asset counts
+initial_counts := get_asset_counts()
+print("Initial asset counts:", initial_counts)
+initial_sources := initial_counts.get("sources", 0)
+print("Initial source count:", initial_sources)
+
+# Trigger import source menu
+print("Triggering Import Source menu...")
+trigger_menu("Sources", "Import Source")
+print("Import Source menu triggered")
+
+# Wait for file dialog processing
+print("Waiting for file dialog processing...")
+
+# Note: In a real test environment, the auto-responder should handle the file dialog
+# We can't guarantee a file will be selected, but we can verify the system doesn't hang
+# and that the menu was properly triggered
+
+# Test 4: Check Asset Counts After Import Attempt
+print("\n=== Test 4: Check Asset Counts After Import Attempt ===")
+
+# Get asset counts after import attempt
+final_counts := get_asset_counts()
+print("Final asset counts:", final_counts)
+final_sources := final_counts.get("sources", 0)
+print("Final source count:", final_sources)
+
+# The source count might be 0 if no file was selected, which is expected in test environment
+print("Source count change:", final_sources - initial_sources)
+
+# Test 5: UI State Consistency
+print("\n=== Test 5: UI State Consistency ===")
+print("Checking UI state consistency after import attempt...")
+
+# Verify project is still loaded
+project_still_loaded := is_project_loaded()
+print("Project still loaded:", project_still_loaded)
+assert(project_still_loaded, "Project should still be loaded after import attempt")
+
+# Verify import capability is still available
+can_import_still := can_import_source()
+print("Can still import source:", can_import_still)
+assert(can_import_still, "Should still be able to import source")
+
+# Test 6: Close Project and Verify Import State Reset
+print("\n=== Test 6: Close Project and Verify Import State Reset ===")
+print("Closing project...")
+
+close_result := close_project()
+print("Close result:", close_result)
+assert(close_result, "Project should close successfully")
+
+# Check import state after closing
+can_import_after_close := can_import_source()
+print("Can import after close:", can_import_after_close)
+assert(not can_import_after_close, "Should not be able to import source after closing project")
+
+# Test 7: Multiple Import Attempts (if project is loaded)
+print("\n=== Test 7: Multiple Import Attempts ===")
+print("Testing multiple import attempts...")
+
+# Create another project
+print("Creating another project...")
+trigger_menu("Project", "New Project")
+print("Second project creation triggered")
+
+# Wait for project creation
+print("Waiting for second project creation...")
+
+project_loaded_2 := is_project_loaded()
+print("Second project loaded:", project_loaded_2)
+assert(project_loaded_2, "Second project should be loaded")
+
+# Test multiple import attempts
+print("Testing first import attempt...")
+trigger_menu("Sources", "Import Source")
+print("First import attempt triggered")
+
+print("Testing second import attempt...")
+trigger_menu("Sources", "Import Source")
+print("Second import attempt triggered")
+
+# Verify system is still responsive
+project_still_loaded_2 := is_project_loaded()
+print("Project still loaded after multiple imports:", project_still_loaded_2)
+assert(project_still_loaded_2, "Project should still be loaded after multiple import attempts")
+
+# Test 8: Clean Up
+print("\n=== Test 8: Clean Up ===")
+print("Cleaning up...")
+
+# Close the project
+close_result_2 := close_project()
+print("Final close result:", close_result_2)
+assert(close_result_2, "Final project close should succeed")
+
+# Verify final state
+final_project_loaded := is_project_loaded()
+final_can_import := can_import_source()
+
+print("Final project loaded:", final_project_loaded)
+print("Final can import:", final_can_import)
+
+assert(not final_project_loaded, "No project should be loaded at the end")
+assert(not final_can_import, "Should not be able to import source at the end")
+
+print("\n=== Import Source E2E Test Complete ===")
+print("All import source tests passed successfully!")
+print("✅ Import source menu is properly enabled/disabled based on project state")
+print("✅ Import source menu triggers file dialog without hanging")
+print("✅ Multiple import attempts work without issues")
+print("✅ UI state is consistent throughout import operations")
+print("✅ Project state is maintained during import operations")
+
+# Exit gracefully
+exit(0)

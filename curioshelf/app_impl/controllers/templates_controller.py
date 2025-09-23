@@ -74,7 +74,10 @@ class TemplatesController:
         
         self.templates_list.clear()
         for template in self.asset_manager.templates.values():
-            self.templates_list.add_item(template.name, template.name)
+            from curioshelf.ui.abstraction import UIListItem
+            template_item = UIListItem(template.name)
+            template_item.set_data(template.name)
+            self.templates_list.add_item(template_item)
     
     def on_template_selected(self, template_name: str) -> None:
         """Handle template selection"""
@@ -129,7 +132,10 @@ class TemplatesController:
         # Add views (simplified for testing)
         for view in self.current_template.required_views:
             if hasattr(self.views_widget, 'add_item'):
-                self.views_widget.add_item(view)
+                from curioshelf.ui.abstraction import UIListItem
+                view_item = UIListItem(view)
+                view_item.set_data(view)
+                self.views_widget.add_item(view_item)
     
     def refresh_usage_stats(self) -> None:
         """Refresh usage statistics"""

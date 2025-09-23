@@ -67,7 +67,10 @@ class SourcesController:
         self.source_combo.clear()
         for source in self.asset_manager.sources.values():
             display_text = f"{source.file_path.name} ({source.width}x{source.height})"
-            self.source_combo.add_item(display_text, source.id)
+            from curioshelf.ui.abstraction import UIListItem
+            source_item = UIListItem(display_text)
+            source_item.set_data(source.id)
+            self.source_combo.add_item(source_item)
     
     def import_source(self) -> None:
         """Import a new source image"""

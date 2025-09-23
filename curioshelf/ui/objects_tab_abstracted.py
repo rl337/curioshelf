@@ -146,9 +146,18 @@ class ObjectsTabAbstracted:
         layer_layout = self.ui_factory.create_layout("horizontal")
         layer_layout.add_widget(self.ui_factory.create_text_input("Layer:"))
         self.layer_combo = self.ui_factory.create_combo_box()
-        self.layer_combo.add_item("concept", "concept")
-        self.layer_combo.add_item("working", "working")
-        self.layer_combo.add_item("production", "production")
+        from curioshelf.ui.abstraction import UIListItem
+        concept_item = UIListItem("concept")
+        concept_item.set_data("concept")
+        self.layer_combo.add_item(concept_item)
+        
+        working_item = UIListItem("working")
+        working_item.set_data("working")
+        self.layer_combo.add_item(working_item)
+        
+        production_item = UIListItem("production")
+        production_item.set_data("production")
+        self.layer_combo.add_item(production_item)
         self.layer_combo.set_current_index(0)
         layer_layout.add_widget(self.layer_combo)
         slice_layout.add_widget(layer_layout)
@@ -189,7 +198,9 @@ class ObjectsTabAbstracted:
         
         self.objects_list.clear()
         for obj in self.asset_manager.objects.values():
-            self.objects_list.add_item(obj.name, obj.id)
+            obj_item = UIListItem(obj.name)
+            obj_item.set_data(obj.id)
+            self.objects_list.add_item(obj_item)
     
     def refresh_sources_combo(self):
         """Refresh the sources combo box"""
@@ -199,7 +210,9 @@ class ObjectsTabAbstracted:
         self.source_combo.clear()
         for source in self.asset_manager.sources.values():
             display_text = f"{source.file_path.name} ({source.width}x{source.height})"
-            self.source_combo.add_item(display_text, source.id)
+            source_item = UIListItem(display_text)
+            source_item.set_data(source.id)
+            self.source_combo.add_item(source_item)
     
     def on_object_selected(self, object_id: str):
         """Handle object selection"""
@@ -282,7 +295,9 @@ class ObjectsTabAbstracted:
             template = self.asset_manager.templates.get(self.current_object.template_name)
         
         if not template:
-            self.views_list.add_item("No template assigned")
+            no_template_item = UIListItem("No template assigned")
+            no_template_item.set_data("no_template")
+            self.views_list.add_item(no_template_item)
             return
         
         # Group slices by view name
@@ -299,10 +314,14 @@ class ObjectsTabAbstracted:
                 # View has slices
                 slice_count = len(slices_by_view[view_name])
                 status = f"✓ {slice_count} slice(s)"
-                self.views_list.add_item(f"{view_name}: {status}", view_name)
+                view_item = UIListItem(f"{view_name}: {status}")
+                view_item.set_data(view_name)
+                self.views_list.add_item(view_item)
             else:
                 # View is missing
-                self.views_list.add_item(f"{view_name}: ✗ Missing", view_name)
+                missing_item = UIListItem(f"{view_name}: ✗ Missing")
+                missing_item.set_data(view_name)
+                self.views_list.add_item(missing_item)
     
     def on_source_selected(self, source_id: str):
         """Handle source selection for slice creation"""

@@ -48,6 +48,7 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         self._project_loaded = False
         self._sources_count = 0
         self._objects_count = 0
+        self.current_project_path: Optional[Path] = None
         self._templates_count = 0
         
         # Setup initial state
@@ -100,11 +101,13 @@ class CurioShelfApplicationImpl(ApplicationInterface):
                 self.project_manager.asset_manager = AssetManager()
                 self.project_manager.is_project_loaded = True
                 self.asset_manager = self.project_manager.asset_manager
+                self.current_project_path = project_path
             else:
                 # We created with legacy structure
                 self.asset_manager = self.project_manager.asset_manager
             
             self._update_application_state()
+            self.update_ui_state()
             
             # Initialize controllers if UI factory is available
             if self.ui_factory:
@@ -139,10 +142,14 @@ class CurioShelfApplicationImpl(ApplicationInterface):
                 self.project_manager.is_project_loaded = True
                 self.asset_manager = self.project_manager.asset_manager
                 
+                # Set application's current project path
+                self.current_project_path = project_path
+                
                 # Load existing assets from the project
                 self._load_project_assets(project_path)
                 
                 self._update_application_state()
+                self.update_ui_state()
                 
                 # Initialize controllers if UI factory is available
                 if self.ui_factory:
@@ -323,7 +330,9 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             self.sources_controller = None
             self.templates_controller = None
             self.objects_controller = None
+            self.current_project_path = None
             self._update_application_state()
+            self.update_ui_state()  # Add this line to update UI state
             self.emit_event("project_closed", {})
         
         return success
@@ -570,6 +579,14 @@ class CurioShelfApplicationImpl(ApplicationInterface):
             counts["slices"], 
             "application"
         )
+        
+        # Emit UI state changed event
+        self.emit_event("ui_state_changed", {
+            "project_loaded": self.is_project_loaded(),
+            "has_sources": self.has_sources(),
+            "has_objects": self.has_objects(),
+            "has_templates": self.has_templates(),
+        })
     
     # Event Handling
     def set_event_handlers(self, handlers: Dict[str, Callable]) -> None:

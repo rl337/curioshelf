@@ -67,15 +67,25 @@ class Operators:
     @binary_operator('*')
     def multiplication(left: Any, right: Any) -> Any:
         """Multiply two values"""
-        left_val = float(left)
-        right_val = float(right)
-        result = left_val * right_val
+        # Handle string multiplication
+        if isinstance(left, str) and isinstance(right, (int, float)):
+            return left * int(right)
+        elif isinstance(left, (int, float)) and isinstance(right, str):
+            return int(left) * right
         
-        # Return integer if both operands were integers and result is whole
-        if (isinstance(left, int) and isinstance(right, int) and 
-            result.is_integer()):
-            return int(result)
-        return result
+        # Handle numeric multiplication
+        try:
+            left_val = float(left)
+            right_val = float(right)
+            result = left_val * right_val
+            
+            # Return integer if both operands were integers and result is whole
+            if (isinstance(left, int) and isinstance(right, int) and 
+                result.is_integer()):
+                return int(result)
+            return result
+        except (ValueError, TypeError):
+            raise ValueError(f"Cannot multiply {type(left).__name__} and {type(right).__name__}")
     
     @staticmethod
     @binary_operator('/')

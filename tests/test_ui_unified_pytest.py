@@ -117,9 +117,18 @@ class TestUIUnified:
         combo = ui_impl.create_combo_box()
         
         # Test adding items
-        combo.add_item("Item 1", "data1")
-        combo.add_item("Item 2", "data2")
-        combo.add_item("Item 3", "data3")
+        from tests.ui_mocks import MockUIListItem
+        item1 = MockUIListItem("Item 1")
+        item1.set_data("data1")
+        combo.add_item(item1)
+        
+        item2 = MockUIListItem("Item 2")
+        item2.set_data("data2")
+        combo.add_item(item2)
+        
+        item3 = MockUIListItem("Item 3")
+        item3.set_data("data3")
+        combo.add_item(item3)
         
         # Qt automatically selects the first item, headless doesn't
         if ui_factory.ui_backend == "qt":
@@ -150,9 +159,18 @@ class TestUIUnified:
         list_widget = ui_impl.create_list_widget()
         
         # Test adding items
-        list_widget.add_item("Item 1", "data1")
-        list_widget.add_item("Item 2", "data2")
-        list_widget.add_item("Item 3", "data3")
+        from tests.ui_mocks import MockUIListItem
+        item1 = MockUIListItem("Item 1")
+        item1.set_data("data1")
+        list_widget.add_item(item1)
+        
+        item2 = MockUIListItem("Item 2")
+        item2.set_data("data2")
+        list_widget.add_item(item2)
+        
+        item3 = MockUIListItem("Item 3")
+        item3.set_data("data3")
+        list_widget.add_item(item3)
         
         assert list_widget.current_text() == ""
         assert list_widget.current_data() is None
@@ -224,10 +242,10 @@ class TestUIUnified:
         
         assert main_window is not None
         assert hasattr(main_window, 'main_widget')
-        assert hasattr(main_window, 'tab_widget')
-        assert hasattr(main_window, 'status_label')
-        assert hasattr(main_window, 'progress_label')
-        assert hasattr(main_window, 'project_status_label')
+        assert hasattr(main_window, 'menu_bar')
+        assert hasattr(main_window, 'status_bar')
+        assert hasattr(main_window, 'view_manager')
+        assert hasattr(main_window, 'actions')
     
     def test_main_window_methods(self, ui_factory):
         """Test main window method calls"""
@@ -236,7 +254,9 @@ class TestUIUnified:
         if 'script' in str(ui_impl.__class__):
             pytest.skip("Script UI does not support full main window creation")
         
-        main_window = ui_factory.create_main_window()
+        # Create main window with abstracted interface (not views)
+        from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
+        main_window = MainWindowAbstracted(ui_impl)
         
         # These methods should not raise exceptions
         main_window.new_project()

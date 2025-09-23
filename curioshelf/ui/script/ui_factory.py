@@ -247,6 +247,14 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a text input (not applicable for script UI)"""
         raise NotImplementedError("Script UI does not support widget creation")
     
+    def create_line_edit(self, parent: Optional['UIWidget'] = None) -> 'UITextInput':
+        """Create a line edit widget (not applicable for script UI)"""
+        raise NotImplementedError("Script UI does not support widget creation")
+    
+    def create_label(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'UILabel':
+        """Create a label widget (not applicable for script UI)"""
+        raise NotImplementedError("Script UI does not support widget creation")
+    
     def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'UIComboBox':
         """Create a combo box (not applicable for script UI)"""
         raise NotImplementedError("Script UI does not support widget creation")

@@ -158,10 +158,15 @@ class ProjectDialogAbstracted(UIWidget):
             try:
                 project_info = self.project_manager.load_project_info(project_dir)
                 display_text = f"{project_info.name} ({project_dir.name})"
-                self.existing_projects_list.add_item(display_text, str(project_dir))
+                from curioshelf.ui.abstraction import UIListItem
+                project_item = UIListItem(display_text)
+                project_item.set_data(str(project_dir))
+                self.existing_projects_list.add_item(project_item)
             except:
                 # If we can't load project info, just show the directory name
-                self.existing_projects_list.add_item(project_dir.name, str(project_dir))
+                fallback_item = UIListItem(project_dir.name)
+                fallback_item.set_data(str(project_dir))
+                self.existing_projects_list.add_item(fallback_item)
     
     def on_project_selected(self, project_path: str):
         """Handle project selection"""

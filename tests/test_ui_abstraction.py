@@ -63,8 +63,14 @@ class TestUIAbstraction(unittest.TestCase):
         combo = MockUIFactory.create_combo_box()
         
         # Add items
-        combo.add_item("Item 1", "data1")
-        combo.add_item("Item 2", "data2")
+        from tests.ui_mocks import MockUIListItem
+        item1 = MockUIListItem("Item 1")
+        item1.set_data("data1")
+        combo.add_item(item1)
+        
+        item2 = MockUIListItem("Item 2")
+        item2.set_data("data2")
+        combo.add_item(item2)
         
         self.assertEqual(len(combo._items), 2)
         
@@ -92,8 +98,14 @@ class TestUIAbstraction(unittest.TestCase):
         list_widget = MockUIFactory.create_list_widget()
         
         # Add items
-        list_widget.add_item("Item 1", "data1")
-        list_widget.add_item("Item 2", "data2")
+        from tests.ui_mocks import MockUIListItem
+        item1 = MockUIListItem("Item 1")
+        item1.set_data("data1")
+        list_widget.add_item(item1)
+        
+        item2 = MockUIListItem("Item 2")
+        item2.set_data("data2")
+        list_widget.add_item(item2)
         
         self.assertEqual(len(list_widget._items), 2)
         

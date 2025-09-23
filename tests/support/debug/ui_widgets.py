@@ -9,7 +9,7 @@ from typing import Any, Optional, Callable, List
 from pathlib import Path
 
 from curioshelf.ui.abstraction import (
-    UIWidget, UIButton, UITextInput, UIComboBox, UIListWidget, UICanvas,
+    UIWidget, UIButton, UILabel, UITextInput, UIComboBox, UIListWidget, UICanvas,
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
@@ -46,6 +46,18 @@ class DebugUIWidget(UIWidget):
         """Show the widget"""
         super().show()
         self._log_ui_event("shown")
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the widget"""
+        self._log_state_change("style_changed", {"style": style})
+    
+    def add_widget(self, widget: 'UIWidget') -> None:
+        """Add a widget to this widget"""
+        self._log_ui_event("widget_added", {"widget_type": widget.__class__.__name__})
+    
+    def clear(self) -> None:
+        """Clear all widgets from this widget"""
+        self._log_ui_event("cleared")
 
 
 class DebugUIButton(UIButton):
@@ -68,6 +80,41 @@ class DebugUIButton(UIButton):
     
     def set_visible(self, visible: bool) -> None:
         """Show or hide the button"""
+        super().set_visible(visible)
+        self.message_logger.log_state_change(self.__class__.__name__, f"{'shown' if visible else 'hidden'}", {"text": self._text})
+    
+    @property
+    def clicked(self):
+        """Get the clicked signal for connecting callbacks"""
+        # For debug UI, we'll return a mock signal object
+        class MockSignal:
+            def connect(self, callback):
+                self._callback = callback
+            
+            def emit(self):
+                if hasattr(self, '_callback'):
+                    self._callback()
+        
+        return MockSignal()
+
+
+class DebugUILabel(UILabel):
+    """Headless implementation of UILabel"""
+    
+    def __init__(self, text: str = "", verbose: bool = True, message_logger: Optional[MessageLogger] = None) -> None:
+        super().__init__()
+        self.verbose = verbose
+        self.message_logger = message_logger or MessageLogger(collect_messages=True, print_messages=verbose)
+        if text:
+            self.set_text(text)
+    
+    def set_text(self, text: str) -> None:
+        """Set the text content of the label"""
+        super().set_text(text)
+        self.message_logger.log_state_change(self.__class__.__name__, "text_changed", {"text": text})
+    
+    def set_visible(self, visible: bool) -> None:
+        """Show or hide the label"""
         super().set_visible(visible)
         self.message_logger.log_state_change(self.__class__.__name__, f"{'shown' if visible else 'hidden'}", {"text": self._text})
 
@@ -104,6 +151,27 @@ class DebugUITextInput(UITextInput):
         self.message_logger.log_state_change(self.__class__.__name__, f"{'shown' if visible else 'hidden'}", {
             "placeholder": self._placeholder
         })
+    
+    def set_placeholder(self, placeholder: str) -> None:
+        """Set the placeholder text"""
+        self._placeholder = placeholder
+        self.message_logger.log_state_change(self.__class__.__name__, "placeholder_changed", {
+            "placeholder": placeholder
+        })
+    
+    @property
+    def text_changed(self):
+        """Get the text_changed signal for connecting callbacks"""
+        # For debug UI, we'll return a mock signal object
+        class MockSignal:
+            def connect(self, callback):
+                self._callback = callback
+            
+            def emit(self):
+                if hasattr(self, '_callback'):
+                    self._callback()
+        
+        return MockSignal()
 
 
 class DebugUIComboBox(UIComboBox):
@@ -119,11 +187,11 @@ class DebugUIComboBox(UIComboBox):
         if self.verbose:
             print(f"[HEADLESS] {message}")
     
-    def add_item(self, text: str, data: Any = None) -> None:
+    def add_item(self, item: 'UIListItem') -> None:
         """Add an item to the combo box"""
-        super().add_item(text, data)
-        self._log(f"Combo box item added: '{text}'")
-        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": text, "data": data})
+        super().add_item(item)
+        self._log(f"Combo box item added: '{item.get_text()}'")
+        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": item.get_text(), "data": item.get_data()})
     
     def clear(self) -> None:
         """Clear all items"""
@@ -164,11 +232,11 @@ class DebugUIListWidget(UIListWidget):
         if self.verbose:
             print(f"[HEADLESS] {message}")
     
-    def add_item(self, text: str, data: Any = None) -> None:
+    def add_item(self, item: 'UIListItem') -> None:
         """Add an item to the list"""
-        super().add_item(text, data)
-        self._log(f"List item added: '{text}'")
-        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": text, "data": data})
+        super().add_item(item)
+        self._log(f"List item added: '{item.get_text()}'")
+        self.message_logger.log_ui_event(self.__class__.__name__, "item_added", {"text": item.get_text(), "data": item.get_data()})
     
     def clear(self) -> None:
         """Clear all items"""
@@ -194,6 +262,20 @@ class DebugUIListWidget(UIListWidget):
         """Show or hide the list"""
         super().set_visible(visible)
         self._log(f"List {'shown' if visible else 'hidden'}")
+    
+    @property
+    def item_selected(self):
+        """Get the item_selected signal for connecting callbacks"""
+        # For debug UI, we'll return a mock signal object
+        class MockSignal:
+            def connect(self, callback):
+                self._callback = callback
+            
+            def emit(self):
+                if hasattr(self, '_callback'):
+                    self._callback()
+        
+        return MockSignal()
 
 
 class DebugUICanvas(UICanvas):
@@ -300,6 +382,12 @@ class DebugUIFileDialog(UIFileDialog):
         self._log(f"FILE DIALOG SAVE: {title} (filter: {filter})")
         # For testing, return a mock file path
         return "/mock/path/to/save/file.json"
+    
+    def get_existing_directory(self, title: str, directory: str = "") -> Optional[str]:
+        """Get an existing directory path"""
+        self._log(f"FILE DIALOG DIRECTORY: {title} (directory: {directory})")
+        # For testing, return a mock directory path
+        return "/mock/path/to/directory"
 
 
 class DebugUIProgressBar(UIProgressBar):
@@ -365,6 +453,11 @@ class DebugUIGroupBox(UIGroupBox):
         """Show or hide the group box"""
         super().set_visible(visible)
         self._log(f"Group box '{self._title}' {'shown' if visible else 'hidden'}")
+    
+    def set_title(self, title: str) -> None:
+        """Set the title of the group box"""
+        self._title = title
+        self._log(f"Group box title set to '{title}'")
 
 
 class DebugUITabWidget(UITabWidget):
@@ -467,6 +560,19 @@ class DebugUILayout(UILayout):
             "orientation": self._orientation,
             "widget_type": widget.__class__.__name__
         })
+    
+    def insert_widget(self, index: int, widget: UIWidget, *args: Any, **kwargs: Any) -> None:
+        """Insert a widget at a specific index in the layout"""
+        self._widgets.insert(index, widget)
+        self._log_ui_event("widget_inserted", {
+            "orientation": self._orientation,
+            "widget_type": widget.__class__.__name__,
+            "index": index
+        })
+    
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the layout"""
+        self._log_ui_event("style_changed", {"style": style})
 
 
 class DebugUIMenuBar(UIWidget):
@@ -515,6 +621,10 @@ class DebugUIMenu(UIWidget):
         """Show the menu"""
         super().show()
         self.message_logger.log_ui_event("DebugUIMenu", "shown", {"name": self.name})
+    
+    def add_separator(self) -> None:
+        """Add a separator to the menu"""
+        self.message_logger.log_ui_event("DebugUIMenu", "separator_added", {"name": self.name})
 
 
 class DebugUIMenuItem(UIMenuItem):
@@ -546,6 +656,20 @@ class DebugUIMenuItem(UIMenuItem):
         """Show the menu item"""
         super().show()
         self.message_logger.log_ui_event("DebugUIMenuItem", "shown", {"text": self.text})
+    
+    @property
+    def clicked(self):
+        """Get the clicked signal for connecting callbacks"""
+        # For debug UI, we'll return a mock signal object
+        class MockSignal:
+            def connect(self, callback):
+                self._callback = callback
+            
+            def emit(self):
+                if hasattr(self, '_callback'):
+                    self._callback()
+        
+        return MockSignal()
     
     def update_state(self, state_name: str) -> None:
         """Update the menu item state based on the callback for the given state name"""
@@ -584,3 +708,7 @@ class DebugUIStatusBar(UIWidget):
         """Show the status bar"""
         super().show()
         self.message_logger.log_ui_event("DebugUIStatusBar", "shown", {"message": self._message})
+    
+    def add_widget(self, widget: 'UIWidget') -> None:
+        """Add a widget to the status bar"""
+        self.message_logger.log_ui_event("DebugUIStatusBar", "widget_added", {"widget_type": widget.__class__.__name__})
