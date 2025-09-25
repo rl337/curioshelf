@@ -17,6 +17,10 @@ from tests.ui_debug import (
 )
 from tests.support.debug.message_system import MessageType
 from curioshelf.ui.ui_factory import create_ui_factory
+from tests.support.layout_assertions import (
+    assert_widget_visibility_consistency,
+    assert_widget_geometry_consistency
+)
 
 
 class TestUIDebugger:
@@ -347,6 +351,10 @@ class TestHeadlessUIDebugging:
         button.click()
         button.set_enabled(False)
         button.set_visible(False)
+        
+        # NEW: Add layout assertions to catch layout issues
+        assert_widget_visibility_consistency([button])
+        assert_widget_geometry_consistency([button])
         
         time.sleep(0.1)  # Wait for processing
         

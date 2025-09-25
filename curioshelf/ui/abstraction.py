@@ -125,6 +125,46 @@ class UIWidget(ABC):
         """Clean up the widget and its resources"""
         # This would be implemented by concrete classes
         pass
+    
+    # Size and Location Information
+    
+    def get_size(self) -> tuple[int, int]:
+        """Get the size of the widget as (width, height)"""
+        # This would be implemented by concrete classes
+        return (0, 0)
+    
+    def get_position(self) -> tuple[int, int]:
+        """Get the position of the widget as (x, y)"""
+        # This would be implemented by concrete classes
+        return (0, 0)
+    
+    def get_geometry(self) -> tuple[int, int, int, int]:
+        """Get the geometry of the widget as (x, y, width, height)"""
+        # This would be implemented by concrete classes
+        return (0, 0, 0, 0)
+    
+    def set_size(self, width: int, height: int) -> None:
+        """Set the size of the widget"""
+        # This would be implemented by concrete classes
+        pass
+    
+    def set_position(self, x: int, y: int) -> None:
+        """Set the position of the widget"""
+        # This would be implemented by concrete classes
+        pass
+    
+    def set_geometry(self, x: int, y: int, width: int, height: int) -> None:
+        """Set the geometry of the widget"""
+        # This would be implemented by concrete classes
+        pass
+    
+    def is_visible(self) -> bool:
+        """Check if the widget is visible"""
+        return self._visible
+    
+    def is_enabled(self) -> bool:
+        """Check if the widget is enabled"""
+        return self._enabled
 
 
 class UILabel(UIWidget):

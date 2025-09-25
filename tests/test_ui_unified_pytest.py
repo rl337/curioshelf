@@ -10,6 +10,12 @@ import time
 from typing import List, Dict, Any
 
 from curioshelf.ui.ui_factory import create_ui_factory
+from tests.support.layout_assertions import (
+    assert_no_unauthorized_overlaps,
+    assert_proper_widget_placement,
+    assert_widget_visibility_consistency,
+    assert_widget_geometry_consistency
+)
 
 
 class TestUIUnified:
@@ -88,6 +94,10 @@ class TestUIUnified:
         
         button.set_visible(True)
         assert button.visible
+        
+        # NEW: Add layout assertions to catch layout issues
+        assert_widget_visibility_consistency([button])
+        assert_widget_geometry_consistency([button])
     
     def test_text_input_operations(self, ui_factory):
         """Test text input operations"""
@@ -226,6 +236,11 @@ class TestUIUnified:
         layout.add_widget(button)
         layout.add_widget(text_input)
         
+        # NEW: Add layout assertions to catch layout issues
+        widgets = [button, text_input]
+        assert_widget_visibility_consistency(widgets)
+        assert_widget_geometry_consistency(widgets)
+        
         # Test removing widgets from layout
         layout.remove_widget(button)
         layout.remove_widget(text_input)
@@ -244,7 +259,7 @@ class TestUIUnified:
         assert hasattr(main_window, 'main_widget')
         assert hasattr(main_window, 'menu_bar')
         assert hasattr(main_window, 'status_bar')
-        assert hasattr(main_window, 'view_manager')
+        assert hasattr(main_window, 'view_container')
         assert hasattr(main_window, 'actions')
     
     def test_main_window_methods(self, ui_factory):
@@ -292,6 +307,10 @@ class TestUIUnified:
             # Should not raise exception
             widget.show()
             assert widget.visible
+        
+        # NEW: Add layout assertions to catch layout issues
+        assert_widget_visibility_consistency(widgets)
+        assert_widget_geometry_consistency(widgets)
 
 
 class TestUITestMode:

@@ -265,6 +265,61 @@ class DebugUIImplementation(UIImplementationInterface, UIFactoryInterface):
         """Create a layout"""
         return DebugUILayout(orientation, self.verbose, self._message_logger)
     
+    def create_directional_layout(self, parent: Optional['UIWidget'] = None) -> 'DebugDirectionalLayout':
+        """Create a directional layout"""
+        from .directional_layout import DebugDirectionalLayout
+        return DebugDirectionalLayout(parent, self._message_logger)
+    
+    # Composite Widgets
+    
+    def create_stack(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'DebugStack':
+        """Create a vertical stack of widgets"""
+        from .composite_widgets import DebugStack
+        return DebugStack(self, spacing, parent, self._message_logger)
+    
+    def create_row(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'DebugRow':
+        """Create a horizontal row of widgets"""
+        from .composite_widgets import DebugRow
+        return DebugRow(self, spacing, parent, self._message_logger)
+    
+    def create_form(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'DebugForm':
+        """Create a form widget with labeled input fields"""
+        from .composite_widgets import DebugForm
+        return DebugForm(self, spacing, parent, self._message_logger)
+    
+    def create_button_row(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'DebugButtonRow':
+        """Create a row of buttons with consistent styling"""
+        from .composite_widgets import DebugButtonRow
+        return DebugButtonRow(self, spacing, parent, self._message_logger)
+    
+    # Layout Widgets - New approach with self-managing layouts
+    
+    def create_stack_widget(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'DebugStackWidget':
+        """Create a stack widget that manages its own vertical layout"""
+        from .layout_widgets import DebugStackWidget
+        return DebugStackWidget(self, spacing, parent, self._message_logger)
+    
+    def create_row_widget(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'DebugRowWidget':
+        """Create a row widget that manages its own horizontal layout"""
+        from .layout_widgets import DebugRowWidget
+        return DebugRowWidget(self, spacing, parent, self._message_logger)
+    
+    def create_form_widget(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'DebugFormWidget':
+        """Create a form widget that manages its own layout"""
+        from .layout_widgets import DebugFormWidget
+        return DebugFormWidget(self, spacing, parent, self._message_logger)
+    
+    def create_button_row_widget(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'DebugButtonRowWidget':
+        """Create a button row widget that manages its own layout"""
+        from .layout_widgets import DebugButtonRowWidget
+        return DebugButtonRowWidget(self, spacing, parent, self._message_logger)
+    
+    def create_table_widget(self, rows: int = 1, cols: int = 1, spacing: int = 5, 
+                           parent: Optional['UIWidget'] = None) -> 'DebugTableWidget':
+        """Create a table widget that manages its own grid layout"""
+        from .layout_widgets import DebugTableWidget
+        return DebugTableWidget(self, rows, cols, spacing, parent, self._message_logger)
+    
     def get_message_logger(self) -> MessageLogger:
         """Get the message logger for testing and debugging"""
         return self._message_logger

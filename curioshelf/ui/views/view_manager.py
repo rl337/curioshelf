@@ -28,6 +28,7 @@ class ViewManager:
         # Create view container
         self.view_container = self.ui.create_widget("view_container")
         self.view_container.set_style("flex: 1;")
+        self.view_container.set_visible(True)  # Make sure the container is visible
         self.main_layout.add_widget(self.view_container)
     
     def register_view(self, name: str, view: BaseView) -> None:
@@ -56,6 +57,8 @@ class ViewManager:
             self.view_container.clear()
         if view.widget:
             self.view_container.add_widget(view.widget)
+            # Ensure the widget is visible
+            view.widget.set_visible(True)
     
     def show_view_by_name(self, name: str) -> bool:
         """Show a view by name"""

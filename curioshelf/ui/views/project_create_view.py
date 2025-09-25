@@ -6,6 +6,7 @@ from typing import Optional, Callable
 from pathlib import Path
 
 from curioshelf.ui.abstraction import UIWidget, UILayout, UIButton, UILabel, UITextInput, UIGroupBox
+from curioshelf.ui.layouts.directional_layout import DirectionalLayout, Direction
 from curioshelf.ui.views.base_view import BaseView
 from curioshelf.config import config
 
@@ -21,77 +22,49 @@ class ProjectCreateView(BaseView):
         super().__init__(ui_implementation, parent)
     
     def _setup_ui(self) -> None:
-        """Set up the project creation UI"""
+        """Set up the project creation UI using simple directional layout"""
         # Create main container
         self.widget = self.ui.create_widget("project_create_view")
         
-        # Create main layout
-        main_layout = self.ui.create_layout("vertical")
+        # Create directional layout
+        main_layout = DirectionalLayout(self.widget)
         self.widget.set_layout(main_layout)
         
-        # Create title
+        # Create title at the top
         title_label = self.ui.create_label("Create New Project")
         title_label.set_text("Create New Project")
-        title_label.set_style("font-size: 18px; font-weight: bold; margin-bottom: 20px;")
-        main_layout.add_widget(title_label)
+        title_label.set_style("font-size: 18px; font-weight: bold; margin: 20px;")
+        main_layout.add_widget(title_label, Direction.NORTH)
         
-        # Create form group
-        form_group = self.ui.create_group_box("Project Details")
-        form_group.set_title("Project Details")
-        form_layout = self.ui.create_layout("vertical")
-        form_group.set_layout(form_layout)
+        # Create a simple form using a stack widget
+        form_stack = self.ui.create_stack_widget(spacing=15)
+        main_layout.add_widget(form_stack.widget, Direction.CENTER, expand=True)
         
-        # Project name input
-        name_label = self.ui.create_label("Project Name:")
-        name_label.set_text("Project Name:")
-        name_label.set_style("font-weight: bold; margin-bottom: 5px;")
-        form_layout.add_widget(name_label)
-        
-        self.name_input = self.ui.create_line_edit()
-        self.name_input.set_placeholder("Enter project name")
-        self.name_input.set_style("width: 100%; padding: 8px; margin-bottom: 15px; font-size: 14px;")
+        # Add project name field
+        name_label = form_stack.add_label("Project Name:", style="font-weight: bold; margin-bottom: 5px;")
+        self.name_input = form_stack.add_text_input("Enter project name", style="padding: 8px; font-size: 14px;")
         self.name_input.text_changed.connect(self._on_name_changed)
-        form_layout.add_widget(self.name_input)
         
-        # Project path input
-        path_label = self.ui.create_label("Project Path:")
-        path_label.set_text("Project Path:")
-        path_label.set_style("font-weight: bold; margin-bottom: 5px;")
-        form_layout.add_widget(path_label)
+        # Add project path field
+        path_label = form_stack.add_label("Project Path:", style="font-weight: bold; margin-bottom: 5px;")
         
-        path_layout = self.ui.create_layout("horizontal")
+        # Create a row for path input and browse button
+        path_row = self.ui.create_row_widget(spacing=10)
+        form_stack.add_widget(path_row.widget)
         
-        self.path_input = self.ui.create_line_edit()
-        self.path_input.set_placeholder("Select project directory")
-        self.path_input.set_style("flex: 1; padding: 8px; margin-right: 10px; font-size: 14px;")
+        self.path_input = path_row.add_text_input("Select project directory", expand=True, style="padding: 8px; font-size: 14px;")
         # Set default project directory
         default_dir = config.get_default_project_directory()
         self.path_input.set_text(str(default_dir))
-        path_layout.add_widget(self.path_input)
         
-        self.browse_btn = self.ui.create_button("Browse...")
-        self.browse_btn.set_style("padding: 8px 16px; font-size: 14px;")
-        self.browse_btn.clicked.connect(self._browse_directory)
-        path_layout.add_widget(self.browse_btn)
+        self.browse_btn = path_row.add_button("Browse...", self._browse_directory, style="padding: 8px 16px; font-size: 14px;")
         
-        form_layout.add_widget(path_layout)
-        main_layout.add_widget(form_group)
+        # Create button row at the bottom
+        button_row = self.ui.create_button_row_widget(spacing=10)
+        main_layout.add_widget(button_row.widget, Direction.SOUTH)
         
-        # Create button layout
-        button_layout = self.ui.create_layout("horizontal")
-        button_layout.set_style("justify-content: flex-end; margin-top: 20px; gap: 10px;")
-        
-        self.cancel_btn = self.ui.create_button("Cancel")
-        self.cancel_btn.set_style("padding: 10px 20px; font-size: 14px;")
-        self.cancel_btn.clicked.connect(self._on_cancel)
-        button_layout.add_widget(self.cancel_btn)
-        
-        self.create_btn = self.ui.create_button("Create Project")
-        self.create_btn.set_style("padding: 10px 20px; font-size: 14px; background-color: #007acc; color: white;")
-        self.create_btn.clicked.connect(self._on_create)
-        button_layout.add_widget(self.create_btn)
-        
-        main_layout.add_widget(button_layout)
+        self.cancel_btn = button_row.add_secondary_button("Cancel", self._on_cancel)
+        self.create_btn = button_row.add_primary_button("Create Project", self._on_create)
         
         # Set up auto-completion timer
         self.auto_complete_timer = None

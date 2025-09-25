@@ -303,6 +303,156 @@ class UIImplementationInterface(ABC):
         """
         pass
     
+    def create_directional_layout(self, parent: Optional[UIWidget] = None) -> 'UILayout':
+        """
+        Create a directional layout manager for organizing widgets
+        
+        Args:
+            parent: Optional parent widget for proper hierarchy
+            
+        Returns:
+            UILayout: A directional layout that supports:
+                - North, South, East, West, Center positioning
+                - Simple widget arrangement without complex parent management
+                - Automatic expansion and filling
+        """
+        # Default implementation - can be overridden by specific UI implementations
+        from .layouts.directional_layout import DirectionalLayout
+        return DirectionalLayout(parent)
+    
+    # Composite Widgets
+    
+    def create_stack(self, spacing: int = 5, parent: Optional[UIWidget] = None) -> 'Stack':
+        """
+        Create a vertical stack of widgets
+        
+        Args:
+            spacing: Spacing between widgets
+            parent: Optional parent widget
+            
+        Returns:
+            Stack: A vertical stack widget
+        """
+        from .composite_widgets import Stack
+        return Stack(self, spacing, parent)
+    
+    def create_row(self, spacing: int = 5, parent: Optional[UIWidget] = None) -> 'Row':
+        """
+        Create a horizontal row of widgets
+        
+        Args:
+            spacing: Spacing between widgets
+            parent: Optional parent widget
+            
+        Returns:
+            Row: A horizontal row widget
+        """
+        from .composite_widgets import Row
+        return Row(self, spacing, parent)
+    
+    def create_form(self, spacing: int = 10, parent: Optional[UIWidget] = None) -> 'Form':
+        """
+        Create a form widget with labeled input fields
+        
+        Args:
+            spacing: Spacing between form elements
+            parent: Optional parent widget
+            
+        Returns:
+            Form: A form widget
+        """
+        from .composite_widgets import Form
+        return Form(self, spacing, parent)
+    
+    def create_button_row(self, spacing: int = 10, parent: Optional[UIWidget] = None) -> 'ButtonRow':
+        """
+        Create a row of buttons with consistent styling
+        
+        Args:
+            spacing: Spacing between buttons
+            parent: Optional parent widget
+            
+        Returns:
+            ButtonRow: A button row widget
+        """
+        from .composite_widgets import ButtonRow
+        return ButtonRow(self, spacing, parent)
+    
+    # Layout Widgets - New approach with self-managing layouts
+    
+    def create_stack_widget(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'StackWidget':
+        """
+        Create a stack widget that manages its own vertical layout
+        
+        Args:
+            spacing: Spacing between widgets
+            parent: Optional parent widget
+            
+        Returns:
+            StackWidget: A stack widget with internal layout management
+        """
+        from .layout_widgets import StackWidget
+        return StackWidget(self, spacing, parent)
+    
+    def create_row_widget(self, spacing: int = 5, parent: Optional['UIWidget'] = None) -> 'RowWidget':
+        """
+        Create a row widget that manages its own horizontal layout
+        
+        Args:
+            spacing: Spacing between widgets
+            parent: Optional parent widget
+            
+        Returns:
+            RowWidget: A row widget with internal layout management
+        """
+        from .layout_widgets import RowWidget
+        return RowWidget(self, spacing, parent)
+    
+    def create_form_widget(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'FormWidget':
+        """
+        Create a form widget that manages its own layout
+        
+        Args:
+            spacing: Spacing between form elements
+            parent: Optional parent widget
+            
+        Returns:
+            FormWidget: A form widget with internal layout management
+        """
+        from .layout_widgets import FormWidget
+        return FormWidget(self, spacing, parent)
+    
+    def create_button_row_widget(self, spacing: int = 10, parent: Optional['UIWidget'] = None) -> 'ButtonRowWidget':
+        """
+        Create a button row widget that manages its own layout
+        
+        Args:
+            spacing: Spacing between buttons
+            parent: Optional parent widget
+            
+        Returns:
+            ButtonRowWidget: A button row widget with internal layout management
+        """
+        from .layout_widgets import ButtonRowWidget
+        return ButtonRowWidget(self, spacing, parent)
+    
+    def create_table_widget(self, rows: int = 1, cols: int = 1, spacing: int = 5, 
+                           parent: Optional['UIWidget'] = None) -> 'TableWidget':
+        """
+        Create a table widget that manages its own grid layout
+        
+        Args:
+            rows: Number of rows in the table
+            cols: Number of columns in the table
+            spacing: Spacing between cells
+            parent: Optional parent widget
+            
+        Returns:
+            TableWidget: A table widget with internal layout management
+        """
+        from .layout_widgets import TableWidget
+        return TableWidget(self, rows, cols, spacing, parent)
+    
     # Menu and Status Bar Support
     
     @abstractmethod

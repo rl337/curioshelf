@@ -86,6 +86,10 @@ class QtUIMainWidget(UIWidget, UIDebugMixin):
         """Set the status bar for the main window"""
         self._qt_widget.setStatusBar(status_bar.qt_widget)
         self.debug_log("status_bar_set", "Status bar set on main window")
+    
+    def is_visible(self) -> bool:
+        """Check if this main widget is visible"""
+        return self._qt_widget.isVisible()
 
 
 class QtUIWidget(UIWidget, UIDebugMixin):
@@ -145,6 +149,59 @@ class QtUIWidget(UIWidget, UIDebugMixin):
         if hasattr(self, '_qt_widget') and self._qt_widget:
             self._qt_widget.deleteLater()
     
+    # Size and Location Information
+    
+    def get_size(self) -> tuple[int, int]:
+        """Get the size of the widget as (width, height)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            size = self._qt_widget.size()
+            return (size.width(), size.height())
+        return (0, 0)
+    
+    def get_position(self) -> tuple[int, int]:
+        """Get the position of the widget as (x, y)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            pos = self._qt_widget.pos()
+            return (pos.x(), pos.y())
+        return (0, 0)
+    
+    def get_geometry(self) -> tuple[int, int, int, int]:
+        """Get the geometry of the widget as (x, y, width, height)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            geom = self._qt_widget.geometry()
+            return (geom.x(), geom.y(), geom.width(), geom.height())
+        return (0, 0, 0, 0)
+    
+    def set_size(self, width: int, height: int) -> None:
+        """Set the size of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.resize(width, height)
+            self.debug_state_change("size_changed", {"width": width, "height": height})
+    
+    def set_position(self, x: int, y: int) -> None:
+        """Set the position of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.move(x, y)
+            self.debug_state_change("position_changed", {"x": x, "y": y})
+    
+    def set_geometry(self, x: int, y: int, width: int, height: int) -> None:
+        """Set the geometry of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.setGeometry(x, y, width, height)
+            self.debug_state_change("geometry_changed", {"x": x, "y": y, "width": width, "height": height})
+    
+    def is_visible(self) -> bool:
+        """Check if the widget is visible"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            return self._qt_widget.isVisible()
+        return self._visible
+    
+    def is_enabled(self) -> bool:
+        """Check if the widget is enabled"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            return self._qt_widget.isEnabled()
+        return self._enabled
+    
     def set_layout(self, layout: 'UILayout') -> None:
         """Set the layout for the widget"""
         super().set_layout(layout)
@@ -158,6 +215,39 @@ class QtUIWidget(UIWidget, UIDebugMixin):
                 "layout_type": layout.__class__.__name__,
                 "widget_id": id(self)
             })
+            # Store the layout reference for later use
+            self._layout = layout
+    
+    def layout(self) -> Optional['UILayout']:
+        """Get the layout of the widget"""
+        return getattr(self, '_layout', None)
+    
+    def add_widget(self, widget: 'UIWidget') -> None:
+        """Add a widget to this widget"""
+        if hasattr(widget, 'qt_widget'):
+            # Ensure we have a layout
+            layout = self._qt_widget.layout()
+            if layout is None:
+                from PySide6.QtWidgets import QVBoxLayout
+                layout = QVBoxLayout()
+                self._qt_widget.setLayout(layout)
+            layout.addWidget(widget.qt_widget)
+        self.debug_log("widget_added", "Widget added to QtUIWidget")
+    
+    def clear(self) -> None:
+        """Clear all widgets from this widget"""
+        # Clear the Qt layout
+        layout = self._qt_widget.layout()
+        if layout:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+        self.debug_log("cleared", "QtUIWidget cleared")
+    
+    def is_visible(self) -> bool:
+        """Check if this widget is visible"""
+        return self._qt_widget.isVisible()
     
     @property
     def qt_widget(self) -> QWidget:
@@ -716,6 +806,60 @@ class QtUIGroupBox(UIGroupBox):
         """Set the title of the group box"""
         self.title = title
     
+    def set_style(self, style: str) -> None:
+        """Set CSS-like style for the group box"""
+        self._qt_group.setStyleSheet(style)
+    
+    # Size and Location Information
+    
+    def get_size(self) -> tuple[int, int]:
+        """Get the size of the widget as (width, height)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            size = self._qt_widget.size()
+            return (size.width(), size.height())
+        return (0, 0)
+    
+    def get_position(self) -> tuple[int, int]:
+        """Get the position of the widget as (x, y)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            pos = self._qt_widget.pos()
+            return (pos.x(), pos.y())
+        return (0, 0)
+    
+    def get_geometry(self) -> tuple[int, int, int, int]:
+        """Get the geometry of the widget as (x, y, width, height)"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            geom = self._qt_widget.geometry()
+            return (geom.x(), geom.y(), geom.width(), geom.height())
+        return (0, 0, 0, 0)
+    
+    def set_size(self, width: int, height: int) -> None:
+        """Set the size of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.resize(width, height)
+    
+    def set_position(self, x: int, y: int) -> None:
+        """Set the position of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.move(x, y)
+    
+    def set_geometry(self, x: int, y: int, width: int, height: int) -> None:
+        """Set the geometry of the widget"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            self._qt_widget.setGeometry(x, y, width, height)
+    
+    def is_visible(self) -> bool:
+        """Check if the widget is visible"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            return self._qt_widget.isVisible()
+        return self._visible
+    
+    def is_enabled(self) -> bool:
+        """Check if the widget is enabled"""
+        if hasattr(self, '_qt_widget') and self._qt_widget:
+            return self._qt_widget.isEnabled()
+        return self._enabled
+    
     @property
     def qt_widget(self) -> QGroupBox:
         """Get the underlying Qt group box"""
@@ -819,17 +963,30 @@ class QtUILayout(UILayout):
     
     def add_widget(self, widget: UIWidget, *args, **kwargs) -> None:
         """Add a widget to the layout"""
+        # Handle expand parameter for Qt layouts
+        expand = kwargs.pop('expand', False)
+        
         # Check if widget has a qt_widget property (all Qt implementations should have this)
         if hasattr(widget, 'qt_widget'):
             # Ensure the widget is properly parented
             if hasattr(self, '_parent_widget') and self._parent_widget:
                 widget.qt_widget.setParent(self._parent_widget)
-            self._qt_layout.addWidget(widget.qt_widget, *args, **kwargs)
+            
+            # Add widget to layout with proper stretch factor
+            if expand:
+                self._qt_layout.addWidget(widget.qt_widget, 1)  # Stretch factor of 1 for expansion
+            else:
+                self._qt_layout.addWidget(widget.qt_widget, 0)  # No stretch factor
         elif hasattr(widget, '_qt_tabs'):  # Special case for QtUITabWidget
             # Ensure the widget is properly parented
             if hasattr(self, '_parent_widget') and self._parent_widget:
                 widget._qt_tabs.setParent(self._parent_widget)
-            self._qt_layout.addWidget(widget._qt_tabs, *args, **kwargs)
+            
+            # Add widget to layout with proper stretch factor
+            if expand:
+                self._qt_layout.addWidget(widget._qt_tabs, 1)  # Stretch factor of 1 for expansion
+            else:
+                self._qt_layout.addWidget(widget._qt_tabs, 0)  # No stretch factor
         else:
             print(f"Warning: Cannot add widget {widget} to layout - no Qt widget found")
     
@@ -980,6 +1137,10 @@ class QtUIMenuItem(UIMenuItem, UIDebugMixin):
         """Enable or disable the menu item"""
         super().set_enabled(enabled)
         self._qt_action.setEnabled(enabled)
+    
+    def is_enabled(self) -> bool:
+        """Check if the menu item is enabled"""
+        return self._qt_action.isEnabled()
     
     def set_visible(self, visible: bool) -> None:
         """Show or hide the menu item"""

@@ -58,6 +58,58 @@ class DebugUIWidget(UIWidget):
     def clear(self) -> None:
         """Clear all widgets from this widget"""
         self._log_ui_event("cleared")
+    
+    # Size and Location Information
+    
+    def get_size(self) -> tuple[int, int]:
+        """Get the size of the widget as (width, height)"""
+        # For headless implementation, return stored size or default
+        return getattr(self, '_size', (100, 50))
+    
+    def get_position(self) -> tuple[int, int]:
+        """Get the position of the widget as (x, y)"""
+        # For headless implementation, return stored position or default
+        return getattr(self, '_position', (0, 0))
+    
+    def get_geometry(self) -> tuple[int, int, int, int]:
+        """Get the geometry of the widget as (x, y, width, height)"""
+        # For headless implementation, return stored geometry or default
+        return getattr(self, '_geometry', (0, 0, 100, 50))
+    
+    def set_size(self, width: int, height: int) -> None:
+        """Set the size of the widget"""
+        self._size = (width, height)
+        self._log_state_change("size_changed", {"width": width, "height": height})
+    
+    def set_position(self, x: int, y: int) -> None:
+        """Set the position of the widget"""
+        self._position = (x, y)
+        self._log_state_change("position_changed", {"x": x, "y": y})
+    
+    def set_geometry(self, x: int, y: int, width: int, height: int) -> None:
+        """Set the geometry of the widget"""
+        # Validate geometry
+        if width <= 0:
+            raise ValueError(f"Widget width must be positive, got {width}")
+        if height <= 0:
+            raise ValueError(f"Widget height must be positive, got {height}")
+        if x < 0:
+            raise ValueError(f"Widget x position must be non-negative, got {x}")
+        if y < 0:
+            raise ValueError(f"Widget y position must be non-negative, got {y}")
+        
+        self._geometry = (x, y, width, height)
+        self._position = (x, y)
+        self._size = (width, height)
+        self._log_state_change("geometry_changed", {"x": x, "y": y, "width": width, "height": height})
+    
+    def is_visible(self) -> bool:
+        """Check if the widget is visible"""
+        return self._visible
+    
+    def is_enabled(self) -> bool:
+        """Check if the widget is enabled"""
+        return self._enabled
 
 
 class DebugUIButton(UIButton):
@@ -88,14 +140,20 @@ class DebugUIButton(UIButton):
         """Get the clicked signal for connecting callbacks"""
         # For debug UI, we'll return a mock signal object
         class MockSignal:
+            def __init__(self, button):
+                self._button = button
+                self._callback = None
+                
             def connect(self, callback):
                 self._callback = callback
-            
+                
             def emit(self):
-                if hasattr(self, '_callback'):
+                # Log the button click
+                self._button.message_logger.log_user_action(self._button.__class__.__name__, "clicked", {"text": self._button._text})
+                if self._callback:
                     self._callback()
         
-        return MockSignal()
+        return MockSignal(self)
 
 
 class DebugUILabel(UILabel):
@@ -662,14 +720,18 @@ class DebugUIMenuItem(UIMenuItem):
         """Get the clicked signal for connecting callbacks"""
         # For debug UI, we'll return a mock signal object
         class MockSignal:
+            def __init__(self, menu_item):
+                self._menu_item = menu_item
+                self._callback = None
+                
             def connect(self, callback):
                 self._callback = callback
             
             def emit(self):
-                if hasattr(self, '_callback'):
+                if hasattr(self, '_callback') and self._callback:
                     self._callback()
         
-        return MockSignal()
+        return MockSignal(self)
     
     def update_state(self, state_name: str) -> None:
         """Update the menu item state based on the callback for the given state name"""

@@ -11,7 +11,7 @@ from curioshelf.event_execution_layer import EventExecutionLayer
 from curioshelf.status_bar_handler import StatusBarEventHandler
 from curioshelf.ui.ui_interface import UIImplementationInterface
 from curioshelf.ui.abstraction import UIWidget, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
-from curioshelf.ui.views.view_manager import ViewManager
+from curioshelf.ui.views.view_container import ViewContainer
 from curioshelf.ui.views.sources_list_view import SourcesListView
 from curioshelf.ui.views.project_create_view import ProjectCreateView
 from curioshelf.ui.views.project_open_view import ProjectOpenView
@@ -38,7 +38,7 @@ class MainWindowWithViews:
         self.main_widget = None
         self.menu_bar = None
         self.status_bar = None
-        self.view_manager = None
+        self.view_container = None
         
         # Status bar event handler
         self.status_handler = StatusBarEventHandler()
@@ -128,8 +128,8 @@ class MainWindowWithViews:
         # Create main widget
         self.main_widget = self.ui.create_main_widget()
         
-        # Create view manager
-        self.view_manager = ViewManager(self.ui, self.main_widget)
+        # Create view container
+        self.view_container = ViewContainer(self.ui)
         
         # Create views
         self._create_views()
@@ -142,6 +142,9 @@ class MainWindowWithViews:
         
         # Set up the main layout
         self._setup_main_layout()
+        
+        # Make the main widget visible
+        self.main_widget.set_visible(True)
     
     def _create_views(self):
         """Create all views"""
@@ -150,8 +153,8 @@ class MainWindowWithViews:
             self.ui,
             on_import_source=self._on_import_source
         )
-        self.view_manager.register_view("sources", self.sources_view)
-        self.view_manager.set_default_view(self.sources_view)
+        self.view_container.register_view("sources", self.sources_view)
+        self.view_container.set_default_view(self.sources_view)
         
         # Create project create view
         self.project_create_view = ProjectCreateView(
@@ -159,7 +162,7 @@ class MainWindowWithViews:
             on_create=self._on_project_created,
             on_cancel=self._on_project_cancel
         )
-        self.view_manager.register_view("project_create", self.project_create_view)
+        self.view_container.register_view("project_create", self.project_create_view)
         
         # Create project open view
         self.project_open_view = ProjectOpenView(
@@ -167,20 +170,24 @@ class MainWindowWithViews:
             on_open=self._on_project_opened,
             on_cancel=self._on_project_cancel
         )
-        self.view_manager.register_view("project_open", self.project_open_view)
+        self.view_container.register_view("project_open", self.project_open_view)
     
     def _setup_main_layout(self):
         """Set up the main layout with menu bar and status bar"""
-        # The view manager already set up the main layout
-        # We just need to add menu bar and status bar
+        # Create main layout
+        main_layout = self.ui.create_layout("vertical")
+        self.main_widget.set_layout(main_layout)
         
         # Add menu bar at the top
         if self.menu_bar:
-            self.view_manager.main_layout.insert_widget(0, self.menu_bar)
+            main_layout.add_widget(self.menu_bar)
+        
+        # Add view container (this will contain all the views)
+        main_layout.add_widget(self.view_container.get_widget())
         
         # Add status bar at the bottom
         if self.status_bar:
-            self.view_manager.main_layout.add_widget(self.status_bar)
+            main_layout.add_widget(self.status_bar)
     
     def create_menu_bar(self):
         """Create the menu bar"""
@@ -193,6 +200,7 @@ class MainWindowWithViews:
         new_project_action = self.ui.create_menu_item("New Project")
         new_project_action.set_text("New Project")
         new_project_action.clicked.connect(self._on_new_project)
+        new_project_action.set_enabled_callback(lambda: True)  # Always enabled
         project_menu.add_item(new_project_action)
         self.actions["new_project"] = new_project_action
         
@@ -200,6 +208,7 @@ class MainWindowWithViews:
         open_project_action = self.ui.create_menu_item("Open Project")
         open_project_action.set_text("Open Project")
         open_project_action.clicked.connect(self._on_open_project)
+        open_project_action.set_enabled_callback(lambda: True)  # Always enabled
         project_menu.add_item(open_project_action)
         self.actions["open_project"] = open_project_action
         
@@ -210,6 +219,7 @@ class MainWindowWithViews:
         save_project_action = self.ui.create_menu_item("Save Project")
         save_project_action.set_text("Save Project")
         save_project_action.clicked.connect(self._on_save_project)
+        save_project_action.set_enabled_callback(lambda: self.app.is_project_loaded())
         project_menu.add_item(save_project_action)
         self.actions["save_project"] = save_project_action
         
@@ -217,6 +227,7 @@ class MainWindowWithViews:
         close_project_action = self.ui.create_menu_item("Close Project")
         close_project_action.set_text("Close Project")
         close_project_action.clicked.connect(self._on_close_project)
+        close_project_action.set_enabled_callback(lambda: self.app.is_project_loaded())
         project_menu.add_item(close_project_action)
         self.actions["close_project"] = close_project_action
         
@@ -229,6 +240,7 @@ class MainWindowWithViews:
         import_source_action = self.ui.create_menu_item("Import Source")
         import_source_action.set_text("Import Source")
         import_source_action.clicked.connect(self._on_import_source)
+        import_source_action.set_enabled_callback(lambda: self.app.is_project_loaded())
         sources_menu.add_item(import_source_action)
         self.actions["import_source"] = import_source_action
         
@@ -290,8 +302,10 @@ class MainWindowWithViews:
             success = self.app.close_project()
             if success:
                 print("Project closed successfully")
+                # Update menu state to reflect project unloaded
+                self._update_menu_state()
                 # Return to sources view
-                self.view_manager.hide_current_view()
+                self.view_container.hide_current_view()
             else:
                 print("Failed to close project")
         else:
@@ -312,12 +326,12 @@ class MainWindowWithViews:
     
     def show_project_create_view(self):
         """Show the project creation view"""
-        self.view_manager.show_view_by_name("project_create")
+        self.view_container.show_view_by_name("project_create")
         self.project_create_view.reset()
     
     def show_project_open_view(self):
         """Show the project opening view"""
-        self.view_manager.show_view_by_name("project_open")
+        self.view_container.show_view_by_name("project_open")
         # Refresh the projects list
         self.project_open_view._refresh_projects()
     
@@ -330,8 +344,10 @@ class MainWindowWithViews:
         
         if success:
             print("Project created successfully")
+            # Update menu state to reflect project loaded
+            self._update_menu_state()
             # Return to sources view
-            self.view_manager.hide_current_view()
+            self.view_container.hide_current_view()
             # Add any existing sources to the sources view
             self._refresh_sources_view()
         else:
@@ -349,8 +365,10 @@ class MainWindowWithViews:
         
         if success:
             print("Project opened successfully")
+            # Update menu state to reflect project loaded
+            self._update_menu_state()
             # Return to sources view
-            self.view_manager.hide_current_view()
+            self.view_container.hide_current_view()
             # Add any existing sources to the sources view
             self._refresh_sources_view()
         else:
@@ -362,7 +380,7 @@ class MainWindowWithViews:
     def _on_project_cancel(self):
         """Handle project dialog cancellation"""
         print("Project dialog cancelled - returning to sources view")
-        self.view_manager.hide_current_view()
+        self.view_container.hide_current_view()
     
     def _refresh_sources_view(self):
         """Refresh the sources view with current project sources"""
@@ -378,8 +396,11 @@ class MainWindowWithViews:
     
     def cleanup(self):
         """Clean up resources"""
-        if self.view_manager:
-            self.view_manager.cleanup()
+        if self.view_container:
+            # View container doesn't need cleanup, but views might
+            for view in self.view_container.views.values():
+                if hasattr(view, 'cleanup'):
+                    view.cleanup()
         if self.event_layer:
             self.event_layer.stop()
         if self.status_handler:
