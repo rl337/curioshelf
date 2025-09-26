@@ -94,10 +94,94 @@ def main():
         help="File to log debug messages to"
     )
     
+    # Add subcommands
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    
+    # Generate samples subcommand
+    generate_parser = subparsers.add_parser('generate_samples', help='Generate sample sprites for testing')
+    generate_parser.add_argument(
+        '--output-dir',
+        type=str,
+        default='samples',
+        help='Output directory for generated samples (default: samples)'
+    )
+    generate_parser.add_argument(
+        '--count',
+        type=int,
+        default=10,
+        help='Number of sprites to generate for each animation (default: 10)'
+    )
+    generate_parser.add_argument(
+        '--width',
+        type=int,
+        default=64,
+        help='Width of each sprite in pixels (default: 64)'
+    )
+    generate_parser.add_argument(
+        '--height',
+        type=int,
+        default=64,
+        help='Height of each sprite in pixels (default: 64)'
+    )
+    generate_parser.add_argument(
+        '--color',
+        type=str,
+        default='black',
+        help='Color for the stick figure (default: black). Use web-safe color names like cyan, magenta, red, etc.'
+    )
+    generate_parser.add_argument(
+        '--sprite-sheet',
+        action='store_true',
+        help='Generate a single sprite sheet with all color variations instead of individual files'
+    )
+    
     args = parser.parse_args()
     
     # Configure logging first
     configure_logging(debug=args.debug, verbose=args.verbose)
+    
+    # Handle generate_samples command
+    if args.command == 'generate_samples':
+        if args.sprite_sheet:
+            from .sprite_generator import generate_sprite_sheet
+            print(f"Generating sprite sheet...")
+            print(f"Output directory: {args.output_dir}")
+            print(f"Frames per animation: {args.count}")
+            print(f"Sprite size: {args.width}x{args.height}")
+            print(f"Mode: Single sprite sheet with all color variations")
+            
+            try:
+                generate_sprite_sheet(
+                    output_dir=args.output_dir,
+                    frames_per_animation=args.count,
+                    sprite_width=args.width,
+                    sprite_height=args.height
+                )
+                print("Sprite sheet generated successfully!")
+            except Exception as e:
+                print(f"Error generating sprite sheet: {e}")
+                sys.exit(1)
+        else:
+            from .sprite_generator import generate_sample_sprites
+            print(f"Generating individual sample sprites...")
+            print(f"Output directory: {args.output_dir}")
+            print(f"Count per animation: {args.count}")
+            print(f"Sprite size: {args.width}x{args.height}")
+            print(f"Color: {args.color}")
+            
+            try:
+                generate_sample_sprites(
+                    output_dir=args.output_dir,
+                    count=args.count,
+                    width=args.width,
+                    height=args.height,
+                    color=args.color
+                )
+                print("Sample sprites generated successfully!")
+            except Exception as e:
+                print(f"Error generating samples: {e}")
+                sys.exit(1)
+        return
     
     # Override UI backend if debug-ui flag is set
     ui_backend = "debug" if args.debug_ui else args.ui

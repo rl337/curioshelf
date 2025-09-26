@@ -1,0 +1,3305 @@
+{
+  "sprite_sheet": {
+    "width": 532,
+    "height": 1306,
+    "sprite_width": 32,
+    "sprite_height": 32,
+    "plugins": 1
+  },
+  "frames_per_animation": 10,
+  "plugins": [
+    {
+      "name": "stick_figure",
+      "width": 532,
+      "height": 1306,
+      "y_offset": 0,
+      "sprite_count": 192,
+      "properties": {
+        "total_colors": 6,
+        "total_animations": 4,
+        "primary_colors": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "secondary_colors": [
+          "cyan",
+          "magenta",
+          "yellow"
+        ],
+        "animation_descriptions": {
+          "walk": "Walk Cycle",
+          "stopping": "Coming to Stop",
+          "speeding_up": "Speeding Up",
+          "jumping": "Jumping"
+        }
+      }
+    }
+  ],
+  "sprites": [
+    {
+      "id": "red_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "red_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 70,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "red_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "red_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "red_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 168,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "red",
+        "color_hex": "#FF0000",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "green_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 286,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "green_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "green_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "green_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "green",
+        "color_hex": "#00FF00",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "blue_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 502,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "blue_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "blue_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "blue_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 600,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "blue",
+        "color_hex": "#0000FF",
+        "is_primary": true,
+        "is_secondary": false,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "cyan_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 718,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "cyan_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "cyan_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 816,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "cyan",
+        "color_hex": "#00FFFF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "magenta_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 934,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "magenta_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "magenta_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 1032,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "magenta",
+        "color_hex": "#FF00FF",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_walk_000",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 0,
+      "x": 0,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_001",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 1,
+      "x": 32,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_002",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 2,
+      "x": 64,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_003",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 3,
+      "x": 96,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_004",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 4,
+      "x": 128,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_005",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 5,
+      "x": 160,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_006",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 6,
+      "x": 192,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_walk_007",
+      "plugin_name": "stick_figure",
+      "animation": "walk",
+      "frame": 7,
+      "x": 224,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Walk Cycle"
+      }
+    },
+    {
+      "id": "yellow_stopping_000",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 0,
+      "x": 276,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_001",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 1,
+      "x": 308,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_002",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 2,
+      "x": 340,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_003",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 3,
+      "x": 372,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_004",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 4,
+      "x": 404,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_005",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 5,
+      "x": 436,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_006",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 6,
+      "x": 468,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_stopping_007",
+      "plugin_name": "stick_figure",
+      "animation": "stopping",
+      "frame": 7,
+      "x": 500,
+      "y": 1150,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Coming to Stop"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_000",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 0,
+      "x": 0,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_001",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 1,
+      "x": 32,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_002",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 2,
+      "x": 64,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_003",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 3,
+      "x": 96,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_004",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 4,
+      "x": 128,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_005",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 5,
+      "x": 160,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_006",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 6,
+      "x": 192,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_speeding_up_007",
+      "plugin_name": "stick_figure",
+      "animation": "speeding_up",
+      "frame": 7,
+      "x": 224,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Speeding Up"
+      }
+    },
+    {
+      "id": "yellow_jumping_000",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 0,
+      "x": 276,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_001",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 1,
+      "x": 308,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_002",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 2,
+      "x": 340,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_003",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 3,
+      "x": 372,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_004",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 4,
+      "x": 404,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_005",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 5,
+      "x": 436,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_006",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 6,
+      "x": 468,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    },
+    {
+      "id": "yellow_jumping_007",
+      "plugin_name": "stick_figure",
+      "animation": "jumping",
+      "frame": 7,
+      "x": 500,
+      "y": 1248,
+      "width": 32,
+      "height": 32,
+      "properties": {
+        "color": "yellow",
+        "color_hex": "#FFFF00",
+        "is_primary": false,
+        "is_secondary": true,
+        "animation_description": "Jumping"
+      }
+    }
+  ]
+}
