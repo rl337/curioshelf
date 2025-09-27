@@ -15,6 +15,12 @@ from ..abstraction import (
     UIMessageBox, UIFileDialog, UIProgressBar, UIGroupBox, UITabWidget,
     UISplitter, UILayout, UIMenuBar, UIMenu, UIMenuItem, UIStatusBar
 )
+from .widgets import (
+    ScriptUIWidget, ScriptUIButton, ScriptUITextInput, ScriptUIComboBox, ScriptUIListWidget,
+    ScriptUICanvas, ScriptUIMessageBox, ScriptUIFileDialog, ScriptUIProgressBar,
+    ScriptUIGroupBox, ScriptUITabWidget, ScriptUISplitter, ScriptUILayout,
+    ScriptUIMenuItem, ScriptUIMenu, ScriptUIMenuBar, ScriptUIStatusBar
+)
 from ..factory_interface import UIFactoryInterface
 from ..ui_interface import UIImplementationInterface, UIImplementationError
 from .command_parser import CommandParser, CommandError, ParsedCommand, CommandType
@@ -236,80 +242,153 @@ class ScriptUIImplementation(UIImplementationInterface, UIFactoryInterface):
     
     # UI Factory methods (stubs for compatibility)
     def create_widget(self, parent: Optional['UIWidget'] = None) -> 'UIWidget':
-        """Create a basic widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a basic widget for script UI"""
+        from .widgets import ScriptUIWidget
+        widget = ScriptUIWidget()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created generic widget: {widget}")
+        return widget
     
     def create_button(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'UIButton':
-        """Create a button (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a button for script UI"""
+        button = ScriptUIButton(text)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created button: '{text}'")
+        return button
     
     def create_text_input(self, placeholder: str = "", parent: Optional['UIWidget'] = None) -> 'UITextInput':
-        """Create a text input (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a text input for script UI"""
+        text_input = ScriptUITextInput(placeholder)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created text input with placeholder: '{placeholder}'")
+        return text_input
     
     def create_line_edit(self, parent: Optional['UIWidget'] = None) -> 'UITextInput':
-        """Create a line edit widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a line edit widget for script UI"""
+        line_edit = ScriptUITextInput()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created line edit")
+        return line_edit
     
     def create_label(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'UILabel':
-        """Create a label widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a label widget for script UI"""
+        # For now, use a text input as a label (read-only)
+        label = ScriptUITextInput(text)
+        label.set_enabled(False)  # Make it read-only
+        if self.verbose:
+            print(f"[SCRIPT UI] Created label: '{text}'")
+        return label
     
     def create_combo_box(self, parent: Optional['UIWidget'] = None) -> 'UIComboBox':
-        """Create a combo box (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a combo box for script UI"""
+        combo_box = ScriptUIComboBox()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created combo box")
+        return combo_box
     
     def create_list_widget(self, parent: Optional['UIWidget'] = None) -> 'UIListWidget':
-        """Create a list widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a list widget for script UI"""
+        list_widget = ScriptUIListWidget()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created list widget")
+        return list_widget
     
     def create_canvas(self, parent: Optional['UIWidget'] = None) -> 'UICanvas':
-        """Create a canvas widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a canvas widget for script UI"""
+        canvas = ScriptUICanvas()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created canvas")
+        return canvas
     
     def create_message_box(self, parent: Optional['UIWidget'] = None) -> 'UIMessageBox':
-        """Create a message box (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a message box for script UI"""
+        message_box = ScriptUIMessageBox()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created message box")
+        return message_box
     
     def create_file_dialog(self, parent: Optional['UIWidget'] = None) -> 'UIFileDialog':
-        """Create a file dialog (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a file dialog for script UI"""
+        file_dialog = ScriptUIFileDialog()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created file dialog")
+        return file_dialog
     
     def create_progress_bar(self, parent: Optional['UIWidget'] = None) -> 'UIProgressBar':
-        """Create a progress bar (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a progress bar for script UI"""
+        progress_bar = ScriptUIProgressBar()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created progress bar")
+        return progress_bar
     
     def create_group_box(self, title: str = "") -> 'UIGroupBox':
-        """Create a group box (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a group box for script UI"""
+        group_box = ScriptUIGroupBox(title)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created group box: '{title}'")
+        return group_box
     
     def create_tab_widget(self, parent: Optional['UIWidget'] = None) -> 'UITabWidget':
-        """Create a tab widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a tab widget for script UI"""
+        tab_widget = ScriptUITabWidget()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created tab widget")
+        return tab_widget
     
     def create_splitter(self, orientation: str = "horizontal", parent: Optional['UIWidget'] = None) -> 'UISplitter':
-        """Create a splitter widget (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a splitter widget for script UI"""
+        splitter = ScriptUISplitter(orientation)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created splitter with orientation: {orientation}")
+        return splitter
     
     def create_layout(self, orientation: str = "vertical", parent: Optional['UIWidget'] = None) -> 'UILayout':
-        """Create a layout (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a layout for script UI"""
+        layout = ScriptUILayout(orientation)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created layout with orientation: {orientation}")
+        return layout
     
     def create_menu_bar(self, parent: Optional['UIWidget'] = None) -> 'UIMenuBar':
-        """Create a menu bar (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a menu bar for script UI"""
+        menu_bar = ScriptUIMenuBar()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created menu bar")
+        return menu_bar
     
     def create_menu(self, title: str, parent: Optional['UIWidget'] = None) -> 'UIMenu':
-        """Create a menu (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a menu for script UI"""
+        menu = ScriptUIMenu(title)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created menu: '{title}'")
+        return menu
     
     def create_menu_item(self, text: str, parent: Optional['UIWidget'] = None) -> 'UIMenuItem':
-        """Create a menu item (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a menu item for script UI"""
+        menu_item = ScriptUIMenuItem(text)
+        if self.verbose:
+            print(f"[SCRIPT UI] Created menu item: '{text}'")
+        return menu_item
     
     def create_status_bar(self, parent: Optional['UIWidget'] = None) -> 'UIStatusBar':
-        """Create a status bar (not applicable for script UI)"""
-        raise NotImplementedError("Script UI does not support widget creation")
+        """Create a status bar for script UI"""
+        status_bar = ScriptUIStatusBar()
+        if self.verbose:
+            print(f"[SCRIPT UI] Created status bar")
+        return status_bar
+    
+    def create_label(self, text: str = "", parent: Optional['UIWidget'] = None) -> 'UIWidget':
+        """Create a label for script UI"""
+        # For now, return a basic widget with text property
+        label = ScriptUIWidget()
+        label.set_property("text", text)
+        # Add set_text method for compatibility
+        def set_text(new_text: str) -> None:
+            label.set_property("text", new_text)
+        label.set_text = set_text
+        if self.verbose:
+            print(f"[SCRIPT UI] Created label: '{text}'")
+        return label
     
     def create_main_widget(self, parent: Optional['UIWidget'] = None) -> 'UIWidget':
         """Create a main widget for the main window"""

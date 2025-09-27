@@ -1,5 +1,8 @@
 """
 Qt implementation of project dialog for creating and opening projects
+
+DEPRECATED: This module is deprecated and should not be used in new code.
+Use the view system (ProjectCreateView/ProjectOpenView) instead.
 """
 
 from typing import Optional, Callable
@@ -17,7 +20,7 @@ from curioshelf.config import config
 
 
 class QtProjectDialog(QDialog):
-    """Qt implementation of project dialog"""
+    """Qt implementation of project dialog - DEPRECATED: Use view system instead"""
     
     # Signals
     project_created = Signal(Path, ProjectMetadata)

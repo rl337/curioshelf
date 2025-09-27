@@ -20,7 +20,7 @@ from curioshelf.event_system import (
 )
 from curioshelf.event_execution_layer import EventExecutionLayer
 from curioshelf.status_bar_handler import StatusBarEventHandler
-from .project_dialog_abstracted import ProjectDialogAbstracted
+# ProjectDialogAbstracted is deprecated - use view system instead
 
 
 class MainWindowAbstracted:
@@ -428,16 +428,13 @@ class MainWindowAbstracted:
         )
     
     def show_project_dialog(self, create_mode: bool = True):
-        """Show the project management dialog"""
-        dialog = ProjectDialogAbstracted(self.ui)
-        dialog.connect_signal("project_created", self.on_project_created)
-        dialog.connect_signal("project_loaded", self.on_project_loaded)
-        
-        # Set the dialog mode
-        if hasattr(dialog, 'set_mode'):
-            dialog.set_mode('create' if create_mode else 'open')
-        
-        dialog.exec()
+        """Show the project management dialog - DEPRECATED: Use view system instead"""
+        # This method is deprecated. The new UI system uses views instead of modal dialogs.
+        # Use MainWindowWithViews for the new view-based UI.
+        raise DeprecationWarning(
+            "show_project_dialog() is deprecated. "
+            "Use MainWindowWithViews with view system instead."
+        )
     
     def on_project_created(self, project_path: Path, project_info: ProjectInfo):
         """Handle project creation"""

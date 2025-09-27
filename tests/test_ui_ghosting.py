@@ -188,27 +188,25 @@ class TestMenuClickBehavior:
         app = MockCurioShelfApplication()
         main_window = MainWindowAbstracted(ui, app, use_mock=True)
         
-        # Mock the project dialog to prevent Qt crashes
-        with patch('curioshelf.ui.project_dialog_abstracted.ProjectDialogAbstracted.exec') as mock_dialog_exec:
-            # Capture events to verify execution
-            events = []
-            def capture_event(event):
-                events.append(event)
-            
-            event_bus.subscribe(EventType.SUCCESS, capture_event)
-            event_bus.subscribe(EventType.ERROR, capture_event)
-            event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
-            
-            # New project should be enabled initially
-            new_project_item = main_window.actions["new_project"]
-            assert new_project_item.enabled, "New Project should be enabled"
-            
-            # Click the enabled menu item
-            new_project_item._on_clicked()
-            
-            # Verify that a SHOW_DIALOG event was emitted (instead of direct project creation)
-            dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
-            assert len(dialog_events) > 0, "SHOW_DIALOG events should be emitted for enabled menu item"
+        # Capture events to verify execution
+        events = []
+        def capture_event(event):
+            events.append(event)
+        
+        event_bus.subscribe(EventType.SUCCESS, capture_event)
+        event_bus.subscribe(EventType.ERROR, capture_event)
+        event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
+        
+        # New project should be enabled initially
+        new_project_item = main_window.actions["new_project"]
+        assert new_project_item.enabled, "New Project should be enabled"
+        
+        # Click the enabled menu item
+        new_project_item._on_clicked()
+        
+        # Verify that a SHOW_DIALOG event was emitted (instead of direct project creation)
+        dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
+        assert len(dialog_events) > 0, "SHOW_DIALOG events should be emitted for enabled menu item"
     
     def test_menu_state_updates_after_operations(self):
         """Test that menu state updates automatically after operations"""

@@ -47,10 +47,8 @@ class TestUIUnified:
     def test_widget_creation(self, ui_factory):
         """Test that all widget types can be created"""
         ui_impl = ui_factory.get_ui_implementation()
-        
-        # Skip widget creation tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support widget creation")
+
+        # Script UI now supports widget creation, so no need to skip
         
         widget_types = [
             'button', 'text_input', 'combo_box', 'list_widget', 
@@ -76,9 +74,7 @@ class TestUIUnified:
         """Test widget operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip widget operations tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support widget operations")
+        # Script UI now supports widget operations, so no need to skip
         
         button = ui_impl.create_button("Test Button")
         
@@ -103,9 +99,7 @@ class TestUIUnified:
         """Test text input operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip text input tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support text input operations")
+        # Script UI now supports text input operations, so no need to skip
         
         text_input = ui_impl.create_text_input("Placeholder")
         
@@ -120,9 +114,7 @@ class TestUIUnified:
         """Test combo box operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip combo box tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support combo box operations")
+        # Script UI now supports combo box operations, so no need to skip
         
         combo = ui_impl.create_combo_box()
         
@@ -162,9 +154,7 @@ class TestUIUnified:
         """Test list widget operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip list widget tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support list widget operations")
+        # Script UI now supports list widget operations, so no need to skip
         
         list_widget = ui_impl.create_list_widget()
         
@@ -199,9 +189,7 @@ class TestUIUnified:
         """Test progress bar operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip progress bar tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support progress bar operations")
+        # Script UI now supports progress bar operations, so no need to skip
         
         progress = ui_impl.create_progress_bar()
         
@@ -224,9 +212,7 @@ class TestUIUnified:
         """Test layout operations"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip layout tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support layout operations")
+        # Script UI now supports layout operations, so no need to skip
         
         layout = ui_impl.create_layout("vertical")
         button = ui_impl.create_button("Test")
@@ -249,9 +235,7 @@ class TestUIUnified:
         """Test main window creation"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip main window creation tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support main window creation")
+        # Script UI now supports main window creation, so no need to skip
         
         main_window = ui_factory.create_main_window()
         
@@ -264,32 +248,25 @@ class TestUIUnified:
     
     def test_main_window_methods(self, ui_factory):
         """Test main window method calls"""
-        # Skip this test for script UI as it doesn't support full widget creation
+        # Script UI now supports full main window creation, so no need to skip
         ui_impl = ui_factory.get_ui_implementation()
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support full main window creation")
         
-        # Create main window with abstracted interface (not views)
-        from curioshelf.ui.main_window_abstracted import MainWindowAbstracted
-        main_window = MainWindowAbstracted(ui_impl)
+        # Create main window with view system (new UI)
+        from curioshelf.ui.main_window_with_views import MainWindowWithViews
+        main_window = MainWindowWithViews(ui_impl)
         
         # These methods should not raise exceptions
-        main_window.new_project()
-        main_window.open_project()
-        main_window.import_source()
-        main_window.create_object()
-        main_window.create_template()
-        main_window.export_assets()
-        main_window.save_project()
-        main_window.close_project()
+        main_window._on_new_project()
+        main_window._on_open_project()
+        main_window._on_import_source()
+        main_window._on_save_project()
+        main_window._on_close_project()
     
     def test_widget_show_operations(self, ui_factory):
         """Test that all widgets can be shown"""
         ui_impl = ui_factory.get_ui_implementation()
         
-        # Skip widget show operations tests for script UI as it doesn't support them
-        if 'script' in str(ui_impl.__class__):
-            pytest.skip("Script UI does not support widget show operations")
+        # Script UI now supports widget show operations, so no need to skip
         
         widgets = [
             ui_impl.create_button("Test"),

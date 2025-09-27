@@ -2,8 +2,8 @@
 """
 Test runner for CurioShelf
 
-This script provides convenient ways to run different categories of tests
-with appropriate configurations for different environments.
+This script provides easy ways to run different test suites for different
+UI implementations and test types.
 """
 
 import sys
@@ -17,134 +17,85 @@ def run_command(cmd, description):
     print(f"\n{'='*60}")
     print(f"Running: {description}")
     print(f"Command: {' '.join(cmd)}")
-    print(f"{'='*60}")
+    print('='*60)
     
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    
-    if result.stdout:
-        print("STDOUT:")
-        print(result.stdout)
-    
-    if result.stderr:
-        print("STDERR:")
-        print(result.stderr)
-    
-    print(f"Return code: {result.returncode}")
+    result = subprocess.run(cmd, cwd=Path(__file__).parent)
     return result.returncode == 0
 
 
 def main():
-    """Main test runner"""
     parser = argparse.ArgumentParser(description="CurioShelf Test Runner")
     parser.add_argument(
-        "--headless-only",
-        action="store_true",
-        help="Run only headless UI tests (safe for CI)"
+        "--ui-type", 
+        choices=["all", "qt", "script", "headless"], 
+        default="all",
+        help="Type of UI tests to run (default: all)"
     )
     parser.add_argument(
-        "--qt-only",
-        action="store_true",
-        help="Run only Qt UI tests (requires display)"
+        "--test-type",
+        choices=["all", "unit", "integration", "e2e"],
+        default="all", 
+        help="Type of tests to run (default: all)"
     )
     parser.add_argument(
-        "--debug-only",
+        "--verbose", "-v",
         action="store_true",
-        help="Run only debugging system tests"
-    )
-    parser.add_argument(
-        "--unit-only",
-        action="store_true",
-        help="Run only unit tests"
-    )
-    parser.add_argument(
-        "--integration-only",
-        action="store_true",
-        help="Run only integration tests"
-    )
-    parser.add_argument(
-        "--unified-only",
-        action="store_true",
-        help="Run only unified tests (work with both headless and Qt)"
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose output"
+        help="Run tests in verbose mode"
     )
     parser.add_argument(
         "--coverage",
-        action="store_true",
-        help="Run with coverage reporting"
+        action="store_true", 
+        help="Run tests with coverage reporting"
     )
     parser.add_argument(
-        "--parallel",
-        type=int,
-        default=1,
-        help="Number of parallel test processes"
+        "--fast",
+        action="store_true",
+        help="Skip slow tests"
     )
     
     args = parser.parse_args()
     
     # Base pytest command
-    base_cmd = ["poetry", "run", "pytest"]
+    cmd = ["poetry", "run", "pytest"]
     
     if args.verbose:
-        base_cmd.append("-v")
+        cmd.append("-v")
     
     if args.coverage:
-        base_cmd.extend(["--cov=curioshelf", "--cov=gui", "--cov-report=html"])
+        cmd.extend(["--cov=curioshelf", "--cov-report=html", "--cov-report=term"])
     
-    if args.parallel > 1:
-        base_cmd.extend(["-n", str(args.parallel)])
+    if args.fast:
+        cmd.extend(["-m", "not slow"])
     
-    # Note: timeout plugin not available, tests should be fast enough
+    # Add UI type filters
+    if args.ui_type == "qt":
+        # Run Qt-specific tests (exclude script UI tests)
+        cmd.extend(["--ignore=tests/test_script_ui.py", "--ignore=tests/test_ui_unified_pytest.py"])
+    elif args.ui_type == "script":
+        # Run script UI tests
+        cmd.extend(["-m", "script"])
+    elif args.ui_type == "headless":
+        # Run headless tests (exclude Qt and script UI tests)
+        cmd.extend(["--ignore=tests/test_script_ui.py", "--ignore=tests/test_ui_unified_pytest.py"])
+    # "all" means no UI filter
     
-    # Determine which tests to run
-    test_patterns = []
-    
-    if args.headless_only:
-        test_patterns.append("tests/test_ui_unified_pytest.py")
-        print("Running unified UI tests (headless backend only)...")
-    
-    elif args.qt_only:
-        test_patterns.append("tests/test_ui_unified_pytest.py")
-        print("Running unified UI tests (Qt backend only)...")
-    
-    elif args.debug_only:
-        test_patterns.append("tests/test_ui_debugging_pytest.py")
-        print("Running debugging system tests only...")
-    
-    elif args.unit_only:
-        test_patterns.extend([
-            "tests/test_ui_unified_pytest.py",
-            "tests/test_ui_debugging_pytest.py"
-        ])
-        print("Running unit tests only...")
-    
-    elif args.integration_only:
-        test_patterns.append("tests/test_ui_unified_pytest.py")
-        print("Running integration tests only...")
-    
-    elif args.unified_only:
-        test_patterns.append("tests/test_ui_unified_pytest.py")
-        print("Running unified tests only...")
-    
-    else:
-        # Run all tests
-        test_patterns.append("tests/")
-        print("Running all tests...")
-    
-    # Add test patterns to command
-    base_cmd.extend(test_patterns)
+    # Add test type filters
+    if args.test_type == "unit":
+        cmd.extend(["-m", "unit"])
+    elif args.test_type == "integration":
+        cmd.extend(["-m", "integration"])
+    elif args.test_type == "e2e":
+        cmd.extend(["tests/e2e/"])
+    # "all" means no test type filter
     
     # Run the tests
-    success = run_command(base_cmd, "Running tests")
+    success = run_command(cmd, f"Running {args.ui_type} {args.test_type} tests")
     
     if success:
-        print("\n✅ All tests passed!")
+        print(f"\n✅ All {args.ui_type} {args.test_type} tests passed!")
         return 0
     else:
-        print("\n❌ Some tests failed!")
+        print(f"\n❌ Some {args.ui_type} {args.test_type} tests failed!")
         return 1
 
 

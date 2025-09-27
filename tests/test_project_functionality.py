@@ -248,58 +248,54 @@ class TestEventExecution:
         app = MockCurioShelfApplication()
         executor = EventExecutor(app)
         
-        # Mock the project dialog to prevent hanging
-        with patch('curioshelf.ui.project_dialog_abstracted.ProjectDialogAbstracted.exec') as mock_dialog_exec:
-            # Capture events
-            events = []
-            def capture_event(event):
-                events.append(event)
-            
-            event_bus.subscribe(EventType.SUCCESS, capture_event)
-            event_bus.subscribe(EventType.ERROR, capture_event)
-            event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
-            
-            # Execute new project command
-            executor._execute_new_project({})
-            
-            # Should have emitted a SHOW_DIALOG event
-            dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
-            assert len(dialog_events) > 0, "Should emit SHOW_DIALOG event"
-            
-            # The dialog event should have the correct data
-            dialog_event = dialog_events[0]
-            assert dialog_event.data["dialog_type"] == "project_dialog"
-            assert dialog_event.data["mode"] == "create"
-            assert dialog_event.data["action"] == "new_project"
+        # Capture events
+        events = []
+        def capture_event(event):
+            events.append(event)
+        
+        event_bus.subscribe(EventType.SUCCESS, capture_event)
+        event_bus.subscribe(EventType.ERROR, capture_event)
+        event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
+        
+        # Execute new project command
+        executor._execute_new_project({})
+        
+        # Should have emitted a SHOW_DIALOG event
+        dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
+        assert len(dialog_events) > 0, "Should emit SHOW_DIALOG event"
+        
+        # The dialog event should have the correct data
+        dialog_event = dialog_events[0]
+        assert dialog_event.data["dialog_type"] == "project_dialog"
+        assert dialog_event.data["mode"] == "create"
+        assert dialog_event.data["action"] == "new_project"
     
     def test_open_project_event(self):
         """Test open project event execution"""
         app = MockCurioShelfApplication()
         executor = EventExecutor(app)
         
-        # Mock the project dialog to prevent hanging
-        with patch('curioshelf.ui.project_dialog_abstracted.ProjectDialogAbstracted.exec') as mock_dialog_exec:
-            # Capture events
-            events = []
-            def capture_event(event):
-                events.append(event)
-            
-            event_bus.subscribe(EventType.SUCCESS, capture_event)
-            event_bus.subscribe(EventType.ERROR, capture_event)
-            event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
-            
-            # Execute open project command
-            executor._execute_open_project({})
-            
-            # Should have emitted a SHOW_DIALOG event
-            dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
-            assert len(dialog_events) > 0, "Should emit SHOW_DIALOG event"
-            
-            # The dialog event should have the correct data
-            dialog_event = dialog_events[0]
-            assert dialog_event.data["dialog_type"] == "project_dialog"
-            assert dialog_event.data["mode"] == "open"
-            assert dialog_event.data["action"] == "open_project"
+        # Capture events
+        events = []
+        def capture_event(event):
+            events.append(event)
+        
+        event_bus.subscribe(EventType.SUCCESS, capture_event)
+        event_bus.subscribe(EventType.ERROR, capture_event)
+        event_bus.subscribe(EventType.SHOW_DIALOG, capture_event)
+        
+        # Execute open project command
+        executor._execute_open_project({})
+        
+        # Should have emitted a SHOW_DIALOG event
+        dialog_events = [e for e in events if e.event_type == EventType.SHOW_DIALOG]
+        assert len(dialog_events) > 0, "Should emit SHOW_DIALOG event"
+        
+        # The dialog event should have the correct data
+        dialog_event = dialog_events[0]
+        assert dialog_event.data["dialog_type"] == "project_dialog"
+        assert dialog_event.data["mode"] == "open"
+        assert dialog_event.data["action"] == "open_project"
     
     def test_save_project_event(self):
         """Test save project event execution"""

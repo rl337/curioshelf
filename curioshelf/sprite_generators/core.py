@@ -179,15 +179,32 @@ class SpriteGenerator:
                                     sprite_width: int, sprite_height: int,
                                     frames_per_animation: int) -> Dict[str, Any]:
         """Create comprehensive metadata for the sprite sheet."""
+        # Collect all unique colors from all plugins
+        all_colors = set()
+        for data in plugin_data:
+            for sprite in data.sprites:
+                if 'color' in sprite.properties:
+                    all_colors.add(sprite.properties['color'])
+        
+        # Collect all unique animations from all plugins
+        all_animations = set()
+        for data in plugin_data:
+            for sprite in data.sprites:
+                all_animations.add(sprite.animation)
+        
         metadata = {
             "sprite_sheet": {
                 "width": total_width,
                 "height": total_height,
                 "sprite_width": sprite_width,
                 "sprite_height": sprite_height,
-                "plugins": len(plugin_data)
+                "plugins": len(plugin_data),
+                "columns": max(len(all_animations), 1),  # Add columns field for backward compatibility
+                "rows": len(all_colors)  # Add rows field for backward compatibility
             },
             "frames_per_animation": frames_per_animation,
+            "colors": sorted(list(all_colors)),  # Add colors field for backward compatibility
+            "animations": sorted(list(all_animations)),  # Add animations field for backward compatibility
             "plugins": [],
             "sprites": []
         }
@@ -216,6 +233,9 @@ class SpriteGenerator:
                     "y": sprite.y + current_y,  # Adjust Y coordinate
                     "width": sprite.width,
                     "height": sprite.height,
+                    "color": sprite.properties.get('color', 'unknown'),  # Add color field for backward compatibility
+                    "is_primary": sprite.properties.get('is_primary', False),  # Add is_primary field for backward compatibility
+                    "is_secondary": sprite.properties.get('is_secondary', False),  # Add is_secondary field for backward compatibility
                     "properties": sprite.properties
                 }
                 metadata["sprites"].append(adjusted_sprite)

@@ -95,8 +95,8 @@ class StickFigureSprite:
         frames = []
         
         for i in range(frame_count):
-            # Calculate animation progress (0.0 to 1.0)
-            progress = i / max(1, frame_count - 1)
+            # Calculate animation progress (0.0 to 1.0), but don't include the end point to avoid identical first/last frames
+            progress = i / frame_count
             
             # Head bobbing (subtle vertical movement)
             head_bob = math.sin(progress * 2 * math.pi) * 2
@@ -127,8 +127,8 @@ class StickFigureSprite:
         frames = []
         
         for i in range(frame_count):
-            # Calculate animation progress (0.0 to 1.0)
-            progress = i / max(1, frame_count - 1)
+            # Calculate animation progress (0.0 to 1.0), but don't include the end point to avoid identical first/last frames
+            progress = i / frame_count
             
             # Gradually reduce movement
             movement_factor = 1.0 - progress
@@ -162,8 +162,8 @@ class StickFigureSprite:
         frames = []
         
         for i in range(frame_count):
-            # Calculate animation progress (0.0 to 1.0)
-            progress = i / max(1, frame_count - 1)
+            # Calculate animation progress (0.0 to 1.0), but don't include the end point to avoid identical first/last frames
+            progress = i / frame_count
             
             # Increasing movement intensity
             movement_factor = progress * 1.5
@@ -197,8 +197,8 @@ class StickFigureSprite:
         frames = []
         
         for i in range(frame_count):
-            # Calculate animation progress (0.0 to 1.0)
-            progress = i / max(1, frame_count - 1)
+            # Calculate animation progress (0.0 to 1.0), but don't include the end point to avoid identical first/last frames
+            progress = i / frame_count
             
             # Jump height (parabolic)
             jump_height = math.sin(progress * math.pi) * 20
@@ -261,7 +261,10 @@ class StickFigureSprite:
         content = self._draw_stick_figure(head_y, body_y_offset, left_arm_angle, right_arm_angle,
                                         left_thigh_angle, left_shin_angle, right_thigh_angle, right_shin_angle, stroke_width)
         
-        return f'<svg width="{self.width}" height="{self.height}" xmlns="http://www.w3.org/2000/svg">\n{content}</svg>'
+        # Add background rectangle
+        background = f'<rect width="{self.width}" height="{self.height}" fill="transparent"/>\n'
+        
+        return f'<svg width="{self.width}" height="{self.height}" xmlns="http://www.w3.org/2000/svg">\n{background}{content}</svg>'
     
     def _draw_arms(self, body_y: float, left_arm_angle: float, right_arm_angle: float, stroke_width: int) -> str:
         """Draw the arms of the stick figure"""
@@ -350,7 +353,7 @@ class StickFigurePlugin(SpritePlugin):
         # Each color gets its own section with 2 animations per row
         animations_per_row = 2
         rows_per_color = (len(self.animations) + animations_per_row - 1) // animations_per_row  # Ceiling division
-        frames_per_animation = 8  # Fixed to 8 frames per animation
+        # Use the provided frames_per_animation parameter
         
         # Calculate margins and spacing
         label_height = 30  # Space for animation labels (increased)

@@ -2,17 +2,22 @@
 Abstracted project dialog for creating and opening projects
 
 This version uses the UI abstraction layer instead of direct PySide6 imports.
+
+DEPRECATED: This module is deprecated and should not be used in new code.
+Use the view system (ProjectCreateView/ProjectOpenView) instead.
 """
 
 from typing import Optional, Callable
 from pathlib import Path
+import time
 
 from curioshelf.projects import ProjectManager, ProjectInfo
+from curioshelf.config import config
 from .abstraction import UIWidget
 
 
 class ProjectDialogAbstracted(UIWidget):
-    """Project dialog using UI abstraction layer"""
+    """Project dialog using UI abstraction layer - DEPRECATED: Use view system instead"""
     
     def __init__(self, ui_factory):
         super().__init__()
@@ -35,6 +40,10 @@ class ProjectDialogAbstracted(UIWidget):
         
         # Dialog mode (create or open)
         self.mode = "create"
+        
+        # Auto-completion timer (simple implementation using time)
+        self.auto_complete_timer = None
+        self.auto_complete_timer_start = None
         
         self.setup_ui()
         self.refresh()
@@ -77,6 +86,8 @@ class ProjectDialogAbstracted(UIWidget):
         name_layout = self.ui_factory.create_layout("horizontal")
         name_layout.add_widget(self.ui_factory.create_text_input("Project Name:"))
         self.project_name_input = self.ui_factory.create_text_input("Enter project name...")
+        # Connect text change callback for auto-completion
+        self.project_name_input.set_text_changed_callback(self._on_project_name_changed)
         name_layout.add_widget(self.project_name_input)
         new_project_layout.add_widget(name_layout)
         
@@ -238,6 +249,37 @@ class ProjectDialogAbstracted(UIWidget):
             msg_box = self.ui_factory.create_message_box()
             msg_box.show_error("Error", f"Failed to open project: {str(e)}")
     
+    def _on_project_name_changed(self, text: str) -> None:
+        """Handle project name text changes for auto-completion"""
+        if config.get("auto_complete_project_path", True):
+            # Simple timer implementation using time
+            self.auto_complete_timer_start = time.time()
+            # Schedule update after 300ms delay
+            self._schedule_project_path_update()
+    
+    def _schedule_project_path_update(self) -> None:
+        """Schedule project path update with debouncing"""
+        if self.auto_complete_timer_start is None:
+            return
+        
+        # Check if enough time has passed since last change
+        if time.time() - self.auto_complete_timer_start >= 0.3:  # 300ms delay
+            self._update_project_path()
+        else:
+            # Schedule another check
+            import threading
+            def delayed_check():
+                time.sleep(0.1)  # Check every 100ms
+                self._schedule_project_path_update()
+            threading.Thread(target=delayed_check, daemon=True).start()
+    
+    def _update_project_path(self) -> None:
+        """Update the project path based on the project name"""
+        project_name = self.project_name_input.get_text().strip()
+        if project_name:
+            suggested_path = config.get_project_path_for_name(project_name)
+            self.project_path_input.set_text(str(suggested_path))
+    
     def cancel(self):
         """Cancel the dialog"""
         self.close()
@@ -248,59 +290,13 @@ class ProjectDialogAbstracted(UIWidget):
         pass
     
     def exec(self):
-        """Execute the dialog"""
-        # Import here to avoid circular imports
-        from .qtimpl.project_dialog import QtProjectDialog
-        from PySide6.QtWidgets import QDialog
-        from tests.support.dialog_auto_responder import get_auto_responder
-        
-        # Create and show the Qt dialog
-        dialog = QtProjectDialog(mode=self.mode)
-        
-        # Connect signals
-        dialog.project_created.connect(self._on_project_created)
-        dialog.project_loaded.connect(self._on_project_loaded)
-        
-        # Setup auto-responder for scripted testing (only if test plugins are loaded)
-        try:
-            from tests.support.test_plugin_loader import get_dialog_responder
-            auto_responder = get_dialog_responder()
-            if auto_responder and auto_responder.enabled:
-                print(f"[PROJECT DIALOG] Auto-responder enabled, will auto-respond to dialog")
-                # Use a timer to allow the dialog to be shown first
-                from PySide6.QtCore import QTimer
-                QTimer.singleShot(100, lambda: self._delayed_auto_respond(dialog, auto_responder))
-        except ImportError:
-            # Test plugins not available, run normally
-            pass
-        
-        # Show the dialog
-        result = dialog.exec()
-        
-        # If dialog was accepted, the signals will have been emitted
-        # If dialog was rejected, emit a rejected event
-        if result != QDialog.Accepted:
-            from curioshelf.event_system import event_bus, UIEvent, EventType
-            event = UIEvent(
-                event_type=EventType.DIALOG_REJECTED,
-                source="project_dialog",
-                data={
-                    "dialog_type": "project_dialog",
-                    "mode": self.mode
-                }
-            )
-            event_bus.emit(event)
-    
-    def _delayed_auto_respond(self, dialog, auto_responder):
-        """Delayed auto-respond to allow dialog to be shown first"""
-        try:
-            auto_responder.auto_respond_to_dialog(dialog, "project_dialog", self.mode)
-            print(f"[PROJECT DIALOG] Auto-responder completed successfully")
-        except Exception as e:
-            print(f"[PROJECT DIALOG] Auto-responder failed: {e}")
-            # Close the dialog and re-raise the error
-            dialog.reject()
-            raise
+        """Execute the dialog - DEPRECATED: Use view system instead"""
+        # This method is deprecated and should not be used in the new UI system
+        # The new UI system uses views instead of modal dialogs
+        raise DeprecationWarning(
+            "ProjectDialogAbstracted.exec() is deprecated. "
+            "Use the view system (ProjectCreateView/ProjectOpenView) instead."
+        )
     
     def _on_project_created(self, project_path: Path, project_info: ProjectInfo):
         """Handle project created signal"""

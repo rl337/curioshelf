@@ -39,37 +39,36 @@ def generate_sample_sprites(output_dir: str = "samples", count: int = 10, width:
     )
     
     # Extract individual frames and save them
-    for sprite in plugin_data.sprites:
-        if sprite.properties.get('color') == color:  # Only save sprites of the requested color
-            anim_name = sprite.animation
-            frame_idx = sprite.frame
+    # Create animation directories first
+    for anim_name in animations.keys():
+        anim_dir = output_path / anim_name
+        anim_dir.mkdir(exist_ok=True)
+    
+    # Generate sprites for the requested color
+    from .sprite_generators.plugins.stick_figure import StickFigureSprite
+    sprite_gen = StickFigureSprite(width, height, color)
+    
+    # Generate frames for each animation type
+    for anim_name in animations.keys():
+        # Generate the specific frame
+        if anim_name == "walk":
+            frames = sprite_gen.generate_walk_cycle(count)
+        elif anim_name == "stopping":
+            frames = sprite_gen.generate_stopping_cycle(count)
+        elif anim_name == "speeding_up":
+            frames = sprite_gen.generate_speeding_up_cycle(count)
+        elif anim_name == "jumping":
+            frames = sprite_gen.generate_jumping_cycle(count)
+        else:
+            continue
+        
+        # Save each frame
+        for frame_idx, frame in enumerate(frames):
+            filename = f"{anim_name}_{frame_idx:03d}.svg"
+            filepath = output_path / anim_name / filename
             
-            # Create animation directory
-            anim_dir = output_path / anim_name
-            anim_dir.mkdir(exist_ok=True)
-            
-            # Generate the individual sprite SVG
-            from .sprite_generators.plugins.stick_figure import StickFigureSprite
-            sprite_gen = StickFigureSprite(width, height, color)
-            
-            # Generate the specific frame
-            if anim_name == "walk":
-                frames = sprite_gen.generate_walk_cycle(count)
-            elif anim_name == "stopping":
-                frames = sprite_gen.generate_stopping_cycle(count)
-            elif anim_name == "speeding_up":
-                frames = sprite_gen.generate_speeding_up_cycle(count)
-            elif anim_name == "jumping":
-                frames = sprite_gen.generate_jumping_cycle(count)
-            else:
-                continue
-            
-            if frame_idx < len(frames):
-                filename = f"{anim_name}_{frame_idx:03d}.svg"
-                filepath = anim_dir / filename
-                
-                with open(filepath, 'w') as f:
-                    f.write(frames[frame_idx])
+            with open(filepath, 'w') as f:
+                f.write(frame)
     
     # Create a README file
     readme_path = output_path / "README.md"
