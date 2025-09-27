@@ -60,7 +60,15 @@ class ProjectStructure:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'ProjectStructure':
         """Create from dictionary (JSON deserialization)"""
-        metadata = ProjectMetadata(**data["metadata"])
+        metadata_data = data["metadata"].copy()
+        
+        # Handle field name differences between ProjectInfo and ProjectMetadata
+        if "created_at" in metadata_data:
+            metadata_data["created"] = metadata_data.pop("created_at")
+        if "modified_at" in metadata_data:
+            metadata_data["modified"] = metadata_data.pop("modified_at")
+        
+        metadata = ProjectMetadata(**metadata_data)
         directories = data.get("directories", {})
         
         return cls(

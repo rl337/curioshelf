@@ -339,8 +339,16 @@ class MainWindowWithViews:
         """Handle project creation"""
         print(f"Creating project: {project_name} at {project_path}")
         
+        # Create project info
+        from curioshelf.projects import ProjectInfo
+        project_info = ProjectInfo(
+            name=project_name,
+            description=f"Project created by user",
+            author="User"
+        )
+        
         # Create the project through the application
-        success = self.app.create_project(project_name, project_path)
+        success = self.app.create_project(project_path, project_info)
         
         if success:
             print("Project created successfully")

@@ -613,6 +613,22 @@ class ScriptUIListWidget(ScriptUIWidget, UIListWidget):
     def item_selected(self) -> ScriptUISignal:
         """Get the item_selected signal for Qt-style connections"""
         return ScriptUISignal(self, "item_selected")
+    
+    def create_item(self, text: str) -> 'UIListItem':
+        """Create a new list item"""
+        from tests.ui_mocks import MockUIListItem
+        return MockUIListItem(text)
+    
+    def get_selected_item(self) -> Optional['UIListItem']:
+        """Get the currently selected item"""
+        if 0 <= self._current_index < len(self._items):
+            text, data = self._items[self._current_index]
+            from tests.ui_mocks import MockUIListItem
+            item = MockUIListItem(text)
+            if data is not None:
+                item.set_data(data)
+            return item
+        return None
 
 
 class ScriptUICanvas(ScriptUIWidget, UICanvas):
@@ -691,6 +707,34 @@ class ScriptUIMessageBox(ScriptUIWidget, UIMessageBox):
     def get_result(self) -> Optional[str]:
         """Get the message box result"""
         return self._result
+    
+    def show_error(self, title: str, text: str) -> None:
+        """Show an error message box"""
+        self.set_title(title)
+        self.set_text(text)
+        self.set_buttons(["OK"])
+        self.show()
+    
+    def show_info(self, title: str, text: str) -> None:
+        """Show an info message box"""
+        self.set_title(title)
+        self.set_text(text)
+        self.set_buttons(["OK"])
+        self.show()
+    
+    def show_question(self, title: str, text: str) -> str:
+        """Show a question message box"""
+        self.set_title(title)
+        self.set_text(text)
+        self.set_buttons(["Yes", "No"])
+        return self.show()
+    
+    def show_warning(self, title: str, text: str) -> None:
+        """Show a warning message box"""
+        self.set_title(title)
+        self.set_text(text)
+        self.set_buttons(["OK"])
+        self.show()
 
 
 class ScriptUIFileDialog(ScriptUIWidget, UIFileDialog):
@@ -733,6 +777,54 @@ class ScriptUIFileDialog(ScriptUIWidget, UIFileDialog):
     
     def get_result(self) -> Optional[str]:
         """Get the selected file"""
+        return self._result
+    
+    def get_open_file_name(self, title: str, filter: str = "", directory: str = "") -> Optional[str]:
+        """Get a file name for opening"""
+        self.set_title(title)
+        self.set_filter(filter)
+        self.set_mode("open")
+        
+        if self.verbose:
+            print(f"[SCRIPT UI] File Dialog: {title}")
+            print(f"[SCRIPT UI] Filter: {filter}")
+            print(f"[SCRIPT UI] Directory: {directory}")
+        
+        # For script UI, we can simulate different behaviors
+        # In a real implementation, this might interact with the script runtime
+        self._result = None  # Simulate no file selected by default
+        self.set_property("result", self._result)
+        return self._result
+    
+    def get_save_file_name(self, title: str, filter: str = "") -> Optional[str]:
+        """Get a file name for saving"""
+        self.set_title(title)
+        self.set_filter(filter)
+        self.set_mode("save")
+        
+        if self.verbose:
+            print(f"[SCRIPT UI] Save Dialog: {title}")
+            print(f"[SCRIPT UI] Filter: {filter}")
+        
+        # For script UI, we can simulate different behaviors
+        # In a real implementation, this might interact with the script runtime
+        self._result = None  # Simulate no file selected by default
+        self.set_property("result", self._result)
+        return self._result
+    
+    def get_existing_directory(self, title: str, directory: str = "") -> Optional[str]:
+        """Get an existing directory path"""
+        self.set_title(title)
+        self.set_mode("directory")
+        
+        if self.verbose:
+            print(f"[SCRIPT UI] Directory Dialog: {title}")
+            print(f"[SCRIPT UI] Directory: {directory}")
+        
+        # For script UI, we can simulate different behaviors
+        # In a real implementation, this might interact with the script runtime
+        self._result = None  # Simulate no directory selected by default
+        self.set_property("result", self._result)
         return self._result
 
 

@@ -455,3 +455,7 @@ class EventExecutionLayer:
     def get_application(self) -> ApplicationInterface:
         """Get the underlying application interface"""
         return self.app
+    
+    def execute_file_dialog_result(self, dialog_type: str, file_path: Optional[Path], data: Dict[str, Any] = None) -> None:
+        """Execute a file dialog result"""
+        self.executor.execute_file_dialog_result(dialog_type, file_path, data)

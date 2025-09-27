@@ -185,7 +185,7 @@ class CurioShelfApplicationImpl(ApplicationInterface):
         sources_dir = project_path / "sources"
         if sources_dir.exists():
             for source_file in sources_dir.iterdir():
-                if source_file.is_file() and source_file.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif', '.bmp']:
+                if source_file.is_file() and source_file.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg']:
                     try:
                         # Add source to asset manager
                         source = self.asset_manager.add_source(source_file, 800, 600)  # Mock dimensions

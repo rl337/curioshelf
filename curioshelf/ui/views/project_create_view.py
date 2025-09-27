@@ -79,10 +79,14 @@ class ProjectCreateView(BaseView):
     
     def _on_name_changed(self, text: str) -> None:
         """Handle project name text changes for auto-completion"""
-        if config.get("auto_complete_project_path", True) and self.auto_complete_timer:
-            # Restart the timer to debounce rapid changes
-            self.auto_complete_timer.stop()
-            self.auto_complete_timer.start(300)  # 300ms delay
+        if config.get("auto_complete_project_path", True):
+            if self.auto_complete_timer:
+                # Restart the timer to debounce rapid changes
+                self.auto_complete_timer.stop()
+                self.auto_complete_timer.start(300)  # 300ms delay
+            else:
+                # If no timer available, update immediately
+                self._update_project_path()
     
     def _update_project_path(self) -> None:
         """Update the project path based on the project name"""
