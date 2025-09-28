@@ -352,6 +352,14 @@ class MainWindowWithViews:
         
         if success:
             print("Project created successfully")
+            
+            # Add to recent projects
+            try:
+                from curioshelf.config import config
+                config.add_recent_project(project_path, project_name)
+            except Exception as e:
+                print(f"Warning: Could not add project to recent projects: {e}")
+            
             # Update menu state to reflect project loaded
             self._update_menu_state()
             # Return to sources view
@@ -373,6 +381,18 @@ class MainWindowWithViews:
         
         if success:
             print("Project opened successfully")
+            
+            # Add to recent projects
+            try:
+                from curioshelf.config import config
+                from curioshelf.projects.structure import ProjectStructureManager
+                project_manager = ProjectStructureManager()
+                structure = project_manager.load_project(project_path)
+                project_name = structure.metadata.name if structure and structure.metadata else project_path.name
+                config.add_recent_project(project_path, project_name)
+            except Exception as e:
+                print(f"Warning: Could not add project to recent projects: {e}")
+            
             # Update menu state to reflect project loaded
             self._update_menu_state()
             # Return to sources view

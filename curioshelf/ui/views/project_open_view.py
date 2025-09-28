@@ -23,78 +23,65 @@ class ProjectOpenView(BaseView):
         super().__init__(ui_implementation, parent)
     
     def _setup_ui(self) -> None:
-        """Set up the project opening UI"""
+        """Set up the project opening UI using the same layout approach as project create view"""
         # Create main container
         self.widget = self.ui.create_widget("project_open_view")
         
-        # Create main layout
-        main_layout = self.ui.create_layout("vertical")
+        # Create directional layout (same as project create view)
+        from curioshelf.ui.layouts.directional_layout import DirectionalLayout, Direction
+        main_layout = DirectionalLayout(self.widget)
         self.widget.set_layout(main_layout)
         
-        # Create title
+        # Create title at the top
         title_label = self.ui.create_label("Open Existing Project")
         title_label.set_text("Open Existing Project")
-        title_label.set_style("font-size: 18px; font-weight: bold; margin-bottom: 20px;")
-        main_layout.add_widget(title_label)
+        title_label.set_style("font-size: 18px; font-weight: bold; margin: 20px;")
+        main_layout.add_widget(title_label, Direction.NORTH)
         
-        # Create recent projects group
-        recent_group = self.ui.create_group_box("Recent Projects")
-        recent_group.set_title("Recent Projects")
-        recent_layout = self.ui.create_layout("vertical")
-        recent_group.set_layout(recent_layout)
+        # Create a stack widget for the main content (same as project create view)
+        content_stack = self.ui.create_stack_widget(spacing=15)
+        main_layout.add_widget(content_stack.widget, Direction.CENTER, expand=True)
+        
+        # Recent projects section
+        recent_label = content_stack.add_label("Recent Projects:", style="font-weight: bold; margin-bottom: 5px;")
         
         # Recent projects list
         self.projects_list = self.ui.create_list_widget()
-        self.projects_list.set_style("width: 100%; height: 200px; margin-bottom: 15px;")
+        self.projects_list.set_style("min-height: 200px; padding: 5px;")
         self.projects_list.item_selected.connect(self._on_project_selected)
-        recent_layout.add_widget(self.projects_list)
+        content_stack.add_widget(self.projects_list)
         
-        # Recent projects buttons
-        recent_btn_layout = self.ui.create_layout("horizontal")
-        recent_btn_layout.set_style("justify-content: flex-start; gap: 10px;")
+        # Recent projects buttons using row widget
+        recent_btn_row = self.ui.create_row_widget(spacing=10)
+        content_stack.add_widget(recent_btn_row.widget)
         
-        self.open_btn = self.ui.create_button("Open Selected Project")
-        self.open_btn.set_style("padding: 8px 16px; font-size: 14px;")
-        self.open_btn.clicked.connect(self._on_open_selected)
+        self.open_btn = recent_btn_row.add_button("Open Selected Project", self._on_open_selected, "padding: 8px 16px;")
         self.open_btn.set_enabled(False)
-        recent_btn_layout.add_widget(self.open_btn)
         
-        self.refresh_btn = self.ui.create_button("Refresh")
-        self.refresh_btn.set_style("padding: 8px 16px; font-size: 14px;")
-        self.refresh_btn.clicked.connect(self._refresh_projects)
-        recent_btn_layout.add_widget(self.refresh_btn)
+        self.refresh_btn = recent_btn_row.add_button("Refresh", self._refresh_projects, "padding: 8px 16px;")
         
-        recent_layout.add_widget(recent_btn_layout)
-        main_layout.add_widget(recent_group)
+        # Browse section
+        browse_label = content_stack.add_label("Or browse for a project directory:", style="font-weight: bold; margin-bottom: 5px;")
         
-        # Create browse group
-        browse_group = self.ui.create_group_box("Browse for Project")
-        browse_group.set_title("Browse for Project")
-        browse_layout = self.ui.create_layout("vertical")
-        browse_group.set_layout(browse_layout)
+        # Project path input using row widget
+        path_row = self.ui.create_row_widget(spacing=10)
+        content_stack.add_widget(path_row.widget)
         
-        browse_label = self.ui.create_label("Or browse for a project directory:")
-        browse_label.set_text("Or browse for a project directory:")
-        browse_label.set_style("margin-bottom: 10px;")
-        browse_layout.add_widget(browse_label)
+        path_label = path_row.add_label("Project Path:", style="padding: 5px;")
         
-        self.browse_btn = self.ui.create_button("Browse for Project Directory...")
-        self.browse_btn.set_style("padding: 10px 20px; font-size: 14px; width: 100%;")
-        self.browse_btn.clicked.connect(self._browse_for_project)
-        browse_layout.add_widget(self.browse_btn)
+        self.project_path_input = path_row.add_text_input("Enter project directory path or click Browse...", expand=True, style="padding: 8px;")
+        self.project_path_input.set_placeholder("Enter project directory path or click Browse...")
         
-        main_layout.add_widget(browse_group)
+        self.browse_btn = path_row.add_button("Browse...", self._browse_for_project, "padding: 8px 16px;")
         
-        # Create button layout
-        button_layout = self.ui.create_layout("horizontal")
-        button_layout.set_style("justify-content: flex-end; margin-top: 20px; gap: 10px;")
+        # Open from path button
+        self.open_from_path_btn = content_stack.add_button("Open from Path", self._open_from_path, "padding: 10px 20px; margin: 5px;")
         
-        self.cancel_btn = self.ui.create_button("Cancel")
-        self.cancel_btn.set_style("padding: 10px 20px; font-size: 14px;")
-        self.cancel_btn.clicked.connect(self._on_cancel)
-        button_layout.add_widget(self.cancel_btn)
+        # Create button row at the bottom (same as project create view)
+        button_row = self.ui.create_button_row_widget(spacing=10)
+        main_layout.add_widget(button_row.widget, Direction.SOUTH)
         
-        main_layout.add_widget(button_layout)
+        self.cancel_btn = button_row.add_secondary_button("Cancel", self._on_cancel)
         
         # Load recent projects
         self._refresh_projects()
@@ -107,9 +94,8 @@ class ProjectOpenView(BaseView):
         """Refresh the list of recent projects"""
         self.projects_list.clear()
         
-        # Get recent projects (for now, we'll scan the default directory)
-        default_dir = config.get_default_project_directory()
-        recent_projects = self._scan_for_projects(default_dir)
+        # Get recent projects from config
+        recent_projects = config.get_recent_projects()
         
         if not recent_projects:
             # Add placeholder item
@@ -117,9 +103,11 @@ class ProjectOpenView(BaseView):
             placeholder.set_data("", "")
             self.projects_list.add_item(placeholder)
         else:
-            for project_path, project_name in recent_projects:
+            for project_info in recent_projects:
+                project_path = project_info.get("path", "")
+                project_name = project_info.get("name", Path(project_path).name)
                 item = self.projects_list.create_item(f"{project_name} ({project_path})")
-                item.set_data(str(project_path), project_name)
+                item.set_data(project_path, project_name)
                 self.projects_list.add_item(item)
     
     def _scan_for_projects(self, directory: Path) -> List[tuple]:
@@ -160,11 +148,17 @@ class ProjectOpenView(BaseView):
             return
         
         project_path_str = selected_item.get_data("path")
+        project_name = selected_item.get_data("name")
         if not project_path_str:
             return
         
         try:
             project_path = Path(project_path_str)
+            
+            # Add to recent projects (this will move it to the top)
+            if project_name:
+                config.add_recent_project(project_path, project_name)
+            
             if self.on_open:
                 self.on_open(project_path)
         except Exception as e:
@@ -182,32 +176,51 @@ class ProjectOpenView(BaseView):
         project_path = file_dialog.get_existing_directory("Open Project Directory", default_dir)
         
         if project_path:
-            project_path = Path(project_path)
+            # Update the text input field
+            self.project_path_input.set_text(project_path)
+            # Automatically open the project after browsing
+            self._open_from_path()
+    
+    def _open_from_path(self) -> None:
+        """Open project from the path in the text input field"""
+        project_path_str = self.project_path_input.get_text().strip()
+        if not project_path_str:
+            message_box = self.ui.create_message_box()
+            message_box.show_error("Error", "Please enter a project path.")
+            return
+        
+        try:
+            project_path = Path(project_path_str)
+            if not project_path.exists():
+                message_box = self.ui.create_message_box()
+                message_box.show_error("Error", "The specified path does not exist.")
+                return
+            
             # Check if this directory contains a curioshelf.json file
             config_file = project_path / "curioshelf.json"
             if not config_file.exists():
-                # Show error message
                 message_box = self.ui.create_message_box()
                 message_box.show_error("Error", "Selected directory does not contain a CurioShelf project (curioshelf.json not found).")
                 return
             
-            try:
-                # Load the project
-                structure = self.project_manager.load_project(project_path)
-                if structure is None:
-                    # Show error message
-                    message_box = self.ui.create_message_box()
-                    message_box.show_error("Error", "Failed to load project structure.")
-                    return
-                
-                # Open the project
-                if self.on_open:
-                    self.on_open(project_path)
-                
-            except Exception as e:
-                # Show error message
+            # Load the project
+            structure = self.project_manager.load_project(project_path)
+            if structure is None:
                 message_box = self.ui.create_message_box()
-                message_box.show_error("Error", f"Failed to open project: {e}")
+                message_box.show_error("Error", "Failed to load project structure.")
+                return
+            
+            # Add to recent projects
+            project_name = structure.metadata.name if structure.metadata else project_path.name
+            config.add_recent_project(project_path, project_name)
+            
+            # Open the project
+            if self.on_open:
+                self.on_open(project_path)
+            
+        except Exception as e:
+            message_box = self.ui.create_message_box()
+            message_box.show_error("Error", f"Failed to open project: {e}")
     
     def _on_cancel(self) -> None:
         """Handle cancel button click"""

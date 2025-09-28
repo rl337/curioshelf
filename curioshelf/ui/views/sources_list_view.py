@@ -19,55 +19,48 @@ class SourcesListView(BaseView):
         super().__init__(ui_implementation, parent)
     
     def _setup_ui(self) -> None:
-        """Set up the sources list UI"""
+        """Set up the sources list UI using specialized layout widgets"""
         # Create main container
         self.widget = self.ui.create_widget("sources_list_view")
         
-        # Create main layout
-        main_layout = self.ui.create_layout("vertical")
+        # Use DirectionalLayout for main structure
+        from curioshelf.ui.layouts.directional_layout import DirectionalLayout, Direction
+        main_layout = DirectionalLayout(self.widget)
         self.widget.set_layout(main_layout)
         
-        # Create title
+        # Title at top
         title_label = self.ui.create_label("Sources")
         title_label.set_text("Sources")
-        title_label.set_style("font-size: 18px; font-weight: bold; margin-bottom: 20px;")
-        main_layout.add_widget(title_label)
+        title_label.set_style("font-size: 18px; font-weight: bold; margin: 20px;")
+        main_layout.add_widget(title_label, Direction.NORTH)
         
-        # Create sources group
-        sources_group = self.ui.create_group_box("Project Sources")
-        sources_group.set_title("Project Sources")
-        sources_layout = self.ui.create_layout("vertical")
-        sources_group.set_layout(sources_layout)
+        # Main content using StackWidget
+        content_stack = self.ui.create_stack_widget(spacing=15)
+        main_layout.add_widget(content_stack.widget, Direction.CENTER, expand=True)
+        
+        # Sources section
+        sources_label = content_stack.add_label("Project Sources:", style="font-weight: bold; margin-bottom: 5px;")
         
         # Sources list
         self.sources_list = self.ui.create_list_widget()
-        self.sources_list.set_style("width: 100%; height: 300px; margin-bottom: 15px;")
-        sources_layout.add_widget(self.sources_list)
+        self.sources_list.set_style("min-height: 300px; padding: 5px;")
+        content_stack.add_widget(self.sources_list)
         
-        # Sources buttons
-        sources_btn_layout = self.ui.create_layout("horizontal")
-        sources_btn_layout.set_style("justify-content: flex-start; gap: 10px;")
+        # Sources buttons using RowWidget
+        sources_btn_row = self.ui.create_row_widget(spacing=10)
+        content_stack.add_widget(sources_btn_row.widget)
         
-        self.import_btn = self.ui.create_button("Import Source")
-        self.import_btn.set_style("padding: 8px 16px; font-size: 14px;")
-        self.import_btn.clicked.connect(self._on_import_source)
-        sources_btn_layout.add_widget(self.import_btn)
+        self.import_btn = sources_btn_row.add_button("Import Source", self._on_import_source, "padding: 8px 16px;")
         
-        self.remove_btn = self.ui.create_button("Remove Selected")
-        self.remove_btn.set_style("padding: 8px 16px; font-size: 14px;")
-        self.remove_btn.clicked.connect(self._on_remove_source)
+        self.remove_btn = sources_btn_row.add_button("Remove Selected", self._on_remove_source, "padding: 8px 16px;")
         self.remove_btn.set_enabled(False)
-        sources_btn_layout.add_widget(self.remove_btn)
         
-        sources_layout.add_widget(sources_btn_layout)
-        main_layout.add_widget(sources_group)
-        
-        # Create empty state message
-        self.empty_label = self.ui.create_label("No sources imported yet")
-        self.empty_label.set_text("No sources imported yet. Click 'Import Source' to add your first source.")
-        self.empty_label.set_style("text-align: center; color: #666; margin-top: 50px; font-style: italic;")
+        # Empty state message
+        self.empty_label = content_stack.add_label(
+            "No sources imported yet. Click 'Import Source' to add your first source.",
+            style="text-align: center; color: #666; margin-top: 50px; font-style: italic;"
+        )
         self.empty_label.set_visible(True)
-        main_layout.add_widget(self.empty_label)
         
         # Update UI state
         self._update_ui_state()
