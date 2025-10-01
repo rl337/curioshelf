@@ -19,7 +19,7 @@ class ViewContainer(UIWidget):
         
         # Create the container widget
         self.container_widget = self.ui.create_widget("view_container")
-        self.container_widget.set_style("flex: 1; width: 100%; height: 100%;")
+        self.container_widget.set_style("width: 100%; height: 100%;")
         
         # Create a layout for the container
         self.container_layout = self.ui.create_layout("vertical")
@@ -57,7 +57,7 @@ class ViewContainer(UIWidget):
         if view.widget:
             view.widget.set_visible(True)
             # Make sure the view fills the container
-            view.widget.set_style("flex: 1; width: 100%; height: 100%;")
+            view.widget.set_style("width: 100%; height: 100%;")
     
     def show_view_by_name(self, name: str) -> bool:
         """Show a view by name"""

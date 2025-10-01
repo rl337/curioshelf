@@ -16,9 +16,11 @@ class ProjectOpenView(BaseView):
     
     def __init__(self, ui_implementation, parent: Optional[UIWidget] = None,
                  on_open: Optional[Callable[[Path], None]] = None,
-                 on_cancel: Optional[Callable[[], None]] = None):
+                 on_cancel: Optional[Callable[[], None]] = None,
+                 show_cancel_button: bool = True):
         self.on_open = on_open
         self.on_cancel = on_cancel
+        self.show_cancel_button = show_cancel_button
         self.project_manager = ProjectStructureManager()
         super().__init__(ui_implementation, parent)
     
@@ -81,7 +83,11 @@ class ProjectOpenView(BaseView):
         button_row = self.ui.create_button_row_widget(spacing=10)
         main_layout.add_widget(button_row.widget, Direction.SOUTH)
         
-        self.cancel_btn = button_row.add_secondary_button("Cancel", self._on_cancel)
+        # Only show cancel button if specified
+        if self.show_cancel_button:
+            self.cancel_btn = button_row.add_secondary_button("Cancel", self._on_cancel)
+        else:
+            self.cancel_btn = None
         
         # Load recent projects
         self._refresh_projects()
@@ -100,14 +106,14 @@ class ProjectOpenView(BaseView):
         if not recent_projects:
             # Add placeholder item
             placeholder = self.projects_list.create_item("No recent projects found")
-            placeholder.set_data("", "")
+            placeholder.set_data({"path": "", "name": ""})
             self.projects_list.add_item(placeholder)
         else:
             for project_info in recent_projects:
                 project_path = project_info.get("path", "")
                 project_name = project_info.get("name", Path(project_path).name)
                 item = self.projects_list.create_item(f"{project_name} ({project_path})")
-                item.set_data(project_path, project_name)
+                item.set_data({"path": project_path, "name": project_name})
                 self.projects_list.add_item(item)
     
     def _scan_for_projects(self, directory: Path) -> List[tuple]:

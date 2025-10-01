@@ -24,6 +24,24 @@ from ..abstraction import (
 from tests.ui_debug import UIDebugMixin, get_global_debugger
 
 
+class QtUISignal:
+    """Qt UI signal implementation that mimics Qt-style signals"""
+    
+    def __init__(self, widget: 'QtUIWidget', signal_name: str):
+        self._widget = widget
+        self._signal_name = signal_name
+    
+    def connect(self, callback: Callable[..., None]) -> None:
+        """Connect a callback to this signal"""
+        self._widget.connect_signal(self._signal_name, callback)
+    
+    def disconnect(self, callback: Callable[..., None]) -> None:
+        """Disconnect a callback from this signal"""
+        if self._signal_name in self._widget._signals:
+            if callback in self._widget._signals[self._signal_name]:
+                self._widget._signals[self._signal_name].remove(callback)
+
+
 class QtUIMainWidget(UIWidget, UIDebugMixin):
     """Qt implementation of UIWidget for main window (QMainWindow)"""
     
@@ -480,6 +498,9 @@ class QtUIListWidget(UIListWidget):
         """Handle Qt selection change"""
         self._current_index = row
         self.emit_signal("current_changed", self.current_data())
+        # Also emit item_selected with the actual item object
+        selected_item = self.get_selected_item()
+        self.emit_signal("item_selected", selected_item)
     
     def add_item(self, text: str, data: Any = None) -> None:
         """Add an item to the list"""
@@ -577,7 +598,7 @@ class QtUIListWidget(UIListWidget):
     @property
     def item_selected(self):
         """Get the item_selected signal for connecting callbacks"""
-        return self._qt_list.currentRowChanged
+        return QtUISignal(self, "item_selected")
     
     @property
     def qt_widget(self) -> QListWidget:

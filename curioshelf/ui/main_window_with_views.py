@@ -15,6 +15,7 @@ from curioshelf.ui.views.view_container import ViewContainer
 from curioshelf.ui.views.sources_list_view import SourcesListView
 from curioshelf.ui.views.project_create_view import ProjectCreateView
 from curioshelf.ui.views.project_open_view import ProjectOpenView
+from curioshelf.ui.views.project_details_view import ProjectDetailsView
 from tests.mock_application import MockCurioShelfApplication
 
 
@@ -148,13 +149,12 @@ class MainWindowWithViews:
     
     def _create_views(self):
         """Create all views"""
-        # Create sources list view (default view)
+        # Create sources list view
         self.sources_view = SourcesListView(
             self.ui,
             on_import_source=self._on_import_source
         )
         self.view_container.register_view("sources", self.sources_view)
-        self.view_container.set_default_view(self.sources_view)
         
         # Create project create view
         self.project_create_view = ProjectCreateView(
@@ -164,13 +164,47 @@ class MainWindowWithViews:
         )
         self.view_container.register_view("project_create", self.project_create_view)
         
-        # Create project open view
+        # Create project open view for initial display (no cancel button)
         self.project_open_view = ProjectOpenView(
             self.ui,
             on_open=self._on_project_opened,
-            on_cancel=self._on_project_cancel
+            on_cancel=self._on_project_cancel,
+            show_cancel_button=False
         )
         self.view_container.register_view("project_open", self.project_open_view)
+        
+        # Create project open view for menu/hotkey invocation (with cancel button)
+        self.project_open_dialog_view = ProjectOpenView(
+            self.ui,
+            on_open=self._on_project_opened,
+            on_cancel=self._on_project_cancel,
+            show_cancel_button=True
+        )
+        self.view_container.register_view("project_open_dialog", self.project_open_dialog_view)
+        
+        # Create project details view
+        self.project_details_view = ProjectDetailsView(
+            self.ui,
+            on_close_project=self._on_close_project,
+            on_continue_to_sources=self._on_continue_to_sources
+        )
+        self.view_container.register_view("project_details", self.project_details_view)
+        
+        # Set the appropriate default view based on project state
+        self._set_initial_view()
+    
+    def _set_initial_view(self):
+        """Set the initial view based on whether a project is loaded"""
+        if self.app.is_project_loaded():
+            # If a project is loaded, show the sources view
+            self.view_container.set_default_view(self.sources_view)
+            # Refresh the sources view with current project data
+            self._refresh_sources_view()
+        else:
+            # If no project is loaded, show the project open view
+            self.view_container.set_default_view(self.project_open_view)
+            # Refresh the recent projects list
+            self.project_open_view._refresh_projects()
     
     def _setup_main_layout(self):
         """Set up the main layout with menu bar and status bar"""
@@ -304,8 +338,10 @@ class MainWindowWithViews:
                 print("Project closed successfully")
                 # Update menu state to reflect project unloaded
                 self._update_menu_state()
-                # Return to sources view
+                # Return to project open view
                 self.view_container.hide_current_view()
+                self.view_container.set_default_view(self.project_open_view)
+                self.project_open_view._refresh_projects()
             else:
                 print("Failed to close project")
         else:
@@ -331,9 +367,9 @@ class MainWindowWithViews:
     
     def show_project_open_view(self):
         """Show the project opening view"""
-        self.view_container.show_view_by_name("project_open")
+        self.view_container.show_view_by_name("project_open_dialog")
         # Refresh the projects list
-        self.project_open_view._refresh_projects()
+        self.project_open_dialog_view._refresh_projects()
     
     def _on_project_created(self, project_name: str, project_path: Path):
         """Handle project creation"""
@@ -381,7 +417,7 @@ class MainWindowWithViews:
         
         if success:
             print("Project opened successfully")
-            
+
             # Add to recent projects
             try:
                 from curioshelf.config import config
@@ -392,13 +428,14 @@ class MainWindowWithViews:
                 config.add_recent_project(project_path, project_name)
             except Exception as e:
                 print(f"Warning: Could not add project to recent projects: {e}")
-            
+
             # Update menu state to reflect project loaded
             self._update_menu_state()
-            # Return to sources view
+            
+            # Show project details view
             self.view_container.hide_current_view()
-            # Add any existing sources to the sources view
-            self._refresh_sources_view()
+            self.project_details_view.load_project(project_path)
+            self.view_container.show_view_by_name("project_details")
         else:
             print("Failed to open project")
             # Show error message
@@ -409,6 +446,12 @@ class MainWindowWithViews:
         """Handle project dialog cancellation"""
         print("Project dialog cancelled - returning to sources view")
         self.view_container.hide_current_view()
+    
+    def _on_continue_to_sources(self):
+        """Handle continue to sources button click"""
+        print("Continuing to sources view")
+        self.view_container.show_view_by_name("sources")
+        self._refresh_sources_view()
     
     def _refresh_sources_view(self):
         """Refresh the sources view with current project sources"""

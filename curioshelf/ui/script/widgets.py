@@ -575,7 +575,9 @@ class ScriptUIListWidget(ScriptUIWidget, UIListWidget):
             self._current_index = index
             self.set_property("current_index", index)
             self.emit_signal("current_index_changed", index)
-            self.emit_signal("item_selected", index)
+            # Emit item_selected with the actual item object
+            selected_item = self.get_selected_item()
+            self.emit_signal("item_selected", selected_item)
     
     def get_current_index(self) -> int:
         """Get the current selection index"""

@@ -27,7 +27,7 @@ class ViewManager:
         
         # Create view container
         self.view_container = self.ui.create_widget("view_container")
-        self.view_container.set_style("flex: 1;")
+        self.view_container.set_style("width: 100%; height: 100%;")
         self.view_container.set_visible(True)  # Make sure the container is visible
         self.main_layout.add_widget(self.view_container)
     

@@ -69,6 +69,8 @@ Thumbs.db
 # CurioShelf specific
 build/
 *.log
+.curioshelf
+test_project_*
 
 # Poetry
 poetry.lock

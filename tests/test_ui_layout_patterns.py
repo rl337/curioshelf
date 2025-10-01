@@ -10,20 +10,33 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+import pytest
 from curioshelf.ui.ui_factory import create_ui_factory
 from curioshelf.ui.views.project_create_view import ProjectCreateView
 from curioshelf.ui.views.project_open_view import ProjectOpenView
 from curioshelf.ui.views.sources_list_view import SourcesListView
+from tests.test_all_ui_implementations import get_available_ui_implementations
 
 
-def test_project_create_view_layout():
+@pytest.fixture(params=get_available_ui_implementations())
+def ui_implementation(request):
+    """Fixture that provides all available UI implementations"""
+    ui_type = request.param
+    ui_factory = create_ui_factory(ui_type, verbose=False)
+    ui_impl = ui_factory.get_ui_implementation()
+    ui_impl.initialize()
+    yield ui_impl, ui_type
+    # Cleanup if needed
+    if hasattr(ui_impl, 'cleanup'):
+        ui_impl.cleanup()
+
+
+def test_project_create_view_layout(ui_implementation):
     """Test project create view layout patterns"""
-    print("Testing Project Create View Layout...")
+    ui_impl, ui_type = ui_implementation
+    print(f"Testing Project Create View Layout with {ui_type} UI...")
     
     try:
-        factory = create_ui_factory("script", verbose=False)
-        ui_impl = factory.get_ui_implementation()
-        ui_impl.initialize()
         
         def on_create(name, path):
             print(f"Project created: {name} at {path}")
@@ -53,14 +66,12 @@ def test_project_create_view_layout():
         return False
 
 
-def test_project_open_view_layout():
+def test_project_open_view_layout(ui_implementation):
     """Test project open view layout patterns"""
-    print("Testing Project Open View Layout...")
+    ui_impl, ui_type = ui_implementation
+    print(f"Testing Project Open View Layout with {ui_type} UI...")
     
     try:
-        factory = create_ui_factory("script", verbose=False)
-        ui_impl = factory.get_ui_implementation()
-        ui_impl.initialize()
         
         def on_open(project_path):
             print(f"Project opened: {project_path}")
@@ -92,14 +103,12 @@ def test_project_open_view_layout():
         return False
 
 
-def test_sources_list_view_layout():
+def test_sources_list_view_layout(ui_implementation):
     """Test sources list view layout patterns"""
-    print("Testing Sources List View Layout...")
+    ui_impl, ui_type = ui_implementation
+    print(f"Testing Sources List View Layout with {ui_type} UI...")
     
     try:
-        factory = create_ui_factory("script", verbose=False)
-        ui_impl = factory.get_ui_implementation()
-        ui_impl.initialize()
         
         def on_import_source():
             print("Import source clicked")
@@ -125,38 +134,9 @@ def test_sources_list_view_layout():
         return False
 
 
-def test_layout_patterns():
-    """Test all UI layout patterns"""
-    print("=" * 60)
-    print("UI LAYOUT PATTERNS TEST SUITE")
-    print("=" * 60)
-    
-    tests = [
-        test_project_create_view_layout,
-        test_project_open_view_layout,
-        test_sources_list_view_layout,
-    ]
-    
-    passed = 0
-    total = len(tests)
-    
-    for test in tests:
-        if test():
-            passed += 1
-        print()
-    
-    print("=" * 60)
-    print(f"RESULTS: {passed}/{total} tests passed")
-    print("=" * 60)
-    
-    if passed == total:
-        print("🎉 All UI layout pattern tests passed!")
-        return True
-    else:
-        print("❌ Some UI layout pattern tests failed!")
-        return False
-
-
 if __name__ == "__main__":
-    success = test_layout_patterns()
-    sys.exit(0 if success else 1)
+    # Run pytest with verbose output
+    import subprocess
+    import sys
+    result = subprocess.run([sys.executable, "-m", "pytest", __file__, "-v"], cwd=project_root)
+    sys.exit(result.returncode)

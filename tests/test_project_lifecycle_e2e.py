@@ -18,20 +18,33 @@ from unittest.mock import Mock, patch
 
 from curioshelf.ui.ui_factory import create_ui_factory
 from curioshelf.app_impl.application_impl import CurioShelfApplicationImpl
+from tests.test_all_ui_implementations import get_available_ui_implementations
 from curioshelf.ui.main_window_with_views import MainWindowWithViews
 from curioshelf.config import config
+
+
+@pytest.fixture(params=get_available_ui_implementations())
+def ui_implementation(request):
+    """Fixture that provides all available UI implementations"""
+    ui_type = request.param
+    ui_factory = create_ui_factory(ui_type, verbose=False)
+    ui_impl = ui_factory.get_ui_implementation()
+    ui_impl.initialize()
+    yield ui_impl, ui_type
+    # Cleanup if needed
+    if hasattr(ui_impl, 'cleanup'):
+        ui_impl.cleanup()
 
 
 class TestProjectLifecycleE2E:
     """Test complete project lifecycle end-to-end"""
     
-    def test_complete_project_lifecycle(self):
+    def test_complete_project_lifecycle(self, ui_implementation):
         """Test complete project lifecycle with source import"""
+        ui_impl, ui_type = ui_implementation
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create UI factory and application
-            ui_factory = create_ui_factory("script", verbose=False)
-            ui_impl = ui_factory.get_ui_implementation()
-            ui_impl.initialize()
+            ui_factory = create_ui_factory(ui_type, verbose=False)
             
             app = CurioShelfApplicationImpl(ui_factory)
             
@@ -148,12 +161,11 @@ class TestProjectLifecycleE2E:
             finally:
                 ui_impl.create_file_dialog = original_create_file_dialog
     
-    def test_project_open_view_functionality(self):
+    def test_project_open_view_functionality(self, ui_implementation):
         """Test that project open view works correctly"""
+        ui_impl, ui_type = ui_implementation
         # Create UI factory and application
-        ui_factory = create_ui_factory("script", verbose=False)
-        ui_impl = ui_factory.get_ui_implementation()
-        ui_impl.initialize()
+        ui_factory = create_ui_factory(ui_type, verbose=False)
         
         app = CurioShelfApplicationImpl(ui_factory)
         
@@ -183,13 +195,12 @@ class TestProjectLifecycleE2E:
         assert hasattr(project_open_view, '_browse_for_project'), "Should have browse for project handler"
         assert hasattr(project_open_view, '_on_cancel'), "Should have cancel handler"
     
-    def test_project_open_view_with_existing_project(self):
+    def test_project_open_view_with_existing_project(self, ui_implementation):
         """Test project open view with an existing project"""
+        ui_impl, ui_type = ui_implementation
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create UI factory and application
-            ui_factory = create_ui_factory("script", verbose=False)
-            ui_impl = ui_factory.get_ui_implementation()
-            ui_impl.initialize()
+            ui_factory = create_ui_factory(ui_type, verbose=False)
             
             app = CurioShelfApplicationImpl(ui_factory)
             

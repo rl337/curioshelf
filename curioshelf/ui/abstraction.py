@@ -425,9 +425,19 @@ class UIListItem:
         """Set the text of the item"""
         self._text = text
     
-    def get_data(self) -> Any:
-        """Get the data of the item"""
-        return self._data
+    def get_data(self, key: str = None) -> Any:
+        """Get the data of the item. If key is provided, return the value for that key from a dictionary."""
+        if key is None:
+            return self._data
+        elif isinstance(self._data, dict):
+            return self._data.get(key)
+        elif isinstance(self._data, tuple) and len(self._data) == 2:
+            # Backward compatibility: if data is a tuple (path, name), map keys
+            if key == "path":
+                return self._data[0]
+            elif key == "name":
+                return self._data[1]
+        return None
     
     def set_data(self, *args) -> None:
         """Set the data of the item. Can accept multiple arguments."""
